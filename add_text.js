@@ -24,7 +24,7 @@ files.forEach(file => {
             // Check if the text is already there to prevent duplication
             if (p1.includes('nav-logo-text')) return match;
 
-            return `${p1}\n          <div class="nav-logo-text" style="font-family: var(--font-display); font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px; margin-left: 10px;">Shaivika <span>Groups</span></div>\n        ${p2}`;
+            return `${p1}\n          <div class="nav-logo-text" style="font-family: var(--font-display); font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px; margin-left: 10px;">Shaivika IT&nbsp;<span>Technologies</span></div>\n        ${p2}`;
         });
 
         fs.writeFileSync(filePath, updatedContent, 'utf8');

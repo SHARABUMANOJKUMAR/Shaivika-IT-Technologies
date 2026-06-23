@@ -1,5 +1,5 @@
 /**
- * SHAIVIKA GROUPS - Main JavaScript
+ * SHAIVIKA IT TECHNOLOGIES - Main JavaScript
  * Shared utilities: navbar, scroll reveal, animations, counter
  */
 
