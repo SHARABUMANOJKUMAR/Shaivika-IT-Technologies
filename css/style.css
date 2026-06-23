@@ -183,12 +183,12 @@ section {
 }
 
 .navbar.scrolled {
-  background: rgba(3, 7, 18, 0.92);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-glass);
   padding: 14px 0;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
 }
 
 .nav-container {
@@ -423,9 +423,9 @@ section {
 
 .nav-links a {
   text-decoration: none;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
   padding: 8px 14px;
   border-radius: 8px;
   transition: all var(--transition-fast);
@@ -433,12 +433,13 @@ section {
 
 .nav-links a:hover,
 .nav-links a.active {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .nav-links a.active {
-  color: var(--accent);
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .nav-cta {

@@ -192,7 +192,7 @@
       <a href="index.html" class="nav-logo">
           <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" alt="Shaivika IT Technologies Logo" class="logo-main-img">
           <div class="nav-logo-text-wrapper" style="display: flex; flex-direction: column; justify-content: center; margin-left: 8px;">
-              <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
+              <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
               <div class="nav-brand-sub" style="font-family: var(--font-primary), sans-serif; font-size: 11px; font-weight: 700; color: #a272eb; letter-spacing: 3.5px; line-height: 1; margin-top: 5px;">IT TECHNOLOGIES</div>
           </div>
         </a>
@@ -237,60 +237,33 @@
     <div class="orb orb-3"></div>
 
     
-    <!-- 3D Spline Animation -->
-    <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 50%; height: 100%; z-index: 0; display: flex; align-items: center; justify-content: center;">
-      <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
-      <spline-viewer url="https://prod.spline.design/2d006c9e-5bc5-42cd-9eac-88e751a2774a/scene.splinecode" style="width: 100%; height: 100%;"></spline-viewer>
-    </div>
-
-    <div class="hero-content" style="position: relative; z-index: 1;">
-      <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        🚀 Next-Gen Digital Solutions Company — Kadapa, India
-      </div>
-      <h1 class="hero-title" style="font-size: clamp(2.5rem, 4.5vw, 3.5rem);">
-        Premium Digital Systems <br>
-        <span class="gradient-text">Built to Inspire Confidence and Drive Growth.</span>
-      </h1>
-      <p class="hero-subtitle">
-        We craft cutting-edge web applications, AI-powered automations, SaaS platforms, and intelligent dashboards —
-        transforming your vision into high-performance digital reality.
-      </p>
-      <div class="hero-actions">
-        <a href="contact.html" class="btn btn-primary btn-lg">
-          <span>🚀</span> Get Started
-        </a>
-        <a href="portfolio.html" class="btn btn-ghost btn-lg">
-          <span>👁️</span> View Our Work
-        </a>
-      </div>
-    </div>
-
-    <div class="hero-content hero-content-split">
+    <!-- Luxury Single Hero Section with 3D Spline -->
+    <div class="hero-content hero-content-split" style="position: relative; z-index: 10; pointer-events: none;">
       <div class="hero-text-col" style="pointer-events: auto;">
-        <div class="hero-badge">
-          <span class="hero-badge-dot"></span>
-          🚀 Next-Gen Digital Solutions Company — Kadapa, India
+        <div class="hero-badge" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); color: var(--text-primary); font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          <span class="hero-badge-dot" style="background: var(--primary);"></span>
+          🚀 Next-Gen Digital Solutions Company
         </div>
-        <h1 class="hero-title" style="font-size: clamp(2.5rem, 4.5vw, 3.5rem);">
+        <h1 class="hero-title" style="font-size: clamp(2.8rem, 5vw, 4.2rem); line-height: 1.15; font-weight: 800; color: var(--text-primary); letter-spacing: -1px;">
           Premium Digital Systems <br>
-          <span class="gradient-text">Built to Inspire Confidence and Drive Growth.</span>
+          <span class="gradient-text" style="background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Built to Inspire Confidence.</span>
         </h1>
-        <p class="hero-subtitle">
+        <p class="hero-subtitle" style="font-size: 1.15rem; color: var(--text-secondary); max-width: 90%; line-height: 1.7;">
           We craft cutting-edge web applications, AI-powered automations, SaaS platforms, and intelligent dashboards —
           transforming your vision into high-performance digital reality.
         </p>
-        <div class="hero-actions">
-          <a href="contact.html" class="btn btn-primary btn-lg">
-            <span>🚀</span> Get Started
+        <div class="hero-actions" style="margin-top: 2.5rem;">
+          <a href="contact.html" class="btn btn-primary btn-lg" style="box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); letter-spacing: 0.5px; padding: 14px 32px; border-radius: 12px; font-weight: 600;">
+            Get Started
           </a>
-          <a href="portfolio.html" class="btn btn-ghost btn-lg">
-            <span>👁️</span> View Our Work
+          <a href="portfolio.html" class="btn btn-ghost btn-lg" style="color: var(--text-primary); border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); padding: 14px 32px; border-radius: 12px; font-weight: 600;">
+            View Our Work
           </a>
         </div>
       </div>
-      <div class="hero-lottie-col">
-        <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_w51pcehl.json" background="transparent" speed="1" style="width: 100%; max-width: 600px; margin: 0 auto; filter: drop-shadow(0 0 30px rgba(37, 99, 235, 0.3));" loop autoplay></lottie-player>
+      <div class="hero-lottie-col" style="position: relative; min-height: 750px; display: flex; align-items: center; justify-content: center; pointer-events: auto;">
+        <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+        <dotlottie-wc src="https://lottie.host/90f7d4f2-19d0-4667-9f1b-45a31b37f1b3/jv5D0PXI0C.lottie" style="width: 100%; max-width: 900px; height: auto; transform: scale(1.85); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));" autoplay loop></dotlottie-wc>
       </div>
     </div>
   </section>
@@ -326,7 +299,7 @@
     <div class="container">
       <div class="section-header">
         <div class="section-badge">What We Offer</div>
-        <h2 class="section-title">Best AI Automation Company in <span class="gradient-text">Kadapa</span></h2>
+        <h2 class="section-title">Best AI Automation Company</h2>
         <p class="section-subtitle">From AI automations to enterprise web apps — we deliver solutions that drive growth
           and efficiency.</p>
       </div>
