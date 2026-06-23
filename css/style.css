@@ -298,7 +298,7 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: logo-levitate 5s ease-in-out infinite;
+  
   transform-style: preserve-3d;
   perspective: 800px;
   transition: transform 0.15s ease-out;
@@ -315,7 +315,7 @@ section {
 
 
 /* ── Particle aura ── */
-.logo-particle {
+.logo-particle { display: none !important; 
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
@@ -368,18 +368,18 @@ section {
   z-index: 1;
   width: 52px;
   height: 52px;
-  border-radius: 50%;
+  
   object-fit: cover;
   background: transparent;
   display: block;
-  clip-path: circle(50%);
+  
   /* Slow zoom-in / zoom-out pulse */
-  animation: ring-zoom 4s ease-in-out infinite;
+  
   transition: transform 0.4s ease;
 }
 
 /* ── Reflection ── */
-.logo-reflection {
+.logo-reflection { display: none !important; 
   position: absolute;
   top: calc(100% + 4px);
   left: 50%;
