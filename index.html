@@ -236,15 +236,34 @@
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
-    <div class="butterflies-container">
-      <div class="css-butterfly b1" style="--s: 0.9;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
-      <div class="css-butterfly b2" style="--s: 0.6;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
-      <div class="css-butterfly b3" style="--s: 0.7;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
-      <div class="css-butterfly b4" style="--s: 0.8;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
-      <div class="css-butterfly b5" style="--s: 0.5;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
-      <div class="css-butterfly b6" style="--s: 0.65;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
-      <div class="css-butterfly b7" style="--s: 0.4;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
-      <div class="css-butterfly b8" style="--s: 0.75;"><div class="wing left-wing"></div><div class="wing right-wing"></div></div>
+    
+    <!-- 3D Spline Animation -->
+    <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 50%; height: 100%; z-index: 0; display: flex; align-items: center; justify-content: center;">
+      <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
+      <spline-viewer url="https://prod.spline.design/2d006c9e-5bc5-42cd-9eac-88e751a2774a/scene.splinecode" style="width: 100%; height: 100%;"></spline-viewer>
+    </div>
+
+    <div class="hero-content" style="position: relative; z-index: 1;">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        🚀 Next-Gen Digital Solutions Company — Kadapa, India
+      </div>
+      <h1 class="hero-title" style="font-size: clamp(2.5rem, 4.5vw, 3.5rem);">
+        Premium Digital Systems <br>
+        <span class="gradient-text">Built to Inspire Confidence and Drive Growth.</span>
+      </h1>
+      <p class="hero-subtitle">
+        We craft cutting-edge web applications, AI-powered automations, SaaS platforms, and intelligent dashboards —
+        transforming your vision into high-performance digital reality.
+      </p>
+      <div class="hero-actions">
+        <a href="contact.html" class="btn btn-primary btn-lg">
+          <span>🚀</span> Get Started
+        </a>
+        <a href="portfolio.html" class="btn btn-ghost btn-lg">
+          <span>👁️</span> View Our Work
+        </a>
+      </div>
     </div>
 
     <div class="hero-content hero-content-split">
