@@ -394,3 +394,38 @@ document.addEventListener('DOMContentLoaded', () => {
   initParallax();
   initLogoTilt();
 });
+
+
+
+/* ===== THEME TOGGLE LOGIC ===== */
+(function() {
+    console.log('Theme toggle script loaded.');
+    const root = document.documentElement;
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    
+    function updateTheme(theme) {
+        if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+            document.querySelectorAll('.theme-toggle-btn').forEach(btn => btn.innerHTML = '&#x2600;');
+        } else {
+            root.removeAttribute('data-theme');
+            document.querySelectorAll('.theme-toggle-btn').forEach(btn => btn.innerHTML = '&#x1F319;');
+        }
+    }
+    
+    // Set initial
+    updateTheme(currentTheme);
+
+    // Event delegation for clicks
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.theme-toggle-btn');
+        if (btn) {
+            e.preventDefault();
+            const isDark = root.hasAttribute('data-theme');
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            updateTheme(newTheme);
+            console.log('Theme changed to', newTheme);
+        }
+    });
+})();
