@@ -206,9 +206,24 @@
             }
         }
     </style>
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
 </head>
 
 <body>
+  <!-- GLOBAL PRELOADER -->
+  <div id="global-preloader">
+    <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 300px; height: 300px" autoplay loop></dotlottie-wc>
+  </div>
+  <script>
+    window.addEventListener('load', function() {
+      const loader = document.getElementById('global-preloader');
+      if (loader) {
+        setTimeout(() => {
+          loader.classList.add('preloader-hidden');
+        }, 1200);
+      }
+    });
+  </script>
 
     <!-- NAVBAR -->
     <nav class="navbar" id="navbar">
