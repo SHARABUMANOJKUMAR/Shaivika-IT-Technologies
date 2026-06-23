@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Dynamic Title & SEO Tags -->
+    <title id="meta-title">Loading Article... | Shaivika IT Solutions</title>
+    <meta id="meta-desc" name="description" content="Loading premium AI and business automation article..." />
+    <meta name="keywords" content="AI Automation, Web Development, SaaS, Business Automation" />
+    <meta name="author" content="Shaivika IT Solutions">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta id="og-title" property="og:title" content="Loading Article... | Shaivika IT Solutions">
+    <meta id="og-desc" property="og:description" content="Loading premium AI and business automation article...">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://shaivikagroups.in/article.html">
+    <meta property="og:image" content="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1776591361/Shaivika_Groups_favicon_hzys7o.png">
+
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/t_shaivikafavicon/Shaivika_Groups_favicon_hzys7o.png" />
+
+    <!-- Core Stylesheet -->
+    <link rel="stylesheet" href="css/style.min.css" />
+    <!-- Premium Article Stylesheet -->
+    <link rel="stylesheet" href="css/article.css" />
+</head>
+
+<body>
+    <!-- Reading Progress Bar -->
+    <div class="reading-progress-container">
+        <div class="reading-progress-bar" id="reading-progress"></div>
+    </div>
+
+    <!-- NAVBAR (Same as global) -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-float-system" data-logo-tilt>
+                    <div class="logo-glow-ring"></div>
+                    <span class="logo-particle"></span><span class="logo-particle"></span>
+                    <span class="logo-particle"></span><span class="logo-particle"></span>
+                    <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1776591361/Shaivika_Groups_favicon_hzys7o.png" alt="Logo" class="logo-main-img" loading="lazy">
+                    <div class="logo-reflection"><img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1776591361/Shaivika_Groups_favicon_hzys7o.png" alt="Logo Reflection" loading="lazy"></div>
+                </div>
+                <div class="nav-logo-text"
+                    style="font-family: var(--font-display); font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px; margin-left: 10px; margin-bottom: 14px; display: flex; align-items: center;">
+                    Shaivika&nbsp;<span>Groups</span></div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a href="contact.html" class="btn btn-ghost btn-sm">Get in Touch</a>
+                <a href="services.html" class="btn btn-primary btn-sm">Our Services</a>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+    <div class="mobile-nav" id="mobileNav">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="blog.html" class="active">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="mobile-nav-cta">
+            <a href="contact.html" class="btn btn-ghost">Get in Touch</a>
+            <a href="services.html" class="btn btn-primary">Our Services</a>
+        </div>
+    </div>
+
+    <main id="article-loader"
+        style="text-align:center; padding: 200px 20px; color: var(--text-secondary); font-size: 1.5rem;">
+        Loading Premium Article... ⚡
+    </main>
+
+    <div id="article-container" style="display: none;">
+        <!-- HERO SECTION -->
+        <header class="article-hero reveal">
+            <div class="hero-bg"></div>
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="container">
+                <div class="section-badge" id="hero-badge">Knowledge Hub</div>
+                <h1 class="article-title" id="hero-title"></h1>
+                <p class="article-subtitle" id="hero-subtitle"></p>
+
+                <div class="article-badges" id="hero-tags"></div>
+
+                <div class="article-meta-row">
+                    <div class="blog-author-avatar" id="hero-avatar"></div>
+                    <div>
+                        <div class="blog-author-name" id="hero-author-name"></div>
+                        <div class="blog-author-date" style="color:var(--text-muted); font-size: 14px;"><span
+                                id="hero-date"></span> &bull; <span id="hero-read-time"></span></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <section class="reveal">
+            <div class="article-layout">
+                <!-- Share Sidebar -->
+                <aside class="share-sidebar">
+                    <button class="share-btn" onclick="shareTo('twitter')" title="Share on Twitter/X">
+                        X
+                    </button>
+                    <button class="share-btn" onclick="shareTo('linkedin')" title="Share on LinkedIn">
+                        in
+                    </button>
+                    <button class="share-btn" onclick="shareTo('whatsapp')" title="Share on WhatsApp">
+                        <svg width="20" height="20" viewBox="0 0 48 48">
+                            <path fill="currentColor"
+                                d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
+                        </svg>
+                    </button>
+                    <button class="share-btn" onclick="copyLink()" title="Copy Link">
+                        🔗
+                    </button>
+                </aside>
+
+                <!-- Article Core -->
+                <article class="article-body">
+                    <!-- Featured Image -->
+                    <div class="article-feature-image">
+                        <span id="hero-featured-image">🤖</span>
+                    </div>
+
+                    <!-- Dynamic HTML Content -->
+                    <div id="article-main-content"></div>
+
+                    <!-- Project Showcase Section -->
+                    <div class="article-showcase reveal" id="showcase-section">
+                        <h2 id="showcase-title"></h2>
+                        <p id="showcase-desc"></p>
+                        <div class="tech-grid" id="showcase-tech"></div>
+                        <ul class="tech-features-list" id="showcase-features"></ul>
+                    </div>
+
+                    <!-- Benefits Section -->
+                    <div class="benefits-grid reveal" id="benefits-section"></div>
+
+                    <!-- Client Attraction Section -->
+                    <div class="client-attraction reveal" id="attraction-section">
+                        <h2>Why Businesses Choose Us</h2>
+                        <ul class="client-attraction-list" id="attraction-list"></ul>
+                    </div>
+                </article>
+
+                <!-- Right Sidebar (Empty for Layout Balance) -->
+                <div class="empty-sidebar"></div>
+            </div>
+        </section>
+
+        <!-- BOTTOM CTA -->
+        <section class="container reveal">
+            <div class="article-cta">
+                <h2>Ready for End-to-End Automation?</h2>
+                <div class="cta-buttons">
+                    <a href="contact.html" class="btn btn-primary" style="padding: 16px 32px; font-size: 1.1rem;">Book
+                        Free Consultation</a>
+                    <a href="https://wa.me/917013550760?text=Hi!%20I%20just%20read%20your%20article%20on%20AI%20Automation.%20I%20want%20to%20know%20more."
+                        target="_blank" class="btn btn-ghost"
+                        style="padding: 16px 32px; font-size: 1.1rem; border-color:#4caf50; color:#4caf50;">WhatsApp Us
+                        Now</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED ARTICLES -->
+        <section class="container reveal" style="margin-bottom: 80px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:40px;">
+                <h2 style="font-size:2rem; font-weight:700;">More Articles</h2>
+                <a href="blog.html" class="btn btn-ghost btn-sm">View All Blog →</a>
+            </div>
+            <div class="blog-grid" id="related-articles-container">
+                <!-- Populated dynamically via JS or hardcoded fallbacks here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- EXIT INTENT POPUP -->
+    <div class="exit-popup-overlay" id="exitPopup">
+        <div class="exit-popup">
+            <button class="popup-close" id="closePopup">&times;</button>
+            <div class="section-badge" style="margin: 0 auto 16px;">🎁 Free Gift</div>
+            <h3>Get The WhatsApp Automation Blueprint PDF</h3>
+            <p style="color:var(--text-secondary); margin-bottom:32px;">Learn the exact step-by-step framework we use to
+                automate sales pipelines for 50+ Indian SMEs.</p>
+            <form class="popup-form" id="popupForm" onsubmit="return false">
+                <input type="text" name="name" placeholder="Your Full Name" required>
+                <input type="email" name="email" placeholder="Your Business Email" required>
+                <input type="tel" name="whatsapp" placeholder="WhatsApp Number" required>
+                <button type="submit" class="btn btn-primary neon-glow" style="width:100%; margin-top:16px;">Send Me The
+                    Blueprint →</button>
+            </form>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:16px;">We hate spam as much as you do. 100%
+                Privacy guaranteed.</p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo">
+                        <div class="logo-float-system" data-logo-tilt>
+                            <div class="logo-glow-ring"></div>
+                            <span class="logo-particle"></span><span class="logo-particle"></span>
+                            <span class="logo-particle"></span><span class="logo-particle"></span>
+                            <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1776591361/Shaivika_Groups_favicon_hzys7o.png" alt="Shaivika IT Solutions Footer Logo" class="logo-main-img"
+                                loading="lazy">
+                            <div class="logo-reflection"><img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1776591361/Shaivika_Groups_favicon_hzys7o.png"
+                                    alt="Shaivika IT Solutions Logo Reflection" loading="lazy"></div>
+                        </div>
+                        <div class="nav-logo-text"
+                            style="font-family: var(--font-display); font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px; margin-left: 10px; margin-bottom: 14px; display: flex; align-items: center;">
+                            Shaivika&nbsp;<span>Groups</span></div>
+                    </a>
+                    <p>
+                        Shaivika IT Solutions is a trusted software company in Kadapa, Andhra Pradesh.
+                        We provide AI automation services, web development, SaaS solutions, CRM systems,
+                        and digital business tools for startups and enterprises across India.
+                    </p>
+                    <div class="footer-socials">
+                        <a href="https://wa.me/917013550760" class="social-btn"><svg xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48" width="22" height="22">
+                                <path fill="#40c351"
+                                    d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
+                                <path fill="#fff" fill-rule="evenodd"
+                                    d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
+                                    clip-rule="evenodd" />
+                            </svg></a>
+                        <a href="mailto:shaivikagroups@gmail.com" class="social-btn"><svg
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22">
+                                <path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z" />
+                                <path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z" />
+                                <polygon fill="#e53935"
+                                    points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17" />
+                                <path fill="#c62828"
+                                    d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
+                                <path fill="#fbc02d"
+                                    d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
+                            </svg></a>
+                        <a href="https://www.linkedin.com/in/shaivika-groups-7823ab362?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                            class="social-btn" title="LinkedIn" target="_blank"><svg xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48" width="22" height="22">
+                                <path fill="#0288D1"
+                                    d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5V37z" />
+                                <path fill="#FFF"
+                                    d="M12 19H17V36H12zM14.485 17h-.028C12.965 17 12 15.888 12 14.499 12 13.08 12.995 12 14.514 12c1.521 0 2.458 1.08 2.486 2.499C17 15.887 16.035 17 14.485 17zM36 36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698-1.501 0-2.313 1.012-2.707 1.99C24.957 25.543 25 26.511 25 27v9h-5V19h5v2.616C25.721 20.5 26.85 19 29.738 19c3.578 0 6.261 2.25 6.261 7.274L36 36 36 36z" />
+                            </svg></a>
+                        <a href="https://www.instagram.com/shaivika_india?igsh=cGdjNXB3eDgwbWk=" class="social-btn"
+                            title="Instagram" target="_blank"><svg xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48" width="22" height="22">
+                                <radialGradient id="ig_gr1" cx="19.38" cy="42.035" r="44.899"
+                                    gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#fd5" />
+                                    <stop offset=".328" stop-color="#ff543f" />
+                                    <stop offset=".348" stop-color="#fc5245" />
+                                    <stop offset=".504" stop-color="#e64771" />
+                                    <stop offset=".643" stop-color="#d53e91" />
+                                    <stop offset=".761" stop-color="#cc39a4" />
+                                    <stop offset=".841" stop-color="#c837ab" />
+                                </radialGradient>
+                                <path fill="url(#ig_gr1)"
+                                    d="M34.017,41.99l-20,0.019c-4.4,0.004-8.003-3.592-8.008-7.992l-0.019-20c-0.004-4.4,3.592-8.003,7.992-8.008l20-0.019c4.4-0.004,8.003,3.592,8.008,7.992l0.019,20C42.014,38.383,38.417,41.986,34.017,41.99z" />
+                                <path fill="#fff"
+                                    d="M24,31c-3.859,0-7-3.14-7-7s3.141-7,7-7s7,3.14,7,7S27.859,31,24,31z M24,19c-2.757,0-5,2.243-5,5s2.243,5,5,5s5-2.243,5-5S26.757,19,24,19z" />
+                                <circle cx="31.5" cy="16.5" r="1.5" fill="#fff" />
+                                <path fill="#fff"
+                                    d="M30,37H18c-3.859,0-7-3.14-7-7V18c0-3.86,3.141-7,7-7h12c3.859,0,7,3.14,7,7v12C37,33.86,33.859,37,30,37z M18,13c-2.757,0-5,2.243-5,5v12c0,2.757,2.243,5,5,5h12c2.757,0,5-2.243,5-5V18c0-2.757-2.243-5-5-5H18z" />
+                            </svg></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="services.html#web-dev">Web Development</a></li>
+                        <li><a href="services.html#ai-automation">AI Automations</a></li>
+                        <li><a href="services.html#saas">SaaS Platforms</a></li>
+                        <li><a href="services.html#dashboards">Dashboards</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-links">
+                        <li><a href="tel:+917013550760"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"
+                                    width="20" height="20" style="flex-shrink: 0;">
+                                    <path fill="#43a047"
+                                        d="M13.25 21.59c2.88 5.66 7.51 10.29 13.18 13.17l4.4-4.41c.55-.55 1.34-.71 2.03-.49C35.1 30.6 37.51 31 40 31c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2C21.22 42 6 26.78 6 8c0-1.1.9-2 2-2h7c1.1 0 2 .9 2 2 0 2.5.4 4.9 1.14 7.14.22.69.06 1.48-.49 2.03l-4.4 4.42z" />
+                                </svg> +91 7013550760</a></li>
+                        <li><a href="mailto:shaivikagroups@gmail.com"><svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
+                                    <path fill="#4caf50"
+                                        d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z" />
+                                    <path fill="#1e88e5"
+                                        d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z" />
+                                    <polygon fill="#e53935"
+                                        points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17" />
+                                    <path fill="#c62828"
+                                        d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
+                                    <path fill="#fbc02d"
+                                        d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
+                                </svg> shaivikagroups@gmail.com</a></li>
+                        <li><a href="https://wa.me/917013550760"><svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
+                                    <path fill="#40c351"
+                                        d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
+                                    <path fill="#fff" fill-rule="evenodd"
+                                        d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
+                                        clip-rule="evenodd" />
+                                </svg> WhatsApp</a></li>
+                        <li><a href="contact.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"
+                                    width="20" height="20" style="flex-shrink: 0;">
+                                    <path fill="#e53935"
+                                        d="M24 4C16.27 4 10 10.27 10 18c0 11.25 14 26 14 26s14-14.75 14-26c0-7.73-6.27-14-14-14zm0 19c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+                                </svg> Kadapa, AP</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Shaivika Groups. All rights reserved.</p>
+                <p>Crafted with ❤️ in Kadapa, Andhra Pradesh</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Load Data & Logic -->
+    <script src="js/blog-data.js"></script>
+    <script src="js/article.js"></script>
+    <script src="js/main.min.js" defer></script>
+</body>
+
+</html>
