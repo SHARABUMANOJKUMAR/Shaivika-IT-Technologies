@@ -30,7 +30,7 @@
   --font-primary: 'Inter', sans-serif;
   --font-display: 'Orbitron', sans-serif;
   --font-secondary: 'Space Grotesk', sans-serif;
-  --section-padding: 100px 0;
+  --section-padding: 60px 0;
   --container-max: 1280px;
   --container-pad: 0 40px;
   --transition-fast: 0.2s ease;
@@ -177,7 +177,7 @@ section {
 
 .section-header {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: 40px;
 }
 
 .section-header .section-subtitle {
@@ -683,7 +683,7 @@ section {
   text-align: center;
   position: relative;
   overflow: hidden;
-  padding: 120px 20px 80px 20px;
+  padding: 100px 20px 60px 20px;
 }
 
 .hero-bg {
@@ -832,9 +832,20 @@ section {
 
 .hero-lottie-col {
   flex: 1;
+  position: relative;
+  min-height: 500px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.hero-lottie {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  transform: scale(1.45);
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
 }
 
 .hero-content-split .hero-subtitle {
@@ -847,7 +858,7 @@ section {
 
 @media (max-width: 900px) {
   .hero-content-split {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     text-align: center;
     gap: 20px;
   }
@@ -2139,7 +2150,7 @@ footer {
 @media (max-width:768px) {
   :root {
     --container-pad: 0 20px;
-    --section-padding: 70px 0;
+    --section-padding: 40px 0;
   }
 
   .nav-links,
@@ -2162,6 +2173,19 @@ footer {
   .values-grid,
   .blog-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-lottie-col {
+    min-height: auto;
+    padding: 20px 0;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .hero-lottie {
+    transform: scale(1.2);
+    width: 100%;
+    max-width: 400px;
   }
 
   .team-grid {
@@ -2231,7 +2255,7 @@ footer {
 @media (max-width:480px) {
   :root {
     --container-pad: 0 16px;
-    --section-padding: 60px 0;
+    --section-padding: 30px 0;
   }
 
   .section-title {
@@ -2249,6 +2273,17 @@ footer {
   .hero-badge {
     font-size: 11px;
     padding: 6px 14px;
+  }
+
+  .hero-lottie-col {
+    min-height: auto;
+    padding: 10px 0;
+    margin-top: 0;
+  }
+
+  .hero-lottie {
+    transform: scale(1.3);
+    max-width: 300px;
   }
 
   .nav-logo-text {
@@ -2277,5 +2312,47 @@ footer {
 @media (min-width:2560px) {
   :root {
     --container-max: 2000px;
+  }
+}
+
+/* ============================================
+   MOBILE DESKTOP VIEW FIX
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .desktop-view .hero,
+  .desktop-view .hero-section {
+    min-height: auto !important;
+    height: auto !important;
+    padding-top: 80px !important;
+    padding-bottom: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .desktop-view .hero-content {
+    transform: none !important;
+    margin: 0 auto !important;
+    max-width: 95% !important;
+  }
+
+  .desktop-view .floating-card {
+    position: absolute;
+    scale: 0.8;
+  }
+
+  .desktop-view .hero-title {
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .desktop-view .hero-description,
+  .desktop-view .hero-subtitle {
+    max-width: 90%;
+    margin: auto;
+  }
+
+  body {
+    overflow-x: hidden !important;
   }
 }

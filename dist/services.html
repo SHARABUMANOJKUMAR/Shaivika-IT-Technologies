@@ -1,0 +1,903 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Automation & Web Services | Shaivika IT Technologies Kadapa</title>
+    <meta name="description"
+        content="Comprehensive digital services by Shaivika IT Technologies: AI automation, CRM development, SaaS platforms, SEO, and custom software in Kadapa and beyond." />
+    <meta name="keywords"
+        content="AI services Andhra Pradesh, WhatsApp automation Kadapa, CRM systems India, web development services, Shaivika IT Technologies offerings" />
+    <meta name="author" content="Shaivika IT Technologies">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Services | Shaivika IT Technologies – AI & Software Experts">
+    <meta property="og:description"
+        content="From intelligent automation to high-performance web apps, explore our full suite of digital solutions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shaivikagroups.in/services.html">
+    <meta property="og:image" content="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" />
+    <link rel="stylesheet" href="css/style.min.css?v=2" />
+    <style>
+        .services-content {
+            padding-top: 40px;
+        }
+
+        .services-section-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .services-section-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 36px;
+        }
+
+        .services-panel {
+            display: none;
+        }
+
+        .services-panel.active {
+            display: block;
+        }
+
+        .service-list-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .service-list-item {
+            padding: 28px;
+            border-radius: 16px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            transition: all var(--transition-smooth);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .service-list-item:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .sli-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .sli-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .sli-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .saas-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .saas-card {
+            padding: 28px;
+            border-radius: 16px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            transition: all var(--transition-smooth);
+        }
+
+        .saas-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .saas-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .saas-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .course-card {
+            padding: 28px;
+            border-radius: 16px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            text-align: center;
+            transition: all var(--transition-smooth);
+        }
+
+        .course-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .course-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .course-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .course-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .ai-sub-list {
+            list-style: none;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ai-sub-list li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            background: rgba(0, 102, 255, 0.06);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-sub-list li::before {
+            content: '→';
+            color: var(--neon-blue);
+            font-weight: 700;
+        }
+
+        @media(max-width:900px) {
+
+            .service-list-grid,
+            .saas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .course-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width:600px) {
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-section-title {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+</head>
+
+<body>
+  <!-- GLOBAL PRELOADER -->
+  <div id="global-preloader">
+    <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 300px; height: 300px" autoplay loop></dotlottie-wc>
+  </div>
+  <script>
+    window.addEventListener('load', function() {
+      const loader = document.getElementById('global-preloader');
+      if (loader) {
+        setTimeout(() => {
+          loader.classList.add('preloader-hidden');
+        }, 1200);
+      }
+    });
+  </script>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+          <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" alt="Shaivika IT Technologies Logo" class="logo-main-img">
+          <div class="nav-logo-text-wrapper" style="display: flex; flex-direction: column; justify-content: center; margin-left: 8px;">
+              <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
+              <div class="nav-brand-sub" style="font-family: var(--font-primary), sans-serif; font-size: 11px; font-weight: 700; color: #a272eb; letter-spacing: 3.5px; line-height: 1; margin-top: 5px;">IT TECHNOLOGIES</div>
+          </div>
+        </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html" class="active">Services</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-cta">
+          <button class="theme-toggle-btn" aria-label="Toggle Theme">🌙</button>
+                <a href="contact.html" class="btn btn-ghost btn-sm">Get in Touch</a>
+                <a href="contact.html" class="btn btn-primary btn-sm">Get a Quote</a>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+    <div class="mobile-nav" id="mobileNav">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html" class="active">Services</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="mobile-nav-cta">
+          <button class="theme-toggle-btn" aria-label="Toggle Theme" style="margin-right: 15px;">🌙</button>
+            <a href="contact.html" class="btn btn-ghost">Get in Touch</a>
+            <a href="contact.html" class="btn btn-primary">Get a Quote</a>
+        </div>
+    </div>
+
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="hero-content">
+            <div class="section-badge">Complete IT Suite</div>
+            <h1 class="section-title" style="font-size:clamp(2.5rem,5vw,4rem);">Shaivika IT Technologies – <span
+                    class="gradient-text">Services</span></h1>
+            <p class="section-subtitle" style="margin:0 auto;">From manual custom services to full SaaS platforms —
+                everything your business needs to thrive in the digital age.</p>
+        </div>
+    </section>
+
+    <!-- SERVICES LAYOUT WITH SIDEBAR -->
+    <section style="padding:60px 0 100px;">
+        <div class="container">
+            <div class="services-layout">
+
+                <!-- SIDEBAR NAV -->
+                <aside class="services-sidebar">
+                    <div class="sidebar-title">Navigation</div>
+                    <ul class="sidebar-nav" id="servicesSidebar">
+                        <li>
+                            <a href="#" class="active" data-panel="pages">
+                                <span class="nav-icon">📄</span> Pages
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-panel="manual">
+                                <span class="nav-icon">🛠️</span> Manual Services
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-panel="saas">
+                                <span class="nav-icon">☁️</span> SaaS Services
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-panel="courses">
+                                <span class="nav-icon">🎓</span> Learning Courses
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- CONTENT PANELS -->
+                <div class="services-content">
+
+                    <!-- PAGES PANEL -->
+                    <div class="services-panel active" id="panel-pages">
+                        <div class="section-badge">Quick Access</div>
+                        <h2 class="services-section-title">Service <span class="gradient-text">Pages</span></h2>
+                        <p class="services-section-desc">Jump directly to the service category that best fits your
+                            business needs.</p>
+                        <div class="service-list-grid">
+                            <div class="service-list-item reveal delay-1" style="cursor:pointer;"
+                                onclick="switchPanel('manual')">
+                                <div class="sli-icon">🛠️</div>
+                                <div>
+                                    <div class="sli-title">Manual Services</div>
+                                    <p class="sli-desc">Custom-built web apps, AI automations, SEO, dashboards,
+                                        chatbots, logo design, and more tailored solutions.</p>
+                                </div>
+                            </div>
+                            <div class="service-list-item reveal delay-2" style="cursor:pointer;"
+                                onclick="switchPanel('saas')">
+                                <div class="sli-icon">☁️</div>
+                                <div>
+                                    <div class="sli-title">SaaS Services</div>
+                                    <p class="sli-desc">20+ production-ready SaaS products — Real Estate CRM, AI Resume
+                                        Builder, ATS Systems, and more.</p>
+                                </div>
+                            </div>
+                            <div class="service-list-item reveal delay-3" style="cursor:pointer;"
+                                onclick="switchPanel('courses')">
+                                <div class="sli-icon">🎓</div>
+                                <div>
+                                    <div class="sli-title">Learning Courses</div>
+                                    <p class="sli-desc">Skill-based courses in AI, web development, automation, SEO, and
+                                        digital marketing for individuals and teams.</p>
+                                </div>
+                            </div>
+                            <div class="service-list-item reveal delay-4">
+                                <div class="sli-icon">📞</div>
+                                <div>
+                                    <div class="sli-title">Free Consultation</div>
+                                    <p class="sli-desc">Not sure which service fits? <a href="contact.html"
+                                            style="color:var(--accent);">Book a free call</a> with our experts and get a
+                                        custom recommendation.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MANUAL SERVICES PANEL -->
+                    <div class="services-panel" id="panel-manual">
+                        <div class="section-badge">Custom Solutions</div>
+                        <h2 class="services-section-title">Manual <span class="gradient-text">Engineering
+                                Services</span></h2>
+                        <p class="services-section-desc">Handcrafted, bespoke digital solutions by the best software
+                            company in Kadapa. We build
+                            digital systems that automate, scale and future-proof modern businesses.</p>
+
+                        <div class="service-list-grid">
+                            <!-- 1 -->
+                            <div class="service-list-item reveal delay-1" id="web-dev">
+                                <div class="sli-icon">🌐</div>
+                                <div>
+                                    <div class="sli-title">Web & App Development (2-in-1)</div>
+                                    <p class="sli-desc">Full-stack web and mobile app development using React, Next.js,
+                                        Node.js with responsive, mobile-first design for all screen sizes.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 2 AI Automations -->
+                            <div class="service-list-item reveal delay-2" id="ai-automation"
+                                style="flex-direction:column;">
+                                <div style="display:flex;gap:16px;align-items:flex-start;">
+                                    <div class="sli-icon">🤖</div>
+                                    <div>
+                                        <div class="sli-title">AI Automations Suite</div>
+                                        <p class="sli-desc">Leading AI automation company in Kadapa providing end-to-end
+                                            solutions across messaging platforms, HR, and business pipelines:</p>
+                                    </div>
+                                </div>
+                                <ul class="ai-sub-list">
+                                    <li>WhatsApp Automation</li>
+                                    <li>Telegram Automation</li>
+                                    <li>AI CRM Integration & SaaS Platforms</li>
+                                    <li>Invoice Billings Automation</li>
+                                    <li>AI Dashboards Automation (Telegram, WhatsApp)</li>
+                                    <li>AI HR Agents</li>
+                                    <li>ATS System for Companies</li>
+                                    <li>AI Calling Agents for Business (Cold Outreach)</li>
+                                    <li>Telegram Voice Agent</li>
+                                    <li>Appointment Booking Agent (Telegram, WhatsApp, Contact)</li>
+                                    <li>Automated Login Security System</li>
+                                    <li>Social Media Posts AI Automation</li>
+                                </ul>
+                                <a href="contact.html" class="btn btn-primary btn-sm"
+                                    style="margin-top:16px;align-self:flex-start;">Get a Quote</a>
+                            </div>
+                            <!-- 3 -->
+                            <div class="service-list-item reveal delay-3" id="seo">
+                                <div class="sli-icon">🔍</div>
+                                <div>
+                                    <div class="sli-title">SEO Optimisation</div>
+                                    <p class="sli-desc">Technical SEO, on-page optimization, keyword research, backlink
+                                        strategy, and monthly performance tracking for higher rankings.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 4 -->
+                            <div class="service-list-item reveal delay-4" id="dashboards">
+                                <div class="sli-icon">📊</div>
+                                <div>
+                                    <div class="sli-title">Analytical Dashboards</div>
+                                    <p class="sli-desc">Real-time business intelligence dashboards with live data
+                                        integration, charts, KPIs, and automated reporting.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 5 -->
+                            <div class="service-list-item reveal delay-5" id="chatbots">
+                                <div class="sli-icon">💬</div>
+                                <div>
+                                    <div class="sli-title">AI Chatbot Builders</div>
+                                    <p class="sli-desc">Custom chatbots for website, WhatsApp, and Telegram — trained on
+                                        your business data for support, sales, and lead generation.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 6 -->
+                            <div class="service-list-item reveal delay-6">
+                                <div class="sli-icon">🎨</div>
+                                <div>
+                                    <div class="sli-title">Logo Designing</div>
+                                    <p class="sli-desc">Professional brand identity design — logos, brand kits, color
+                                        palettes, and typography systems that make lasting impressions.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 7 -->
+                            <div class="service-list-item reveal delay-1">
+                                <div class="sli-icon">🎬</div>
+                                <div>
+                                    <div class="sli-title">AI Video & Photo Business Promotions</div>
+                                    <p class="sli-desc">AI-generated videos, promotional reels, product photos, and
+                                        visual content for social media and marketing campaigns.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 8 -->
+                            <div class="service-list-item reveal delay-2">
+                                <div class="sli-icon">💍</div>
+                                <div>
+                                    <div class="sli-title">Virtual Wedding & Invitation Cards</div>
+                                    <p class="sli-desc">Beautiful digital wedding invitations and event cards with
+                                        animated design, RSVP integration, and instant WhatsApp sharing.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 9 -->
+                            <div class="service-list-item reveal delay-3">
+                                <div class="sli-icon">🎓</div>
+                                <div>
+                                    <div class="sli-title">Final Year Projects</div>
+                                    <p class="sli-desc">Full-stack final year projects for B.Tech/MCA/M.Tech with
+                                        complete documentation, deployment, and presentation support.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                            <!-- 10 -->
+                            <div class="service-list-item reveal delay-4">
+                                <div class="sli-icon">📋</div>
+                                <div>
+                                    <div class="sli-title">Custom CRM Systems</div>
+                                    <p class="sli-desc">Intelligent Customer Relationship Management systems with
+                                        automated follow-ups,
+                                        WhatsApp integration, and real-time lead tracking analytics.</p>
+                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
+                                        Quote</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SAAS SERVICES PANEL -->
+                    <div class="services-panel" id="panel-saas">
+                        <div class="section-badge">Ready-to-Deploy</div>
+                        <h2 class="services-section-title">SaaS <span class="gradient-text">Products</span></h2>
+                        <p class="services-section-desc">20+ production-ready SaaS platforms you can deploy and scale
+                            immediately — covering real estate, HR, finance, health, and more.</p>
+                        <div class="saas-grid" id="saas">
+                            <div class="saas-card reveal delay-1">
+                                <div style="font-size:28px;margin-bottom:10px;">🏡</div>
+                                <div class="saas-title">Real Estate Agent Automation Platform</div>
+                                <p class="saas-desc">Fastest revenue potential. AI-powered listings, lead management,
+                                    automated follow-ups, and property analytics.</p>
+                                <span class="tag tag-green">Fastest Revenue</span>
+                            </div>
+                            <div class="saas-card reveal delay-2">
+                                <div style="font-size:28px;margin-bottom:10px;">📈</div>
+                                <div class="saas-title">Digital Marketing & Social Media Automation Suite</div>
+                                <p class="saas-desc">AI-driven social media scheduling, ad management, content
+                                    generation, and performance analytics for agencies.</p>
+                                <span class="tag tag-blue">High Demand</span>
+                            </div>
+                            <div class="saas-card reveal delay-3">
+                                <div style="font-size:28px;margin-bottom:10px;">🛠️</div>
+                                <div class="saas-title">Local Service Business CRM (Google Sheets Integrated)</div>
+                                <p class="saas-desc">Fast implementation CRM for plumbers, electricians, salons —
+                                    integrated with Google Sheets for easy adoption.</p>
+                                <span class="tag tag-cyan">Fast Setup</span>
+                            </div>
+                            <div class="saas-card reveal delay-4">
+                                <div style="font-size:28px;margin-bottom:10px;">📄</div>
+                                <div class="saas-title">AI-Powered Resume Builder Platform</div>
+                                <p class="saas-desc">Smart resume builder with ATS optimization, multiple templates, AI
+                                    content suggestions, and one-click downloads.</p>
+                                <span class="tag tag-purple">AI-Powered</span>
+                            </div>
+                            <div class="saas-card reveal delay-5">
+                                <div style="font-size:28px;margin-bottom:10px;">💼</div>
+                                <div class="saas-title">Professional Portfolio Builder System</div>
+                                <p class="saas-desc">No-code portfolio creation platform for developers, designers, and
+                                    freelancers with custom domains and analytics.</p>
+                                <span class="tag tag-blue">No-Code</span>
+                            </div>
+                            <div class="saas-card reveal delay-6">
+                                <div style="font-size:28px;margin-bottom:10px;">🤖</div>
+                                <div class="saas-title">AI-Based Software Testing Team Solution</div>
+                                <p class="saas-desc">Automated testing pipelines with AI bug detection, test case
+                                    generation, and CI/CD integration for dev teams.</p>
+                                <span class="tag tag-purple">Enterprise</span>
+                            </div>
+                            <div class="saas-card reveal delay-1">
+                                <div style="font-size:28px;margin-bottom:10px;">📞</div>
+                                <div class="saas-title">AI Sales Team & AI Agent Calling System</div>
+                                <p class="saas-desc">AI voice agents that conduct real sales calls, qualify leads,
+                                    schedule appointments, and update CRM automatically.</p>
+                                <span class="tag tag-green">Revenue Booster</span>
+                            </div>
+                            <div class="saas-card reveal delay-2">
+                                <div style="font-size:28px;margin-bottom:10px;">📊</div>
+                                <div class="saas-title">ATS Resume Tracking System for HR Teams</div>
+                                <p class="saas-desc">Full applicant tracking system with AI screening, pipeline
+                                    management, and team collaboration for HR departments.</p>
+                                <span class="tag tag-blue">HR Tech</span>
+                            </div>
+                            <div class="saas-card reveal delay-3">
+                                <div style="font-size:28px;margin-bottom:10px;">🧠</div>
+                                <div class="saas-title">AI Resume Screening System</div>
+                                <p class="saas-desc">Automated resume parsing and ranking against job descriptions with
+                                    bias reduction and structured scoring reports.</p>
+                                <span class="tag tag-purple">AI-Powered</span>
+                            </div>
+                            <div class="saas-card reveal delay-4">
+                                <div style="font-size:28px;margin-bottom:10px;">✅</div>
+                                <div class="saas-title">ATS Score Checking & Improvement System</div>
+                                <p class="saas-desc">Analyze and improve ATS compatibility scores for resumes with AI
+                                    suggestions and keyword optimization tools.</p>
+                                <span class="tag tag-cyan">Job Seekers</span>
+                            </div>
+                            <div class="saas-card reveal delay-5">
+                                <div style="font-size:28px;margin-bottom:10px;">🧾</div>
+                                <div class="saas-title">AI-Powered GST Invoice Generator System</div>
+                                <p class="saas-desc">Automated GST-compliant invoice generation with tax calculation,
+                                    PDF export, client management, and payment tracking.</p>
+                                <span class="tag tag-green">SME-Friendly</span>
+                            </div>
+                            <div class="saas-card reveal delay-6">
+                                <div style="font-size:28px;margin-bottom:10px;">🏪</div>
+                                <div class="saas-title">All-in-One Small Business Management</div>
+                                <p class="saas-desc">Complete business suite — customers, inventory, invoicing,
+                                    expenses, and reporting for small business owners.</p>
+                                <span class="tag tag-blue">All-in-One</span>
+                            </div>
+                            <div class="saas-card reveal delay-1">
+                                <div style="font-size:28px;margin-bottom:10px;">🎯</div>
+                                <div class="saas-title">AI Lead Automation & CRM for Businesses</div>
+                                <p class="saas-desc">Intelligent lead scoring, automated nurture sequences, follow-up
+                                    reminders, and conversion analytics in one platform.</p>
+                                <span class="tag tag-green">Sales Booster</span>
+                            </div>
+                            <div class="saas-card reveal delay-2">
+                                <div style="font-size:28px;margin-bottom:10px;">💰</div>
+                                <div class="saas-title">Smart Financial Life Manager</div>
+                                <p class="saas-desc">Personal and business finance management with AI-powered budgeting,
+                                    expense tracking, and investment insights.</p>
+                                <span class="tag tag-cyan">FinTech</span>
+                            </div>
+                            <div class="saas-card reveal delay-3">
+                                <div style="font-size:28px;margin-bottom:10px;">🎯</div>
+                                <div class="saas-title">Goal & Habit System</div>
+                                <p class="saas-desc">AI-powered goal-setting and habit tracking platform with smart
+                                    reminders, progress analytics, and team accountability.</p>
+                                <span class="tag tag-purple">Productivity</span>
+                            </div>
+                            <div class="saas-card reveal delay-4">
+                                <div style="font-size:28px;margin-bottom:10px;">🏥</div>
+                                <div class="saas-title">AI Health Guidance</div>
+                                <p class="saas-desc">Personalized AI health recommendations, diet planning, symptom
+                                    tracking, and appointment booking with doctors.</p>
+                                <span class="tag tag-green">HealthTech</span>
+                            </div>
+                            <div class="saas-card reveal delay-5">
+                                <div style="font-size:28px;margin-bottom:10px;">✍️</div>
+                                <div class="saas-title">AI Content Generator</div>
+                                <p class="saas-desc">AI-powered content creation for blogs, social media, ads, emails,
+                                    and product descriptions with SEO optimization.</p>
+                                <span class="tag tag-blue">Content AI</span>
+                            </div>
+                            <div class="saas-card reveal delay-6">
+                                <div style="font-size:28px;margin-bottom:10px;">📅</div>
+                                <div class="saas-title">Appointment Booking Platform</div>
+                                <p class="saas-desc">Smart booking system with calendar integration, automated
+                                    reminders, payment processing, and client management.</p>
+                                <span class="tag tag-cyan">Service Biz</span>
+                            </div>
+                            <div class="saas-card reveal delay-1">
+                                <div style="font-size:28px;margin-bottom:10px;">🔄</div>
+                                <div class="saas-title">Smart Auto Multi CRM System</div>
+                                <p class="saas-desc">Manage multiple CRMs from one dashboard with AI automation syncing
+                                    data across platforms automatically.</p>
+                                <span class="tag tag-purple">Multi-CRM</span>
+                            </div>
+                            <div class="saas-card reveal delay-2">
+                                <div style="font-size:28px;margin-bottom:10px;">⚖️</div>
+                                <div class="saas-title">AI Legal Assistance & FIR Drafting</div>
+                                <p class="saas-desc">AI-powered legal document drafting, FIR complaint generation, legal
+                                    advice, and case management for individuals.</p>
+                                <span class="tag tag-blue">LegalTech</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COURSES PANEL -->
+                    <div class="services-panel" id="panel-courses">
+                        <div class="section-badge">Skill Up</div>
+                        <h2 class="services-section-title">Learning <span class="gradient-text">Courses</span></h2>
+                        <p class="services-section-desc">Structured, hands-on courses taught by expert practitioners —
+                            designed for individuals, developers, and business teams ready to level up their digital
+                            skills.</p>
+                        <div class="course-grid">
+                            <div class="course-card reveal delay-1">
+                                <span class="course-icon">🌐</span>
+                                <div class="course-title">Full-Stack Web Development</div>
+                                <p class="course-desc">HTML, CSS, JavaScript, React, Node.js, databases and deployment.
+                                    From beginner to job-ready developer.</p>
+                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
+                                    Now</a>
+                            </div>
+                            <div class="course-card reveal delay-2">
+                                <span class="course-icon">🤖</span>
+                                <div class="course-title">AI & Automation Mastery</div>
+                                <p class="course-desc">WhatsApp bots, AI agents, workflow automation with n8n, Make, and
+                                    Python. Build real-world automation systems.</p>
+                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
+                                    Now</a>
+                            </div>
+                            <div class="course-card reveal delay-3">
+                                <span class="course-icon">🔍</span>
+                                <div class="course-title">SEO & Digital Marketing</div>
+                                <p class="course-desc">Technical SEO, Google Ads, social media marketing, email
+                                    campaigns, and analytics for business growth.</p>
+                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
+                                    Now</a>
+                            </div>
+                            <div class="course-card reveal delay-4">
+                                <span class="course-icon">📊</span>
+                                <div class="course-title">Data Analytics & Dashboards</div>
+                                <p class="course-desc">Power BI, Google Data Studio, SQL, Python pandas — build
+                                    dashboards that business leaders love.</p>
+                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
+                                    Now</a>
+                            </div>
+                            <div class="course-card reveal delay-5">
+                                <span class="course-icon">🎨</span>
+                                <div class="course-title">UI/UX Design</div>
+                                <p class="course-desc">Figma, glassmorphism, dark themes, design systems, prototyping,
+                                    and user research for modern interfaces.</p>
+                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
+                                    Now</a>
+                            </div>
+                            <div class="course-card reveal delay-6">
+                                <span class="course-icon">☁️</span>
+                                <div class="course-title">SaaS Product Building</div>
+                                <p class="course-desc">Build and launch your own SaaS product from idea to revenue —
+                                    architecture, coding, marketing, and scaling.</p>
+                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
+                                    Now</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- end services-content -->
+            </div><!-- end services-layout -->
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section style="background:var(--bg-secondary);padding:80px 0;">
+        <div class="container" style="text-align:center;">
+            <div class="section-badge" style="margin:0 auto 20px;">Custom Project?</div>
+            <h2 class="section-title">Need a Tailored <span class="gradient-text">Solution?</span></h2>
+            <p class="section-subtitle" style="margin:0 auto 40px;">Tell us your requirements and we'll design a custom
+                solution that fits your budget, timeline, and goals perfectly.</p>
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+                <a href="contact.html" class="btn btn-primary btn-lg"><svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 48 48" width="24" height="24"
+                        style="vertical-align:middle;margin-right:8px; display:inline-block; transform: translateY(-1px);">
+                        <path fill="#40c351"
+                            d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
+                        <path fill="#fff" fill-rule="evenodd"
+                            d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
+                            clip-rule="evenodd" />
+                    </svg> <span style="font-size: 16px; font-weight: 700;">WhatsApp Us</span></a>
+                <a href="portfolio.html" class="btn btn-ghost btn-lg">View Our Portfolio</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo">
+          <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" alt="Shaivika IT Technologies Logo" class="logo-main-img">
+          <div class="nav-logo-text-wrapper" style="display: flex; flex-direction: column; justify-content: center; margin-left: 8px;">
+              <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
+              <div class="nav-brand-sub" style="font-family: var(--font-primary), sans-serif; font-size: 11px; font-weight: 700; color: #a272eb; letter-spacing: 3.5px; line-height: 1; margin-top: 5px;">IT TECHNOLOGIES</div>
+          </div>
+        </a>
+                    <p>
+                        Shaivika IT Technologies is a trusted software company in Kadapa, Andhra Pradesh.
+                        We provide AI automation services, web development, SaaS solutions, CRM systems,
+                        and digital business tools for startups and enterprises across India.
+                    </p>
+                    <div class="footer-socials">
+                        <a href="https://wa.me/917013550760" class="social-btn"><svg xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48" width="22" height="22">
+                                <path fill="#40c351"
+                                    d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
+                                <path fill="#fff" fill-rule="evenodd"
+                                    d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
+                                    clip-rule="evenodd" />
+                            </svg></a>
+                        <a href="mailto:shaivikagroups@gmail.com" class="social-btn"><svg
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22">
+                                <path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z" />
+                                <path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z" />
+                                <polygon fill="#e53935"
+                                    points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17" />
+                                <path fill="#c62828"
+                                    d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
+                                <path fill="#fbc02d"
+                                    d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
+                            </svg></a>
+                        <a href="https://www.linkedin.com/in/shaivika-groups-7823ab362?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                            class="social-btn" title="LinkedIn" target="_blank"><svg xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48" width="22" height="22">
+                                <path fill="#0288D1"
+                                    d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5V37z" />
+                                <path fill="#FFF"
+                                    d="M12 19H17V36H12zM14.485 17h-.028C12.965 17 12 15.888 12 14.499 12 13.08 12.995 12 14.514 12c1.521 0 2.458 1.08 2.486 2.499C17 15.887 16.035 17 14.485 17zM36 36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698-1.501 0-2.313 1.012-2.707 1.99C24.957 25.543 25 26.511 25 27v9h-5V19h5v2.616C25.721 20.5 26.85 19 29.738 19c3.578 0 6.261 2.25 6.261 7.274L36 36 36 36z" />
+                            </svg></a>
+                        <a href="https://www.instagram.com/shaivika_india?igsh=cGdjNXB3eDgwbWk=" class="social-btn"
+                            title="Instagram" target="_blank"><svg xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48" width="22" height="22">
+                                <radialGradient id="ig_gr1" cx="19.38" cy="42.035" r="44.899"
+                                    gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#fd5" />
+                                    <stop offset=".328" stop-color="#ff543f" />
+                                    <stop offset=".348" stop-color="#fc5245" />
+                                    <stop offset=".504" stop-color="#e64771" />
+                                    <stop offset=".643" stop-color="#d53e91" />
+                                    <stop offset=".761" stop-color="#cc39a4" />
+                                    <stop offset=".841" stop-color="#c837ab" />
+                                </radialGradient>
+                                <path fill="url(#ig_gr1)"
+                                    d="M34.017,41.99l-20,0.019c-4.4,0.004-8.003-3.592-8.008-7.992l-0.019-20c-0.004-4.4,3.592-8.003,7.992-8.008l20-0.019c4.4-0.004,8.003,3.592,8.008,7.992l0.019,20C42.014,38.383,38.417,41.986,34.017,41.99z" />
+                                <path fill="#fff"
+                                    d="M24,31c-3.859,0-7-3.14-7-7s3.141-7,7-7s7,3.14,7,7S27.859,31,24,31z M24,19c-2.757,0-5,2.243-5,5s2.243,5,5,5s5-2.243,5-5S26.757,19,24,19z" />
+                                <circle cx="31.5" cy="16.5" r="1.5" fill="#fff" />
+                                <path fill="#fff"
+                                    d="M30,37H18c-3.859,0-7-3.14-7-7V18c0-3.86,3.141-7,7-7h12c3.859,0,7,3.14,7,7v12C37,33.86,33.859,37,30,37z M18,13c-2.757,0-5,2.243-5,5v12c0,2.757,2.243,5,5,5h12c2.757,0,5-2.243,5-5V18c0-2.757-2.243-5-5-5H18z" />
+                            </svg></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="switchPanel('manual');return false;">Manual Services</a></li>
+                        <li><a href="#" onclick="switchPanel('saas');return false;">SaaS Products</a></li>
+                        <li><a href="#" onclick="switchPanel('courses');return false;">Learning Courses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-links">
+                        <li><a href="tel:+917013550760"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
+                    <path fill="#43a047"
+                                        d="M13.25 21.59c2.88 5.66 7.51 10.29 13.18 13.17l4.4-4.41c.55-.55 1.34-.71 2.03-.49C35.1 30.6 37.51 31 40 31c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2C21.22 42 6 26.78 6 8c0-1.1.9-2 2-2h7c1.1 0 2 .9 2 2 0 2.5.4 4.9 1.14 7.14.22.69.06 1.48-.49 2.03l-4.4 4.42z" />
+                                </svg> +91 7013550760</a></li>
+                        <li><a href="mailto:shaivikagroups@gmail.com"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
+                    <path fill="#4caf50"
+                                        d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z" />
+                                    <path fill="#1e88e5"
+                                        d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z" />
+                                    <polygon fill="#e53935"
+                                        points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17" />
+                                    <path fill="#c62828"
+                                        d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
+                                    <path fill="#fbc02d"
+                                        d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
+                                </svg> shaivikagroups</a></li>
+                        <li><a href="https://wa.me/917013550760"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
+                    <path fill="#40c351"
+                                        d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
+                                    <path fill="#fff" fill-rule="evenodd"
+                                        d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
+                                        clip-rule="evenodd" />
+                                </svg> WhatsApp</a></li>
+                        <li><a href="contact.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
+                    <path fill="#e53935"
+                                        d="M24 4C16.27 4 10 10.27 10 18c0 11.25 14 26 14 26s14-14.75 14-26c0-7.73-6.27-14-14-14zm0 19c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+                                </svg> Kadapa, AP</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Shaivika IT Technologies. All rights reserved.</p>
+                <p>Crafted with ❤️ in Kadapa, Andhra Pradesh</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.min.js?v=2" defer></script>
+    <script>
+        function switchPanel(panelId) {
+            // Hide all panels
+            document.querySelectorAll('.services-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#servicesSidebar a').forEach(a => a.classList.remove('active'));
+            // Show target
+            const panel = document.getElementById('panel-' + panelId);
+            if (panel) panel.classList.add('active');
+            const link = document.querySelector(`#servicesSidebar a[data-panel="${panelId}"]`);
+            if (link) link.classList.add('active');
+            // Scroll to sidebar
+            document.querySelector('.services-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        document.querySelectorAll('#servicesSidebar a[data-panel]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchPanel(link.dataset.panel);
+            });
+        });
+
+        // Handle URL hash
+        const hash = window.location.hash.slice(1);
+        if (hash) {
+            const el = document.getElementById(hash);
+            if (el) {
+                const panel = el.closest('.services-panel');
+                if (panel) {
+                    const panelId = panel.id.replace('panel-', '');
+                    switchPanel(panelId);
+                    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
