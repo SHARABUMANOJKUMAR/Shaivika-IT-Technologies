@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -210,20 +210,53 @@
 </head>
 
 <body>
-  <!-- GLOBAL PRELOADER -->
-  <div id="global-preloader">
-    <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 300px; height: 300px" autoplay loop></dotlottie-wc>
+  <!-- GLOBAL PRELOADER / OFFLINE SCREEN -->
+  <div id="global-preloader" class="preloader-hidden">
+    <div class="preloader-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; max-width: 400px; width: 100%;">
+      <!-- Offline Icon (Feather/Lucide style) -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; color: var(--neon-purple, #6366f1);">
+        <path d="M12 21v.01" />
+        <path d="M19.386 15.386a9 9 0 0 0-12.772 0" />
+        <path d="M22.062 12.693a13 13 0 0 0-18.124 0" />
+        <path d="M24.739 10.001a17 17 0 0 0-23.478 0" />
+        <path d="m2 2 20 20" />
+      </svg>
+      <h2 style="font-family: var(--font-display, 'Orbitron', sans-serif); font-size: 24px; font-weight: 700; color: var(--text-primary, #f8fafc); margin-bottom: 12px; letter-spacing: 1px;">CONNECTION LOST</h2>
+      <p style="font-family: var(--font-primary, 'Inter', sans-serif); font-size: 15px; color: var(--text-secondary, #94a3b8); line-height: 1.6; margin-bottom: 24px;">Please check your internet connection. This page will automatically reconnect once your online status is restored.</p>
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted, #475569); font-size: 13px; font-family: var(--font-primary), sans-serif;">
+        <span class="pulse-dot" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6366f1; animation: pulse 1.5s infinite;"></span>
+        Attempting to reconnect...
+      </div>
+    </div>
   </div>
   <script>
-    window.addEventListener('load', function() {
+    (function() {
       const loader = document.getElementById('global-preloader');
-      if (loader) {
-        setTimeout(() => {
+      if (!loader) return;
+      
+      function updateOnlineStatus() {
+        if (navigator.onLine) {
           loader.classList.add('preloader-hidden');
-        }, 1200);
+        } else {
+          loader.classList.remove('preloader-hidden');
+        }
       }
-    });
+
+      // Check status immediately
+      updateOnlineStatus();
+
+      // Listen for network status changes
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+    })();
   </script>
+  <style>
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+  </style>
 
     <!-- NAVBAR -->
     <nav class="navbar" id="navbar">
@@ -355,7 +388,7 @@
                                     <div class="sli-title">Free Consultation</div>
                                     <p class="sli-desc">Not sure which service fits? <a href="contact.html"
                                             style="color:var(--accent);">Book a free call</a> with our experts and get a
-                                        custom recommendation.</p>
+                                         custom recommendation.</p>
                                 </div>
                             </div>
                         </div>
@@ -379,7 +412,7 @@
                                     <p class="sli-desc">Full-stack web and mobile app development using React, Next.js,
                                         Node.js with responsive, mobile-first design for all screen sizes.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 2 AI Automations -->
@@ -403,7 +436,7 @@
                                     <li>ATS System for Companies</li>
                                     <li>AI Calling Agents for Business (Cold Outreach)</li>
                                     <li>Telegram Voice Agent</li>
-                                    <li>Appointment Booking Agent (Telegram, WhatsApp, Contact)</li>
+                                    
                                     <li>Automated Login Security System</li>
                                     <li>Social Media Posts AI Automation</li>
                                 </ul>
@@ -418,7 +451,7 @@
                                     <p class="sli-desc">Technical SEO, on-page optimization, keyword research, backlink
                                         strategy, and monthly performance tracking for higher rankings.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 4 -->
@@ -429,7 +462,7 @@
                                     <p class="sli-desc">Real-time business intelligence dashboards with live data
                                         integration, charts, KPIs, and automated reporting.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 5 -->
@@ -440,7 +473,7 @@
                                     <p class="sli-desc">Custom chatbots for website, WhatsApp, and Telegram — trained on
                                         your business data for support, sales, and lead generation.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 6 -->
@@ -451,7 +484,7 @@
                                     <p class="sli-desc">Professional brand identity design — logos, brand kits, color
                                         palettes, and typography systems that make lasting impressions.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 7 -->
@@ -462,7 +495,7 @@
                                     <p class="sli-desc">AI-generated videos, promotional reels, product photos, and
                                         visual content for social media and marketing campaigns.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 8 -->
@@ -473,7 +506,7 @@
                                     <p class="sli-desc">Beautiful digital wedding invitations and event cards with
                                         animated design, RSVP integration, and instant WhatsApp sharing.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 9 -->
@@ -484,7 +517,7 @@
                                     <p class="sli-desc">Full-stack final year projects for B.Tech/MCA/M.Tech with
                                         complete documentation, deployment, and presentation support.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                             <!-- 10 -->
@@ -496,7 +529,7 @@
                                         automated follow-ups,
                                         WhatsApp integration, and real-time lead tracking analytics.</p>
                                     <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                        Quote</a>
+                                         Quote</a>
                                 </div>
                             </div>
                         </div>
@@ -509,132 +542,7 @@
                         <p class="services-section-desc">20+ production-ready SaaS platforms you can deploy and scale
                             immediately — covering real estate, HR, finance, health, and more.</p>
                         <div class="saas-grid" id="saas">
-                            <div class="saas-card reveal delay-1">
-                                <div style="font-size:28px;margin-bottom:10px;">🏡</div>
-                                <div class="saas-title">Real Estate Agent Automation Platform</div>
-                                <p class="saas-desc">Fastest revenue potential. AI-powered listings, lead management,
-                                    automated follow-ups, and property analytics.</p>
-                                <span class="tag tag-green">Fastest Revenue</span>
-                            </div>
-                            <div class="saas-card reveal delay-2">
-                                <div style="font-size:28px;margin-bottom:10px;">📈</div>
-                                <div class="saas-title">Digital Marketing & Social Media Automation Suite</div>
-                                <p class="saas-desc">AI-driven social media scheduling, ad management, content
-                                    generation, and performance analytics for agencies.</p>
-                                <span class="tag tag-blue">High Demand</span>
-                            </div>
-                            <div class="saas-card reveal delay-3">
-                                <div style="font-size:28px;margin-bottom:10px;">🛠️</div>
-                                <div class="saas-title">Local Service Business CRM (Google Sheets Integrated)</div>
-                                <p class="saas-desc">Fast implementation CRM for plumbers, electricians, salons —
-                                    integrated with Google Sheets for easy adoption.</p>
-                                <span class="tag tag-cyan">Fast Setup</span>
-                            </div>
-                            <div class="saas-card reveal delay-4">
-                                <div style="font-size:28px;margin-bottom:10px;">📄</div>
-                                <div class="saas-title">AI-Powered Resume Builder Platform</div>
-                                <p class="saas-desc">Smart resume builder with ATS optimization, multiple templates, AI
-                                    content suggestions, and one-click downloads.</p>
-                                <span class="tag tag-purple">AI-Powered</span>
-                            </div>
-                            <div class="saas-card reveal delay-5">
-                                <div style="font-size:28px;margin-bottom:10px;">💼</div>
-                                <div class="saas-title">Professional Portfolio Builder System</div>
-                                <p class="saas-desc">No-code portfolio creation platform for developers, designers, and
-                                    freelancers with custom domains and analytics.</p>
-                                <span class="tag tag-blue">No-Code</span>
-                            </div>
-                            <div class="saas-card reveal delay-6">
-                                <div style="font-size:28px;margin-bottom:10px;">🤖</div>
-                                <div class="saas-title">AI-Based Software Testing Team Solution</div>
-                                <p class="saas-desc">Automated testing pipelines with AI bug detection, test case
-                                    generation, and CI/CD integration for dev teams.</p>
-                                <span class="tag tag-purple">Enterprise</span>
-                            </div>
-                            <div class="saas-card reveal delay-1">
-                                <div style="font-size:28px;margin-bottom:10px;">📞</div>
-                                <div class="saas-title">AI Sales Team & AI Agent Calling System</div>
-                                <p class="saas-desc">AI voice agents that conduct real sales calls, qualify leads,
-                                    schedule appointments, and update CRM automatically.</p>
-                                <span class="tag tag-green">Revenue Booster</span>
-                            </div>
-                            <div class="saas-card reveal delay-2">
-                                <div style="font-size:28px;margin-bottom:10px;">📊</div>
-                                <div class="saas-title">ATS Resume Tracking System for HR Teams</div>
-                                <p class="saas-desc">Full applicant tracking system with AI screening, pipeline
-                                    management, and team collaboration for HR departments.</p>
-                                <span class="tag tag-blue">HR Tech</span>
-                            </div>
-                            <div class="saas-card reveal delay-3">
-                                <div style="font-size:28px;margin-bottom:10px;">🧠</div>
-                                <div class="saas-title">AI Resume Screening System</div>
-                                <p class="saas-desc">Automated resume parsing and ranking against job descriptions with
-                                    bias reduction and structured scoring reports.</p>
-                                <span class="tag tag-purple">AI-Powered</span>
-                            </div>
-                            <div class="saas-card reveal delay-4">
-                                <div style="font-size:28px;margin-bottom:10px;">✅</div>
-                                <div class="saas-title">ATS Score Checking & Improvement System</div>
-                                <p class="saas-desc">Analyze and improve ATS compatibility scores for resumes with AI
-                                    suggestions and keyword optimization tools.</p>
-                                <span class="tag tag-cyan">Job Seekers</span>
-                            </div>
-                            <div class="saas-card reveal delay-5">
-                                <div style="font-size:28px;margin-bottom:10px;">🧾</div>
-                                <div class="saas-title">AI-Powered GST Invoice Generator System</div>
-                                <p class="saas-desc">Automated GST-compliant invoice generation with tax calculation,
-                                    PDF export, client management, and payment tracking.</p>
-                                <span class="tag tag-green">SME-Friendly</span>
-                            </div>
-                            <div class="saas-card reveal delay-6">
-                                <div style="font-size:28px;margin-bottom:10px;">🏪</div>
-                                <div class="saas-title">All-in-One Small Business Management</div>
-                                <p class="saas-desc">Complete business suite — customers, inventory, invoicing,
-                                    expenses, and reporting for small business owners.</p>
-                                <span class="tag tag-blue">All-in-One</span>
-                            </div>
-                            <div class="saas-card reveal delay-1">
-                                <div style="font-size:28px;margin-bottom:10px;">🎯</div>
-                                <div class="saas-title">AI Lead Automation & CRM for Businesses</div>
-                                <p class="saas-desc">Intelligent lead scoring, automated nurture sequences, follow-up
-                                    reminders, and conversion analytics in one platform.</p>
-                                <span class="tag tag-green">Sales Booster</span>
-                            </div>
-                            <div class="saas-card reveal delay-2">
-                                <div style="font-size:28px;margin-bottom:10px;">💰</div>
-                                <div class="saas-title">Smart Financial Life Manager</div>
-                                <p class="saas-desc">Personal and business finance management with AI-powered budgeting,
-                                    expense tracking, and investment insights.</p>
-                                <span class="tag tag-cyan">FinTech</span>
-                            </div>
-                            <div class="saas-card reveal delay-3">
-                                <div style="font-size:28px;margin-bottom:10px;">🎯</div>
-                                <div class="saas-title">Goal & Habit System</div>
-                                <p class="saas-desc">AI-powered goal-setting and habit tracking platform with smart
-                                    reminders, progress analytics, and team accountability.</p>
-                                <span class="tag tag-purple">Productivity</span>
-                            </div>
-                            <div class="saas-card reveal delay-4">
-                                <div style="font-size:28px;margin-bottom:10px;">🏥</div>
-                                <div class="saas-title">AI Health Guidance</div>
-                                <p class="saas-desc">Personalized AI health recommendations, diet planning, symptom
-                                    tracking, and appointment booking with doctors.</p>
-                                <span class="tag tag-green">HealthTech</span>
-                            </div>
-                            <div class="saas-card reveal delay-5">
-                                <div style="font-size:28px;margin-bottom:10px;">✍️</div>
-                                <div class="saas-title">AI Content Generator</div>
-                                <p class="saas-desc">AI-powered content creation for blogs, social media, ads, emails,
-                                    and product descriptions with SEO optimization.</p>
-                                <span class="tag tag-blue">Content AI</span>
-                            </div>
-                            <div class="saas-card reveal delay-6">
-                                <div style="font-size:28px;margin-bottom:10px;">📅</div>
-                                <div class="saas-title">Appointment Booking Platform</div>
-                                <p class="saas-desc">Smart booking system with calendar integration, automated
-                                    reminders, payment processing, and client management.</p>
-                                <span class="tag tag-cyan">Service Biz</span>
-                            </div>
+                            
                             <div class="saas-card reveal delay-1">
                                 <div style="font-size:28px;margin-bottom:10px;">🔄</div>
                                 <div class="saas-title">Smart Auto Multi CRM System</div>
