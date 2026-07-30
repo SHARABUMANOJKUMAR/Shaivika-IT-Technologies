@@ -2,6 +2,14 @@
 <html lang="en">
 
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'light';
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shaivika IT Technologies | AI Automation, Web Development & Software Company in Kadapa</title>

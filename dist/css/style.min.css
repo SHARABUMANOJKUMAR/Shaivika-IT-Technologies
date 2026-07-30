@@ -201,13 +201,14 @@ section {
   z-index: 1000;
   padding: 18px 0;
   transition: all var(--transition-smooth);
+  border-bottom: 1px solid transparent;
 }
 
 .navbar.scrolled {
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom-color: var(--border-glass);
   padding: 14px 0;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
 }
@@ -2320,5 +2321,107 @@ footer {
 @media (min-width:2560px) {
   :root {
     --container-max: 2000px;
+  }
+}
+
+/* ============================================
+   MOBILE DESKTOP VIEW FIX
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .desktop-view .hero,
+  .desktop-view .hero-section {
+    min-height: auto !important;
+    height: auto !important;
+    padding-top: 80px !important;
+    padding-bottom: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .desktop-view .hero-content {
+    transform: none !important;
+    margin: 0 auto !important;
+    max-width: 95% !important;
+  }
+
+  .desktop-view .floating-card {
+    position: absolute;
+    scale: 0.8;
+  }
+
+  .desktop-view .hero-title {
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .desktop-view .hero-description,
+  .desktop-view .hero-subtitle {
+    max-width: 90%;
+    margin: auto;
+  }
+
+  body {
+    overflow-x: hidden !important;
+  }
+}
+
+/* ============================================
+   ANTIGRAVITY MOBILE VIEW ALIGNMENTS & PADDING FIXES
+   ============================================ */
+@media screen and (max-width: 768px) {
+  /* Navbar spacing and sizing */
+  .navbar {
+    padding: 12px 0 !important;
+  }
+  .logo-main-img {
+    height: 40px !important;
+  }
+  .navbar .nav-logo-text-wrapper {
+    margin-left: 6px !important;
+  }
+  .navbar .nav-brand-main {
+    font-size: 18px !important;
+    letter-spacing: 1px !important;
+  }
+  .navbar .nav-brand-sub {
+    font-size: 8px !important;
+    letter-spacing: 2px !important;
+    margin-top: 3px !important;
+  }
+
+  /* Position mobile nav exactly below scaled navbar to prevent overlapping */
+  .mobile-nav {
+    top: 64px !important; /* 12px top/bottom padding + 40px logo = 64px height */
+    transition: top var(--transition-smooth);
+  }
+  .navbar.scrolled ~ .mobile-nav {
+    top: 64px !important;
+  }
+
+  /* Center the theme toggle icon in the mobile nav and prevent stretching */
+  .mobile-nav-cta .theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    align-self: center;
+    margin: 0 0 10px 0 !important;
+  }
+
+  /* Center align the footer layout and its elements for a balanced mobile grid */
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .footer-socials {
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .footer-col {
+    text-align: center;
+  }
+  .footer-links a {
+    justify-content: center;
   }
 }
