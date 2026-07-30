@@ -171,53 +171,20 @@
 </head>
 
 <body>
-  <!-- GLOBAL PRELOADER / OFFLINE SCREEN -->
-  <div id="global-preloader" class="preloader-hidden">
-    <div class="preloader-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; max-width: 400px; width: 100%;">
-      <!-- Offline Icon (Feather/Lucide style) -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; color: var(--neon-purple, #6366f1);">
-        <path d="M12 21v.01" />
-        <path d="M19.386 15.386a9 9 0 0 0-12.772 0" />
-        <path d="M22.062 12.693a13 13 0 0 0-18.124 0" />
-        <path d="M24.739 10.001a17 17 0 0 0-23.478 0" />
-        <path d="m2 2 20 20" />
-      </svg>
-      <h2 style="font-family: var(--font-display, 'Orbitron', sans-serif); font-size: 24px; font-weight: 700; color: var(--text-primary, #f8fafc); margin-bottom: 12px; letter-spacing: 1px;">CONNECTION LOST</h2>
-      <p style="font-family: var(--font-primary, 'Inter', sans-serif); font-size: 15px; color: var(--text-secondary, #94a3b8); line-height: 1.6; margin-bottom: 24px;">Please check your internet connection. This page will automatically reconnect once your online status is restored.</p>
-      <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted, #475569); font-size: 13px; font-family: var(--font-primary), sans-serif;">
-        <span class="pulse-dot" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6366f1; animation: pulse 1.5s infinite;"></span>
-        Attempting to reconnect...
-      </div>
-    </div>
+  <!-- GLOBAL PRELOADER -->
+  <div id="global-preloader">
+    <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 300px; height: 300px" autoplay loop></dotlottie-wc>
   </div>
   <script>
-    (function() {
+    window.addEventListener('load', function() {
       const loader = document.getElementById('global-preloader');
-      if (!loader) return;
-      
-      function updateOnlineStatus() {
-        if (navigator.onLine) {
+      if (loader) {
+        setTimeout(() => {
           loader.classList.add('preloader-hidden');
-        } else {
-          loader.classList.remove('preloader-hidden');
-        }
+        }, 1200);
       }
-
-      // Check status immediately
-      updateOnlineStatus();
-
-      // Listen for network status changes
-      window.addEventListener('online', updateOnlineStatus);
-      window.addEventListener('offline', updateOnlineStatus);
-    })();
+    });
   </script>
-  <style>
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.6; }
-    }
-  </style>
 
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
@@ -662,7 +629,7 @@
                   <path fill="#c62828"
                     d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
                   <path fill="#fbc02d"
-                    d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,9.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
+                    d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
                 </svg> shaivikagroups@gmail.com</a></li>
             <li><a href="https://wa.me/917013550760"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"
                   width="20" height="20" style="flex-shrink: 0;">

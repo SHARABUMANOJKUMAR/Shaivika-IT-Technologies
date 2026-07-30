@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -157,53 +157,20 @@
 </head>
 
 <body>
-  <!-- GLOBAL PRELOADER / OFFLINE SCREEN -->
-  <div id="global-preloader" class="preloader-hidden">
-    <div class="preloader-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; max-width: 400px; width: 100%;">
-      <!-- Offline Icon (Feather/Lucide style) -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; color: var(--neon-purple, #6366f1);">
-        <path d="M12 21v.01" />
-        <path d="M19.386 15.386a9 9 0 0 0-12.772 0" />
-        <path d="M22.062 12.693a13 13 0 0 0-18.124 0" />
-        <path d="M24.739 10.001a17 17 0 0 0-23.478 0" />
-        <path d="m2 2 20 20" />
-      </svg>
-      <h2 style="font-family: var(--font-display, 'Orbitron', sans-serif); font-size: 24px; font-weight: 700; color: var(--text-primary, #f8fafc); margin-bottom: 12px; letter-spacing: 1px;">CONNECTION LOST</h2>
-      <p style="font-family: var(--font-primary, 'Inter', sans-serif); font-size: 15px; color: var(--text-secondary, #94a3b8); line-height: 1.6; margin-bottom: 24px;">Please check your internet connection. This page will automatically reconnect once your online status is restored.</p>
-      <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted, #475569); font-size: 13px; font-family: var(--font-primary), sans-serif;">
-        <span class="pulse-dot" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6366f1; animation: pulse 1.5s infinite;"></span>
-        Attempting to reconnect...
-      </div>
-    </div>
+  <!-- GLOBAL PRELOADER -->
+  <div id="global-preloader">
+    <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 300px; height: 300px" autoplay loop></dotlottie-wc>
   </div>
   <script>
-    (function() {
+    window.addEventListener('load', function() {
       const loader = document.getElementById('global-preloader');
-      if (!loader) return;
-      
-      function updateOnlineStatus() {
-        if (navigator.onLine) {
+      if (loader) {
+        setTimeout(() => {
           loader.classList.add('preloader-hidden');
-        } else {
-          loader.classList.remove('preloader-hidden');
-        }
+        }, 1200);
       }
-
-      // Check status immediately
-      updateOnlineStatus();
-
-      // Listen for network status changes
-      window.addEventListener('online', updateOnlineStatus);
-      window.addEventListener('offline', updateOnlineStatus);
-    })();
+    });
   </script>
-  <style>
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.6; }
-    }
-  </style>
 
     <!-- NAVBAR -->
     <nav class="navbar" id="navbar">
@@ -655,10 +622,10 @@
                 <div class="footer-col">
                     <h4>Services</h4>
                     <ul class="footer-links">
-                        <li><a href="services.html#web-dev">Web Development</a></li>
-                        <li><a href="services.html#ai-automation">AI Automations</a></li>
-                        <li><a href="services.html#saas">SaaS Platforms</a></li>
-                        <li><a href="services.html#dashboards">Dashboards</a></li>
+                        <li><a href="services.html">Web Development</a></li>
+                        <li><a href="services.html">AI Automations</a></li>
+                        <li><a href="services.html">SaaS Platforms</a></li>
+                        <li><a href="services.html">Dashboards</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -682,7 +649,7 @@
                                         d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
                                     <path fill="#fbc02d"
                                         d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
-                                </svg> shaivikagroups@gmail.com</a></li>
+                                </svg> shaivikagroups</a></li>
                         <li><a href="https://wa.me/917013550760"><svg xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 48 48" width="16" height="16"
                                     style="vertical-align:middle;margin-right:6px">
@@ -691,7 +658,7 @@
                                     <path fill="#fff" fill-rule="evenodd"
                                         d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
                                         clip-rule="evenodd" />
-                                </svg> WhatsApp Us</a></li>
+                                </svg> WhatsApp</a></li>
                         <li><a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="16"
                                     height="16" style="vertical-align:middle;margin-right:6px">
                                     <path fill="#e53935"
