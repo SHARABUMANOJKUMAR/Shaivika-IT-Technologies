@@ -35,6 +35,8 @@
   --container-pad: 0 40px;
   --transition-fast: 0.2s ease;
   --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --bg-mobile-nav: rgba(255, 255, 255, 0.97);
+  --bg-mobile-nav-hover: rgba(0, 0, 0, 0.05);
 }
 
 /* ===== DARK MODE VARIABLES ===== */
@@ -48,6 +50,8 @@
   --text-muted: #475569;
   --border-glass: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(37, 99, 235, 0.4);
+  --bg-mobile-nav: rgba(3, 7, 18, 0.97);
+  --bg-mobile-nav-hover: rgba(255, 255, 255, 0.06);
 }
 
 [data-theme="dark"] body,
@@ -586,7 +590,7 @@ section {
   top: 70px;
   left: 0;
   right: 0;
-  background: rgba(3, 7, 18, 0.97);
+  background: var(--bg-mobile-nav);
   backdrop-filter: blur(20px);
   z-index: 999;
   padding: 20px 30px 30px;
@@ -618,7 +622,7 @@ section {
 .mobile-nav a:hover,
 .mobile-nav a.active {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-mobile-nav-hover);
 }
 
 .mobile-nav-cta {
@@ -2328,37 +2332,55 @@ footer {
    MOBILE DESKTOP VIEW FIX
    ============================================ */
 @media screen and (max-width: 768px) {
-  .desktop-view .hero,
-  .desktop-view .hero-section {
+  .hero,
+  .hero-section {
     min-height: auto !important;
     height: auto !important;
-    padding-top: 80px !important;
+    padding-top: 90px !important;
     padding-bottom: 40px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
   }
 
-  .desktop-view .hero-content {
+  .hero-content {
     transform: none !important;
     margin: 0 auto !important;
     max-width: 95% !important;
+    padding: 30px 16px !important;
   }
 
-  .desktop-view .floating-card {
+  .floating-card {
     position: absolute;
     scale: 0.8;
   }
 
-  .desktop-view .hero-title {
-    font-size: clamp(2rem, 6vw, 3rem);
-    line-height: 1.1;
+  .hero-title {
+    font-size: clamp(2rem, 6vw, 3rem) !important;
+    line-height: 1.1 !important;
   }
 
-  .desktop-view .hero-description,
-  .desktop-view .hero-subtitle {
-    max-width: 90%;
-    margin: auto;
+  .hero-description,
+  .hero-subtitle {
+    max-width: 90% !important;
+    margin: auto !important;
+  }
+
+  /* Force responsive section padding to override inline style paddings on mobile */
+  section {
+    padding: var(--section-padding) !important;
+  }
+
+  /* Reduce space around divider */
+  .gradient-divider {
+    margin: 30px 0 !important;
+  }
+
+  /* Reduce inner page hero vertical heights and paddings */
+  .page-hero {
+    min-height: auto !important;
+    padding-top: 100px !important;
+    padding-bottom: 40px !important;
   }
 
   body {
@@ -2424,4 +2446,38 @@ footer {
   .footer-links a {
     justify-content: center;
   }
+}
+
+/* ============================================
+   WHATSAPP FLOATING BUTTON
+   ============================================ */
+.whatsapp-float {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+  z-index: 999;
+  transition: all var(--transition-smooth);
+  text-decoration: none;
+}
+
+.whatsapp-float:hover {
+  background-color: #128c7e;
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+  color: white;
+}
+
+/* Adjust notification position so it does not overlap with WhatsApp button */
+.notification {
+  bottom: 100px !important;
 }
