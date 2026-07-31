@@ -1,5 +1,6 @@
 {
   "server": {
     "baseDir": ["./Shaivika-IT-Technologies"]
-  }
+  },
+  "files": ["./Shaivika-IT-Technologies/**/*.{html,htm,css,js}"]
 }
