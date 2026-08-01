@@ -204,7 +204,7 @@
       if (!loader) return;
       
       function updateOnlineStatus() {
-        if (navigator.onLine) {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || navigator.onLine) {
           loader.classList.add('preloader-hidden');
         } else {
           loader.classList.remove('preloader-hidden');
@@ -690,6 +690,7 @@
   </footer>
 
   <script src="js/main.min.js?v=8" defer></script>
+  <script src="js/lead-interceptor.js" defer></script>
   <!-- Animated Character Script -->
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   <!-- Dark Smoke Background Script -->

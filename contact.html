@@ -190,7 +190,7 @@
       if (!loader) return;
       
       function updateOnlineStatus() {
-        if (navigator.onLine) {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || navigator.onLine) {
           loader.classList.add('preloader-hidden');
         } else {
           loader.classList.remove('preloader-hidden');
@@ -379,19 +379,19 @@
                             <div class="form-group" style="margin-bottom:20px;">
                                 <label for="fservice">Service Interested In</label>
                                 <select id="fservice" name="service" class="form-input form-select">
-                                    <option value="" style="background:#0d1424;">Select a service...</option>
-                                    <option style="background:#0d1424;">Web & App Development</option>
-                                    <option style="background:#0d1424;">AI Automation (WhatsApp/Telegram)</option>
-                                    <option style="background:#0d1424;">SaaS Platform Development</option>
-                                    <option style="background:#0d1424;">Analytical Dashboards</option>
-                                    <option style="background:#0d1424;">AI Chatbot Builder</option>
-                                    <option style="background:#0d1424;">SEO Optimisation</option>
-                                    <option style="background:#0d1424;">Logo & Brand Design</option>
-                                    <option style="background:#0d1424;">AI Video & Promotions</option>
-                                    <option style="background:#0d1424;">Final Year Project</option>
-                                    <option style="background:#0d1424;">CRM System</option>
-                                    <option style="background:#0d1424;">Learning Course</option>
-                                    <option style="background:#0d1424;">Other</option>
+                                    <option value="">Select a service...</option>
+                                    <option>Web & App Development</option>
+                                    <option>AI Automation (WhatsApp/Telegram)</option>
+                                    <option>SaaS Platform Development</option>
+                                    <option>Analytical Dashboards</option>
+                                    <option>AI Chatbot Builder</option>
+                                    <option>SEO Optimisation</option>
+                                    <option>Logo & Brand Design</option>
+                                    <option>AI Video & Promotions</option>
+                                    <option>Final Year Project</option>
+                                    <option>CRM System</option>
+                                    <option>Learning Course</option>
+                                    <option>Other</option>
                                 </select>
                             </div>
                             <div class="form-group" style="margin-bottom:28px;">
@@ -716,6 +716,7 @@
     </footer>
 
     <script src="js/main.min.js?v=2" defer></script>
+    <script src="js/lead-interceptor.js" defer></script>
 
     <!-- Google Apps Script Contact Form Handler -->
     <script>

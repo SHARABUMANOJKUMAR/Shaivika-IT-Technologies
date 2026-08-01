@@ -98,20 +98,53 @@
 </head>
 
 <body>
-  <!-- GLOBAL PRELOADER -->
-  <div id="global-preloader">
-    <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 300px; height: 300px" autoplay loop></dotlottie-wc>
+  <!-- GLOBAL PRELOADER / OFFLINE SCREEN -->
+  <div id="global-preloader" class="preloader-hidden">
+    <div class="preloader-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; max-width: 400px; width: 100%;">
+      <!-- Offline Icon (Feather/Lucide style) -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; color: var(--neon-purple, #6366f1);">
+        <path d="M12 21v.01" />
+        <path d="M19.386 15.386a9 9 0 0 0-12.772 0" />
+        <path d="M22.062 12.693a13 13 0 0 0-18.124 0" />
+        <path d="M24.739 10.001a17 17 0 0 0-23.478 0" />
+        <path d="m2 2 20 20" />
+      </svg>
+      <h2 style="font-family: var(--font-display, 'Orbitron', sans-serif); font-size: 24px; font-weight: 700; color: var(--text-primary, #f8fafc); margin-bottom: 12px; letter-spacing: 1px;">CONNECTION LOST</h2>
+      <p style="font-family: var(--font-primary, 'Inter', sans-serif); font-size: 15px; color: var(--text-secondary, #94a3b8); line-height: 1.6; margin-bottom: 24px;">Please check your internet connection. This page will automatically reconnect once your online status is restored.</p>
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted, #475569); font-size: 13px; font-family: var(--font-primary), sans-serif;">
+        <span class="pulse-dot" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6366f1; animation: pulse 1.5s infinite;"></span>
+        Attempting to reconnect...
+      </div>
+    </div>
   </div>
   <script>
-    window.addEventListener('load', function() {
+    (function() {
       const loader = document.getElementById('global-preloader');
-      if (loader) {
-        setTimeout(() => {
+      if (!loader) return;
+      
+      function updateOnlineStatus() {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || navigator.onLine) {
           loader.classList.add('preloader-hidden');
-        }, 1200);
+        } else {
+          loader.classList.remove('preloader-hidden');
+        }
       }
-    });
+
+      // Check status immediately
+      updateOnlineStatus();
+
+      // Listen for network status changes
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+    })();
   </script>
+  <style>
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+  </style>
 
     <!-- NAVBAR -->
     <nav class="navbar" id="navbar">
@@ -173,138 +206,16 @@
         <div class="container">
             <!-- Filter Bar -->
             <div class="filter-bar" data-filter-group>
-                <button class="filter-btn active" data-filter="all">All Projects</button>
-                <button class="filter-btn" data-filter="webapp">Web Apps</button>
-                <button class="filter-btn" data-filter="ai">AI & Automation</button>
-                <button class="filter-btn" data-filter="ui">UI Design</button>
-                <button class="filter-btn" data-filter="saas">SaaS</button>
-                <button class="filter-btn" data-filter="enterprise">Enterprise</button>
+                <!-- Dynamically rendered categories -->
             </div>
 
             <!-- Projects -->
             <div class="projects-grid" data-filter-container>
-                <!-- P1 -->
-                <div class="project-card" data-category="webapp ui" data-modal-open="#modal-manspharsh">
-                    <div class="project-thumb"
-                        style="background:linear-gradient(135deg,rgba(0,102,255,0.3),rgba(124,58,237,0.3));">
-                        <span style="position:relative;z-index:2;">🏥</span>
-                    </div>
-                    <div class="project-info">
-                        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;"><span
-                                class="tag tag-blue">Web App</span><span class="tag tag-purple">UI/UX</span></div>
-                        <h3 class="project-title">Manspharshcare Platform</h3>
-                        <p class="project-desc">Comprehensive healthcare web platform with patient portal, appointment
-                            booking, and telemedicine.</p>
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span class="read-more">View Case Study →</span>
-                            <a href="https://mansparshcare.xyz/" target="_blank" class="btn btn-ghost btn-sm"
-                                onclick="event.stopPropagation()">Live →</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- P2 -->
-                <div class="project-card" data-category="webapp enterprise" data-modal-open="#modal-hostel">
-                    <div class="project-thumb"
-                        style="background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,102,255,0.3));">
-                        <span style="position:relative;z-index:2;">🏠</span>
-                    </div>
-                    <div class="project-info">
-                        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;"><span
-                                class="tag tag-cyan">Web App</span><span class="tag tag-green">Enterprise</span></div>
-                        <h3 class="project-title">Siddartha Hostel Management</h3>
-                        <p class="project-desc">Smart hostel management with room allocation, fee automation, and
-                            WhatsApp notification integration.</p>
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span class="read-more">View Case Study →</span>
-                            <a href="https://siddarthainstitutions-boys-hostel.netlify.app/" target="_blank"
-                                class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">Live →</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- P3 -->
-                <div class="project-card" data-category="ai saas">
-                    <div class="project-thumb"
-                        style="background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(0,245,212,0.2));">
-                        <span style="position:relative;z-index:2;">🤖</span>
-                    </div>
-                    <div class="project-info">
-                        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;"><span
-                                class="tag tag-purple">AI Automation</span><span class="tag tag-blue">CRM</span></div>
-                        <h3 class="project-title">AI Lead Automation CRM</h3>
-                        <p class="project-desc">Intelligent lead scoring, WhatsApp follow-ups, pipeline management and
-                            conversion analytics.</p>
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span class="read-more">View Details →</span>
-                            <a href="contact.html" class="btn btn-ghost btn-sm"
-                                onclick="event.stopPropagation()">Inquire →</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- P4 -->
-                <div class="project-card" data-category="saas enterprise">
-                    <div class="project-thumb"
-                        style="background:linear-gradient(135deg,rgba(0,180,255,0.2),rgba(124,58,237,0.2));">
-                        <span style="position:relative;z-index:2;">📊</span>
-                    </div>
-                    <div class="project-info">
-                        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;"><span
-                                class="tag tag-blue">SaaS</span><span class="tag tag-cyan">Analytics</span></div>
-                        <h3 class="project-title">Business Analytics Dashboard</h3>
-                        <p class="project-desc">Real-time data visualization platform with Google Sheets integration,
-                            KPI tracking, and automated reports.</p>
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span class="read-more">View Details →</span>
-                            <a href="contact.html" class="btn btn-ghost btn-sm"
-                                onclick="event.stopPropagation()">Inquire →</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- P5 -->
-                <div class="project-card" data-category="ai webapp">
-                    <div class="project-thumb"
-                        style="background:linear-gradient(135deg,rgba(0,245,212,0.2),rgba(0,102,255,0.2));">
-                        <span style="position:relative;z-index:2;">💬</span>
-                    </div>
-                    <div class="project-info">
-                        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;"><span
-                                class="tag tag-green">AI Chatbot</span><span class="tag tag-blue">WhatsApp</span></div>
-                        <h3 class="project-title">Real Estate WhatsApp Bot</h3>
-                        <p class="project-desc">Intelligent WhatsApp bot that qualifies property leads, shares listings,
-                            and schedules site visits automatically.</p>
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span class="read-more">View Details →</span>
-                            <a href="contact.html" class="btn btn-ghost btn-sm"
-                                onclick="event.stopPropagation()">Inquire →</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- P6 -->
-                <div class="project-card" data-category="ui webapp">
-                    <div class="project-thumb"
-                        style="background:linear-gradient(135deg,rgba(248,37,133,0.15),rgba(124,58,237,0.3));">
-                        <span style="position:relative;z-index:2;">🎓</span>
-                    </div>
-                    <div class="project-info">
-                        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;"><span
-                                class="tag tag-purple">UI Design</span><span class="tag tag-blue">Web App</span></div>
-                        <h3 class="project-title">EdTech Learning Platform</h3>
-                        <p class="project-desc">Dark-themed e-learning platform with video courses, progress tracking,
-                            gamification, and certificate generation.</p>
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span class="read-more">View Details →</span>
-                            <a href="contact.html" class="btn btn-ghost btn-sm"
-                                onclick="event.stopPropagation()">Inquire →</a>
-                        </div>
-                    </div>
-                </div>
+                <!-- Dynamically rendered projects -->
             </div>
 
             <div class="pagination">
-                <button class="page-btn" data-page>‹</button>
-                <button class="page-btn active" data-page>1</button>
-                <button class="page-btn" data-page>2</button>
-                <button class="page-btn" data-page>3</button>
-                <button class="page-btn" data-page>›</button>
+                <!-- Dynamically rendered pagination -->
             </div>
         </div>
     </section>
@@ -580,6 +491,7 @@
     </footer>
 
     <script src="js/main.min.js?v=2" defer></script>
+    <script src="js/portfolio-manager.js" defer></script>
   <!-- WHATSAPP FLOATING BUTTON -->
   <a href="https://wa.me/917013550760" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="30" height="30" fill="currentColor">

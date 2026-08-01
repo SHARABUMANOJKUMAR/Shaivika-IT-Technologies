@@ -1,0 +1,67 @@
+{
+  "categories": [
+    { "id": "webapp", "name": "Web Apps" },
+    { "id": "ai", "name": "AI & Automation" },
+    { "id": "ui", "name": "UI Design" },
+    { "id": "saas", "name": "SaaS" },
+    { "id": "enterprise", "name": "Enterprise" }
+  ],
+  "projects": [
+    {
+      "id": "p1",
+      "title": "Manspharshcare Platform",
+      "description": "Comprehensive healthcare web platform built for Manspharshcare.xyz — featuring patient portal, appointment booking, and telemedicine.",
+      "categories": ["webapp", "ui"],
+      "link": "https://mansparshcare.xyz/",
+      "image": "",
+      "emoji": "🏥",
+      "modalId": "#modal-manspharsh"
+    },
+    {
+      "id": "p2",
+      "title": "Siddartha Hostel Management",
+      "description": "Smart hostel management with room allocation, fee automation, and WhatsApp notification integration.",
+      "categories": ["webapp", "enterprise"],
+      "link": "https://siddarthainstitutions-boys-hostel.netlify.app/",
+      "image": "",
+      "emoji": "🏠",
+      "modalId": "#modal-hostel"
+    },
+    {
+      "id": "p3",
+      "title": "AI Lead Automation CRM",
+      "description": "Intelligent lead scoring, WhatsApp follow-ups, pipeline management and conversion analytics.",
+      "categories": ["ai", "saas"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🤖"
+    },
+    {
+      "id": "p4",
+      "title": "Business Analytics Dashboard",
+      "description": "Real-time data visualization platform with Google Sheets integration, KPI tracking, and automated reports.",
+      "categories": ["saas", "enterprise"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "📊"
+    },
+    {
+      "id": "p5",
+      "title": "Real Estate WhatsApp Bot",
+      "description": "Intelligent WhatsApp bot that qualifies property leads, shares listings, and schedules site visits automatically.",
+      "categories": ["ai", "webapp"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "💬"
+    },
+    {
+      "id": "p6",
+      "title": "EdTech Learning Platform",
+      "description": "Dark-themed e-learning platform with video courses, progress tracking, gamification, and certificate generation.",
+      "categories": ["ui", "webapp"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🎓"
+    }
+  ]
+}

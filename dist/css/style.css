@@ -1442,6 +1442,11 @@ footer {
   transition: all var(--transition-fast);
 }
 
+.form-select option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
 .form-input::placeholder,
 .form-textarea::placeholder {
   color: var(--text-muted);
@@ -2072,6 +2077,7 @@ footer {
   transition: transform var(--transition-smooth);
   max-width: 340px;
   backdrop-filter: blur(10px);
+  color: #ffffff;
 }
 
 .notification.show {

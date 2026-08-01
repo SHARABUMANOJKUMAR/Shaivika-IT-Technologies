@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Shaivika IT Technologies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --accent: #38bdf8;
+            --cyan: #22d3ee;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg-primary: #050505;
+            --bg-secondary: #0f172a;
+            --bg-glass: rgba(15, 23, 42, 0.75);
+            --bg-card-hover: rgba(15, 23, 42, 0.95);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(37, 99, 235, 0.4);
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #38bdf8 100%);
+            --font-primary: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-glass: rgba(0, 0, 0, 0.08);
+            --border-glow: rgba(37, 99, 235, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-primary);
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* ===== BACKGROUND ANIMATIONS ===== */
+        .background-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: float 20s infinite alternate;
+        }
+
+        .blob-1 {
+            background: var(--primary);
+            top: -10%;
+            left: -10%;
+        }
+
+        .blob-2 {
+            background: var(--secondary);
+            bottom: -10%;
+            right: -10%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* ===== LOGIN CONTAINER ===== */
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .login-logo {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            text-decoration: none;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border-glass);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        /* ===== MAIN DASHBOARD CONTAINER ===== */
+        .dashboard-container {
+            display: none;
+            flex-grow: 1;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .sidebar-logo {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .sidebar-item {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .sidebar-link.active {
+            background: rgba(37, 99, 235, 0.1);
+            border-left: 3px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-glass);
+            padding-top: 20px;
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* ===== DASHBOARD CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: rgba(37, 99, 235, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .stat-details h3 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .stat-details p {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* ===== TABS CONTENT ===== */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TABLES & LISTS ===== */
+        .data-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+
+        .data-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .search-input {
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            min-width: 260px;
+        }
+
+        .data-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th, .data-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .data-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* ===== TAGS ===== */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .tag-blue { background: rgba(37, 99, 235, 0.15); color: #60a5fa; }
+        .tag-purple { background: rgba(124, 58, 237, 0.15); color: #c084fc; }
+        .tag-cyan { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+        .tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+        /* ===== ACTION ICON BUTTONS ===== */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .action-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .action-btn.delete:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* ===== MODALS ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 600px;
+            padding: 36px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalScale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalScale {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* ===== FORMS INTERNAL ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-full {
+            grid-column: 1 / -1;
+        }
+
+        .textarea-input {
+            width: 100%;
+            height: 120px;
+            resize: vertical;
+        }
+
+        /* Image upload preview */
+        .image-preview-box {
+            margin-top: 10px;
+            border: 2px dashed var(--border-glass);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .image-preview-box img {
+            max-height: 120px;
+            border-radius: 8px;
+            display: none;
+            margin: 0 auto;
+        }
+
+        .image-preview-box span {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Lead detail fields */
+        .lead-detail-field {
+            margin-bottom: 18px;
+        }
+
+        .lead-detail-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .lead-detail-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-glass);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 20px;
+            }
+            .sidebar-header {
+                margin-bottom: 20px;
+            }
+            .sidebar-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .sidebar-item {
+                margin-bottom: 0;
+            }
+            .sidebar-link {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            .main-content {
+                padding: 20px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- ===== LOGIN INTERFACE ===== -->
+    <div class="login-wrapper" id="loginWrapper">
+        <div class="login-card">
+            <h1 class="login-logo">SHAIVIKA</h1>
+            <p class="login-subtitle">Administrator Portal Login</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input class="form-input" type="text" id="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input class="form-input" type="password" id="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MAIN DASHBOARD ===== -->
+    <div class="dashboard-container" id="dashboardContainer">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">SHAIVIKA ADMIN</span>
+                <button class="theme-toggle-btn action-btn" aria-label="Toggle Theme" id="themeToggleBtn">🌙</button>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item">
+                    <span class="sidebar-link active" data-tab="dashboard-summary">📊 Dashboard Summary</span>
+                </li>
+                <li class="sidebar-item">
+                    <span class="sidebar-link" data-tab="portfolio-manager-tab">💼 Portfolio Projects</span>
+                </li>
+                <li class="sidebar-item">
+                    <span class="sidebar-link" data-tab="category-manager-tab">🏷️ Categories</span>
+                </li>
+                <li class="sidebar-item">
+                    <span class="sidebar-link" data-tab="leads-manager-tab">✉️ Form Submissions</span>
+                </li>
+                <li class="sidebar-item">
+                    <span class="sidebar-link" data-tab="settings-tab">⚙️ Settings & Backup</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <span class="sidebar-link" id="logoutBtn" style="color: var(--danger);">🚪 Sign Out</span>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <h2 class="page-title" id="contentTitle">Dashboard Summary</h2>
+                <div style="font-size: 0.9rem; color: var(--text-secondary);" id="currentTime"></div>
+            </header>
+
+            <!-- TAB 1: SUMMARY -->
+            <section class="tab-content active" id="dashboard-summary">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💼</div>
+                        <div class="stat-details">
+                            <h3>Total Projects</h3>
+                            <p id="statTotalProjects">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏷️</div>
+                        <div class="stat-details">
+                            <h3>Categories</h3>
+                            <p id="statTotalCategories">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✉️</div>
+                        <div class="stat-details">
+                            <h3>Submissions</h3>
+                            <p id="statTotalSubmissions">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-card-header">
+                        <h3 class="modal-title">Recent Submissions (Leads)</h3>
+                        <button class="btn btn-secondary btn-sm" id="viewAllLeadsBtn">View All</button>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentLeadsBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: PORTFOLIO -->
+            <section class="tab-content" id="portfolio-manager-tab">
+                <div class="data-card">
+                    <div class="data-card-header">
+                        <input type="text" class="search-input" id="searchProjects" placeholder="Search projects by title, desc...">
+                        <button class="btn btn-primary btn-sm" id="addNewProjectBtn">➕ Add Project</button>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Thumb</th>
+                                    <th>Title</th>
+                                    <th>Categories</th>
+                                    <th>URL / Target</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectsTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: CATEGORIES -->
+            <section class="tab-content" id="category-manager-tab">
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;" id="catGridContainer">
+                    <!-- Left Form -->
+                    <div class="data-card" style="height: fit-content;">
+                        <h3 class="modal-title" style="margin-bottom: 20px;" id="catFormTitle">Add New Category</h3>
+                        <form id="categoryForm">
+                            <input type="hidden" id="editCatIndex" value="-1">
+                            <div class="form-group">
+                                <label class="form-label">Category Name</label>
+                                <input type="text" class="form-input" id="catName" required placeholder="e.g. Mobile Apps">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Slug ID</label>
+                                <input type="text" class="form-input" id="catId" required placeholder="e.g. mobile-apps" pattern="[a-z0-9\-]+">
+                                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">Lowercase alphanumeric and dashes only.</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Save Category</button>
+                        </form>
+                    </div>
+                    <!-- Right Table -->
+                    <div class="data-card">
+                        <h3 class="modal-title" style="margin-bottom: 20px;">Existing Categories</h3>
+                        <div class="data-table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Slug ID</th>
+                                        <th>Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoriesTableBody">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: LEADS -->
+            <section class="tab-content" id="leads-manager-tab">
+                <div class="data-card">
+                    <div class="data-card-header">
+                        <input type="text" class="search-input" id="searchLeads" placeholder="Search leads by name, email, msg...">
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary btn-sm" id="exportLeadsCsv">Export CSV</button>
+                            <button class="btn btn-secondary btn-sm" id="exportLeadsJson">Export JSON</button>
+                        </div>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: SETTINGS -->
+            <section class="tab-content" id="settings-tab">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    <!-- Change Password -->
+                    <div class="data-card">
+                        <h3 class="modal-title" style="margin-bottom: 24px;">Change Admin Password</h3>
+                        <form id="changePasswordForm">
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-input" id="currentPass" required autocomplete="current-password">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-input" id="newPass" required autocomplete="new-password">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-input" id="confirmPass" required autocomplete="new-password">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Update Password</button>
+                        </form>
+                    </div>
+
+                    <!-- Database Management -->
+                    <div class="data-card" style="height: fit-content;">
+                        <h3 class="modal-title" style="margin-bottom: 24px;">Database Maintenance</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5;">
+                            Export the portfolio and leads database as a JSON file, or restore data from an existing backup.
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 14px;">
+                            <button class="btn btn-secondary" id="btnExportDb" style="width: 100%;">📥 Export Database Backup</button>
+                            
+                            <label class="btn btn-secondary" style="width: 100%; cursor: pointer;">
+                                📤 Import Database Restore
+                                <input type="file" id="btnImportDbFile" accept=".json" style="display: none;">
+                            </label>
+
+                            <button class="btn btn-danger btn-sm" id="btnResetDb" style="width: 100%; margin-top: 15px;">⚠️ Reset to Default Baseline</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== PROJECT ADD/EDIT MODAL ===== -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="projectModalTitle">Add Portfolio Project</h3>
+                <button class="modal-close" id="closeProjectModal">✕</button>
+            </div>
+            <form id="projectForm">
+                <input type="hidden" id="editProjectIndex" value="-1">
+                <div class="form-grid">
+                    <div class="form-group form-full">
+                        <label class="form-label">Project Title</label>
+                        <input type="text" class="form-input" id="projectTitle" required placeholder="e.g. Modern Mobile App">
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label">Project Description</label>
+                        <textarea class="form-input textarea-input" id="projectDesc" required placeholder="Brief detail about what the project does..."></textarea>
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label">Categories (Select relevant)</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;" id="projectCategoriesSelect">
+                            <!-- Dynamic category checkboxes -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Live Link / Target URL</label>
+                        <input type="text" class="form-input" id="projectLink" placeholder="https://example.com or contact.html">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fallback Emoji (if no image)</label>
+                        <input type="text" class="form-input" id="projectEmoji" placeholder="e.g. 📱 or 🏥" maxlength="4">
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label">Project Image (File Upload or Image URL)</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="text" class="form-input" id="projectImageUrl" placeholder="https://path/to/image.jpg">
+                            <input type="file" class="form-input" id="projectImageFile" accept="image/*" style="padding: 10px 16px;">
+                        </div>
+                        <div class="image-preview-box">
+                            <span id="previewPlaceholder">No image loaded (will use fallback emoji)</span>
+                            <img id="img-preview" src="#" alt="Preview">
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
+                    <button type="button" class="btn btn-secondary" id="cancelProjectModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== LEAD DETAILS MODAL ===== -->
+    <div class="modal" id="leadModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Form Submission Details</h3>
+                <button class="modal-close" id="closeLeadModal">✕</button>
+            </div>
+            <div id="leadModalBody">
+                <!-- Dynamic details -->
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+                <button class="btn btn-primary btn-sm" id="closeLeadModalBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast system -->
+    <div class="toast" id="toastBox">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span id="toastMsg">Action complete.</span>
+    </div>
+
+    <!-- ===== ADMIN PORTAL JAVASCRIPT ===== -->
+    <script>
+        // Core state
+        let database = {
+            categories: [],
+            projects: [],
+            submissions: []
+        };
+        let currentActiveTab = 'dashboard-summary';
+        let projectImageBase64 = '';
+
+        // DOM Elements
+        const loginWrapper = document.getElementById('loginWrapper');
+        const loginForm = document.getElementById('loginForm');
+        const dashboardContainer = document.getElementById('dashboardContainer');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link[data-tab]');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const contentTitle = document.getElementById('contentTitle');
+        const currentTime = document.getElementById('currentTime');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+        // Initialize admin password if not present
+        if (!localStorage.getItem('shaivika_admin_password')) {
+            localStorage.setItem('shaivika_admin_password', 'adminpassword123');
+        }
+
+        // Live Clock
+        setInterval(() => {
+            const now = new Date();
+            currentTime.textContent = now.toLocaleString();
+        }, 1000);
+        currentTime.textContent = new Date().toLocaleString();
+
+        // Check authentication state
+        const checkAuth = () => {
+            if (localStorage.getItem('shaivika_admin_logged_in') === 'true') {
+                loginWrapper.style.display = 'none';
+                dashboardContainer.style.display = 'flex';
+                loadData();
+            } else {
+                loginWrapper.style.display = 'flex';
+                dashboardContainer.style.display = 'none';
+            }
+        };
+
+        // Theme management
+        const initTheme = () => {
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            themeToggleBtn.innerHTML = currentTheme === 'dark' ? '☀️' : '🌙';
+        };
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeToggleBtn.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+
+        // Login Submit
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const storedPass = localStorage.getItem('shaivika_admin_password');
+
+            if (user === 'admin' && pass === storedPass) {
+                localStorage.setItem('shaivika_admin_logged_in', 'true');
+                showToast('Login successful! Welcome to the admin portal.', 'success');
+                checkAuth();
+            } else {
+                showToast('Invalid credentials. Please try again.', 'error');
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('shaivika_admin_logged_in');
+            showToast('Logged out successfully.', 'success');
+            checkAuth();
+        });
+
+        // Tabs switching
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const targetTab = link.dataset.tab;
+                
+                sidebarLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                document.getElementById(targetTab).classList.add('active');
+
+                contentTitle.textContent = link.textContent.substring(2);
+                currentActiveTab = targetTab;
+            });
+        });
+
+        // Toast notifications
+        const showToast = (msg, type = 'success') => {
+            const toastBox = document.getElementById('toastBox');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMsg = document.getElementById('toastMsg');
+
+            toastIcon.textContent = type === 'success' ? '✅' : '❌';
+            toastMsg.textContent = msg;
+            
+            toastBox.classList.add('show');
+            setTimeout(() => {
+                toastBox.classList.remove('show');
+            }, 3500);
+        };
+
+        // Load & Synchronize Database
+        const loadData = async () => {
+            try {
+                // Portfolio Categories
+                let cats = localStorage.getItem('shaivika_portfolio_categories');
+                if (cats) {
+                    database.categories = JSON.parse(cats);
+                } else {
+                    database.categories = [
+                        { id: "webapp", name: "Web Apps" },
+                        { id: "ai", name: "AI & Automation" },
+                        { id: "ui", name: "UI Design" },
+                        { id: "saas", name: "SaaS" },
+                        { id: "enterprise", name: "Enterprise" }
+                    ];
+                    localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(database.categories));
+                }
+
+                // Portfolio Projects
+                let projs = localStorage.getItem('shaivika_portfolio_projects');
+                if (projs) {
+                    database.projects = JSON.parse(projs);
+                } else {
+                    const fallback = await fetch('../data/portfolio.json');
+                    if (fallback.ok) {
+                        const data = await fallback.json();
+                        database.projects = data.projects;
+                    }
+                    localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(database.projects));
+                }
+
+                // Submissions
+                let subs = localStorage.getItem('shaivika_submissions');
+                database.submissions = subs ? JSON.parse(subs) : [];
+
+                updateDashboardStats();
+                renderDashboardRecentSubmissions();
+                renderProjectsTable();
+                renderCategoriesTable();
+                renderLeadsTable();
+                populateCategoryCheckboxes();
+            } catch (err) {
+                console.error(err);
+                showToast('Error syncing with LocalStorage.', 'error');
+            }
+        };
+
+        // Save Data to LocalStorage
+        const saveData = () => {
+            localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(database.categories));
+            localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(database.projects));
+            localStorage.setItem('shaivika_submissions', JSON.stringify(database.submissions));
+            updateDashboardStats();
+            populateCategoryCheckboxes();
+        };
+
+        // Stats Updates
+        const updateDashboardStats = () => {
+            document.getElementById('statTotalProjects').textContent = database.projects.length;
+            document.getElementById('statTotalCategories').textContent = database.categories.length;
+            document.getElementById('statTotalSubmissions').textContent = database.submissions.length;
+        };
+
+        // Render Summary Recent Leads (max 5)
+        const renderDashboardRecentSubmissions = () => {
+            const tbody = document.getElementById('recentLeadsBody');
+            tbody.innerHTML = '';
+            
+            // Sorted date-wise descending
+            const sortedSubmissions = [...database.submissions].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            const recent = sortedSubmissions.slice(0, 5);
+
+            if (recent.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No form submissions yet.</td></tr>';
+                return;
+            }
+
+            recent.forEach(sub => {
+                const tr = document.createElement('tr');
+                const date = new Date(sub.timestamp).toLocaleDateString();
+                const typeTag = sub.type === 'Newsletter' ? 'tag-purple' : 'tag-blue';
+                tr.innerHTML = `
+                    <td>${date}</td>
+                    <td><span class="tag ${typeTag}">${sub.type}</span></td>
+                    <td>${sub.name}</td>
+                    <td>${sub.email}</td>
+                    <td>${sub.subject}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="viewLeadDetails('${sub.id}')">View</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        document.getElementById('viewAllLeadsBtn').addEventListener('click', () => {
+            const leadsTabLink = document.querySelector('.sidebar-link[data-tab="leads-manager-tab"]');
+            leadsTabLink.click();
+        });
+
+        // ===== PORTFOLIO PROJECTS MANAGEMENT =====
+        const renderProjectsTable = (searchQuery = '') => {
+            const tbody = document.getElementById('projectsTableBody');
+            tbody.innerHTML = '';
+
+            let filtered = database.projects;
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filtered = database.projects.filter(p => 
+                    p.title.toLowerCase().includes(query) || 
+                    p.description.toLowerCase().includes(query) ||
+                    p.categories.some(cat => cat.toLowerCase().includes(query))
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No projects found.</td></tr>';
+                return;
+            }
+
+            filtered.forEach((proj, idx) => {
+                const tr = document.createElement('tr');
+                
+                // thumbnail setup
+                let thumbHTML = '';
+                if (proj.image) {
+                    thumbHTML = `<img src="${proj.image}" style="width:50px; height:35px; object-fit:cover; border-radius:4px; border:1px solid var(--border-glass);">`;
+                } else {
+                    thumbHTML = `<span style="font-size: 1.25rem;">${proj.emoji || '💻'}</span>`;
+                }
+
+                // tags
+                const tags = proj.categories.map(cId => {
+                    const cat = database.categories.find(c => c.id === cId);
+                    const name = cat ? cat.name : cId;
+                    return `<span class="tag tag-cyan" style="font-size: 0.65rem; margin-right:4px;">${name}</span>`;
+                }).join('');
+
+                const linkDisplay = proj.link ? `<a href="${proj.link}" target="_blank" style="color:var(--accent); text-decoration:none; font-size:0.85rem;">${proj.link}</a>` : '<span style="color:var(--text-muted);">None</span>';
+
+                tr.innerHTML = `
+                    <td style="text-align:center;">${thumbHTML}</td>
+                    <td style="font-weight:600;">${proj.title}</td>
+                    <td>${tags}</td>
+                    <td>${linkDisplay}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="openEditProject(${idx})">✏️</button>
+                            <button class="action-btn delete" onclick="deleteProject(${idx})">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        document.getElementById('searchProjects').addEventListener('input', (e) => {
+            renderProjectsTable(e.target.value);
+        });
+
+        // Populate Category Checkboxes in Project Modal
+        const populateCategoryCheckboxes = () => {
+            const wrapper = document.getElementById('projectCategoriesSelect');
+            wrapper.innerHTML = '';
+            database.categories.forEach(cat => {
+                const label = document.createElement('label');
+                label.style.cssText = 'display:flex; align-items:center; gap:6px; cursor:pointer; background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px; border:1px solid var(--border-glass); font-size:0.85rem;';
+                label.innerHTML = `
+                    <input type="checkbox" name="projCatCheckbox" value="${cat.id}" style="cursor:pointer;">
+                    ${cat.name}
+                `;
+                wrapper.appendChild(label);
+            });
+        };
+
+        // File reader base64 conversion
+        document.getElementById('projectImageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    projectImageBase64 = evt.target.result;
+                    document.getElementById('img-preview').src = projectImageBase64;
+                    document.getElementById('img-preview').style.display = 'block';
+                    document.getElementById('previewPlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Add URL preview
+        document.getElementById('projectImageUrl').addEventListener('input', function(e) {
+            if (e.target.value.trim()) {
+                projectImageBase64 = ''; // Clear file base64 if URL is written
+                document.getElementById('img-preview').src = e.target.value.trim();
+                document.getElementById('img-preview').style.display = 'block';
+                document.getElementById('previewPlaceholder').style.display = 'none';
+            }
+        });
+
+        // Modals opening/closing
+        const projectModal = document.getElementById('projectModal');
+        const openProjectModal = () => {
+            projectModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+        const closeProjectModal = () => {
+            projectModal.classList.remove('open');
+            document.body.style.overflow = '';
+            // Reset form
+            document.getElementById('projectForm').reset();
+            document.getElementById('editProjectIndex').value = '-1';
+            projectImageBase64 = '';
+            document.getElementById('img-preview').style.display = 'none';
+            document.getElementById('previewPlaceholder').style.display = 'block';
+        };
+
+        document.getElementById('addNewProjectBtn').addEventListener('click', () => {
+            document.getElementById('projectModalTitle').textContent = 'Add Portfolio Project';
+            openProjectModal();
+        });
+        document.getElementById('closeProjectModal').addEventListener('click', closeProjectModal);
+        document.getElementById('cancelProjectModal').addEventListener('click', closeProjectModal);
+
+        // Project Submit
+        document.getElementById('projectForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editProjectIndex').value);
+            const title = document.getElementById('projectTitle').value.trim();
+            const description = document.getElementById('projectDesc').value.trim();
+            const link = document.getElementById('projectLink').value.trim();
+            const emoji = document.getElementById('projectEmoji').value.trim();
+            const imageUrl = document.getElementById('projectImageUrl').value.trim();
+
+            const selectedCats = [];
+            document.querySelectorAll('input[name="projCatCheckbox"]:checked').forEach(cb => {
+                selectedCats.push(cb.value);
+            });
+
+            if (selectedCats.length === 0) {
+                showToast('Please select at least one category.', 'error');
+                return;
+            }
+
+            const imageSource = projectImageBase64 || imageUrl || '';
+
+            const projectData = {
+                title,
+                description,
+                categories: selectedCats,
+                link,
+                emoji,
+                image: imageSource
+            };
+
+            if (editIdx > -1) {
+                // Update
+                // Preserve modalId if existing
+                if (database.projects[editIdx].modalId) {
+                    projectData.modalId = database.projects[editIdx].modalId;
+                }
+                database.projects[editIdx] = {
+                    id: database.projects[editIdx].id || 'p_' + Date.now(),
+                    ...projectData
+                };
+                showToast('Project updated successfully.', 'success');
+            } else {
+                // Create
+                projectData.id = 'p_' + Date.now();
+                database.projects.push(projectData);
+                showToast('New project created successfully.', 'success');
+            }
+
+            saveData();
+            renderProjectsTable();
+            closeProjectModal();
+        });
+
+        // Open Edit Project
+        window.openEditProject = (idx) => {
+            const proj = database.projects[idx];
+            document.getElementById('editProjectIndex').value = idx;
+            document.getElementById('projectModalTitle').textContent = 'Edit Portfolio Project';
+            
+            document.getElementById('projectTitle').value = proj.title;
+            document.getElementById('projectDesc').value = proj.description;
+            document.getElementById('projectLink').value = proj.link || '';
+            document.getElementById('projectEmoji').value = proj.emoji || '';
+
+            // Check checkboxes
+            document.querySelectorAll('input[name="projCatCheckbox"]').forEach(cb => {
+                cb.checked = proj.categories.includes(cb.value);
+            });
+
+            // Image Preview
+            if (proj.image) {
+                if (proj.image.startsWith('data:image')) {
+                    projectImageBase64 = proj.image;
+                    document.getElementById('projectImageUrl').value = '';
+                } else {
+                    document.getElementById('projectImageUrl').value = proj.image;
+                }
+                document.getElementById('img-preview').src = proj.image;
+                document.getElementById('img-preview').style.display = 'block';
+                document.getElementById('previewPlaceholder').style.display = 'none';
+            } else {
+                document.getElementById('img-preview').style.display = 'none';
+                document.getElementById('previewPlaceholder').style.display = 'block';
+            }
+
+            openProjectModal();
+        };
+
+        // Delete Project
+        window.deleteProject = (idx) => {
+            if (confirm('Are you sure you want to delete this project?')) {
+                database.projects.splice(idx, 1);
+                saveData();
+                renderProjectsTable();
+                showToast('Project deleted successfully.', 'success');
+            }
+        };
+
+        // ===== CATEGORIES MANAGEMENT =====
+        const renderCategoriesTable = () => {
+            const tbody = document.getElementById('categoriesTableBody');
+            tbody.innerHTML = '';
+
+            database.categories.forEach((cat, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code>${cat.id}</code></td>
+                    <td style="font-weight:600;">${cat.name}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="openEditCategory(${idx})">✏️</button>
+                            <button class="action-btn delete" onclick="deleteCategory(${idx})">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // Auto Slugify category name
+        document.getElementById('catName').addEventListener('input', (e) => {
+            const editIdx = parseInt(document.getElementById('editCatIndex').value);
+            if (editIdx === -1) { // Only auto slugify on new category
+                const slug = e.target.value.toLowerCase()
+                    .replace(/[^a-z0-9\s\-]/g, '') // remove spec chars
+                    .replace(/\s+/g, '-') // spaces to dashes
+                    .replace(/-+/g, '-'); // collapse multiple dashes
+                document.getElementById('catId').value = slug;
+            }
+        });
+
+        // Category Submit
+        document.getElementById('categoryForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editCatIndex').value);
+            const id = document.getElementById('catId').value.trim();
+            const name = document.getElementById('catName').value.trim();
+
+            const catData = { id, name };
+
+            if (editIdx > -1) {
+                // Update
+                const oldId = database.categories[editIdx].id;
+                
+                // Update projects mapping if category id changed
+                if (oldId !== id) {
+                    database.projects.forEach(p => {
+                        p.categories = p.categories.map(c => c === oldId ? id : c);
+                    });
+                }
+                
+                database.categories[editIdx] = catData;
+                showToast('Category updated successfully.', 'success');
+            } else {
+                // Check uniqueness
+                if (database.categories.some(c => c.id === id)) {
+                    showToast('Category Slug ID already exists.', 'error');
+                    return;
+                }
+                database.categories.push(catData);
+                showToast('Category added successfully.', 'success');
+            }
+
+            saveData();
+            renderCategoriesTable();
+            renderProjectsTable();
+            resetCategoryForm();
+        });
+
+        const resetCategoryForm = () => {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('editCatIndex').value = '-1';
+            document.getElementById('catFormTitle').textContent = 'Add New Category';
+            document.getElementById('catId').disabled = false;
+        };
+
+        window.openEditCategory = (idx) => {
+            const cat = database.categories[idx];
+            document.getElementById('editCatIndex').value = idx;
+            document.getElementById('catName').value = cat.name;
+            document.getElementById('catId').value = cat.id;
+            // Prevent changing baseline IDs to avoid breaking existing styles if they prefer
+            document.getElementById('catFormTitle').textContent = 'Edit Category';
+            document.getElementById('catId').disabled = true; // slug id cannot be changed to prevent broken matches
+        };
+
+        window.deleteCategory = (idx) => {
+            const cat = database.categories[idx];
+            
+            // Check if any projects use this category
+            const linkedProjects = database.projects.filter(p => p.categories.includes(cat.id));
+            if (linkedProjects.length > 0) {
+                if (!confirm(`Warning: ${linkedProjects.length} projects are associated with this category. If you delete it, they will lose this category tag. Proceed?`)) {
+                    return;
+                }
+                // Strip category from projects
+                database.projects.forEach(p => {
+                    p.categories = p.categories.filter(c => c !== cat.id);
+                });
+            } else {
+                if (!confirm('Are you sure you want to delete this category?')) {
+                    return;
+                }
+            }
+
+            database.categories.splice(idx, 1);
+            saveData();
+            renderCategoriesTable();
+            renderProjectsTable();
+            showToast('Category deleted successfully.', 'success');
+        };
+
+        // ===== FORM SUBMISSIONS (LEADS) =====
+        const renderLeadsTable = (searchQuery = '') => {
+            const tbody = document.getElementById('leadsTableBody');
+            tbody.innerHTML = '';
+
+            // Sort date-wise descending
+            let filtered = [...database.submissions].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filtered = filtered.filter(l => 
+                    l.name.toLowerCase().includes(query) || 
+                    l.email.toLowerCase().includes(query) ||
+                    l.subject.toLowerCase().includes(query) ||
+                    l.message.toLowerCase().includes(query)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No form submissions found.</td></tr>';
+                return;
+            }
+
+            filtered.forEach(sub => {
+                const tr = document.createElement('tr');
+                const date = new Date(sub.timestamp).toLocaleString();
+                const typeTag = sub.type === 'Newsletter' ? 'tag-purple' : 'tag-blue';
+                tr.innerHTML = `
+                    <td>${date}</td>
+                    <td><span class="tag ${typeTag}">${sub.type}</span></td>
+                    <td>${sub.name}</td>
+                    <td>${sub.email}</td>
+                    <td>${sub.subject}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="viewLeadDetails('${sub.id}')">👁️</button>
+                            <button class="action-btn delete" onclick="deleteLead('${sub.id}')">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        document.getElementById('searchLeads').addEventListener('input', (e) => {
+            renderLeadsTable(e.target.value);
+        });
+
+        // View Lead details
+        const leadModal = document.getElementById('leadModal');
+        window.viewLeadDetails = (id) => {
+            const sub = database.submissions.find(s => s.id === id);
+            if (!sub) return;
+
+            const modalBody = document.getElementById('leadModalBody');
+            modalBody.innerHTML = `
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Submitted On</div>
+                    <div class="lead-detail-value">${new Date(sub.timestamp).toLocaleString()}</div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Submission Type</div>
+                    <div class="lead-detail-value">${sub.type}</div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Full Name</div>
+                    <div class="lead-detail-value">${sub.name}</div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Email Address</div>
+                    <div class="lead-detail-value">${sub.email}</div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Subject</div>
+                    <div class="lead-detail-value">${sub.subject}</div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Message / Notes</div>
+                    <div class="lead-detail-value" style="white-space: pre-wrap;">${sub.message}</div>
+                </div>
+            `;
+
+            leadModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeLeadModal = () => {
+            leadModal.classList.remove('open');
+            document.body.style.overflow = '';
+        };
+
+        document.getElementById('closeLeadModal').addEventListener('click', closeLeadModal);
+        document.getElementById('closeLeadModalBtn').addEventListener('click', closeLeadModal);
+
+        window.deleteLead = (id) => {
+            if (confirm('Are you sure you want to delete this form submission?')) {
+                database.submissions = database.submissions.filter(s => s.id !== id);
+                saveData();
+                renderLeadsTable();
+                renderDashboardRecentSubmissions();
+                showToast('Form submission deleted.', 'success');
+            }
+        };
+
+        // CSV Export
+        document.getElementById('exportLeadsCsv').addEventListener('click', () => {
+            if (database.submissions.length === 0) {
+                showToast('No submissions to export.', 'error');
+                return;
+            }
+            let csv = 'ID,Date,Type,Name,Email,Subject,Message\r\n';
+            database.submissions.forEach(sub => {
+                const date = new Date(sub.timestamp).toISOString();
+                const msgClean = (sub.message || '').replace(/"/g, '""');
+                csv += `"${sub.id}","${date}","${sub.type}","${sub.name}","${sub.email}","${sub.subject}","${msgClean}"\r\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `submissions_export_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('CSV export complete.', 'success');
+        });
+
+        // JSON Export
+        document.getElementById('exportLeadsJson').addEventListener('click', () => {
+            if (database.submissions.length === 0) {
+                showToast('No submissions to export.', 'error');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(database.submissions, null, 2)], { type: 'application/json' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `submissions_export_${Date.now()}.json`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('JSON export complete.', 'success');
+        });
+
+        // ===== SETTINGS & CREDENTIALS =====
+        document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const curr = document.getElementById('currentPass').value.trim();
+            const newP = document.getElementById('newPass').value.trim();
+            const conf = document.getElementById('confirmPass').value.trim();
+
+            const stored = localStorage.getItem('shaivika_admin_password');
+
+            if (curr !== stored) {
+                showToast('Current password does not match.', 'error');
+                return;
+            }
+            if (newP !== conf) {
+                showToast('New passwords do not match.', 'error');
+                return;
+            }
+            if (newP.length < 6) {
+                showToast('Password should be at least 6 characters long.', 'error');
+                return;
+            }
+
+            localStorage.setItem('shaivika_admin_password', newP);
+            showToast('Password changed successfully.', 'success');
+            document.getElementById('changePasswordForm').reset();
+        });
+
+        // Database Backup Export
+        document.getElementById('btnExportDb').addEventListener('click', () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(database, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `shaivika_db_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Database backup downloaded.', 'success');
+        });
+
+        // Database Backup Restore
+        document.getElementById('btnImportDbFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (parsed.categories && parsed.projects) {
+                        database.categories = parsed.categories;
+                        database.projects = parsed.projects;
+                        database.submissions = parsed.submissions || [];
+                        saveData();
+                        loadData();
+                        showToast('Database restored successfully from backup!', 'success');
+                    } else {
+                        showToast('Invalid backup file structure.', 'error');
+                    }
+                } catch (err) {
+                    showToast('Failed to parse JSON file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            // Reset file input
+            e.target.value = '';
+        });
+
+        // Database Reset
+        document.getElementById('btnResetDb').addEventListener('click', async () => {
+            if (confirm('Warning: This will reset all portfolio items, categories, and delete all form submissions, reverting back to baseline defaults. Are you absolutely sure?')) {
+                try {
+                    const response = await fetch('../data/portfolio.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        database.categories = data.categories;
+                        database.projects = data.projects;
+                        database.submissions = [];
+                        saveData();
+                        loadData();
+                        showToast('Database has been reset to defaults.', 'success');
+                    } else {
+                        showToast('Failed to fetch default database config.', 'error');
+                    }
+                } catch (e) {
+                    showToast('Error resetting database.', 'error');
+                }
+            }
+        });
+
+        // Close modal clicking outside
+        window.onclick = (e) => {
+            if (e.target === projectModal) {
+                closeProjectModal();
+            }
+            if (e.target === leadModal) {
+                closeLeadModal();
+            }
+        };
+
+        // Esc key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeProjectModal();
+                closeLeadModal();
+            }
+        });
+
+        // Bootstrapping
+        checkAuth();
+        initTheme();
+    </script>
+</body>
+</html>
