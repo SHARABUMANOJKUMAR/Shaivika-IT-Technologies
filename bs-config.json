@@ -1,6 +1,9 @@
 {
   "server": {
-    "baseDir": ["./Shaivika-IT-Technologies"]
+    "baseDir": ["./Shaivika-IT-Technologies"],
+    "middleware": {
+      "1": null
+    }
   },
   "files": ["./Shaivika-IT-Technologies/**/*.{html,htm,css,js}"]
 }
