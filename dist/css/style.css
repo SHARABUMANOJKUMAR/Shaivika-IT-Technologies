@@ -2481,3 +2481,15 @@ footer {
 .notification {
   bottom: 100px !important;
 }
+
+/* ============================================
+   MOBILE DESKTOP PORTRAIT VIEW HEIGHT & PADDING FIX
+   ============================================ */
+@media screen and (max-aspect-ratio: 1/1) {
+  .hero,
+  .hero-section {
+    min-height: auto !important;
+    padding-top: 130px !important;
+    padding-bottom: 70px !important;
+  }
+}
