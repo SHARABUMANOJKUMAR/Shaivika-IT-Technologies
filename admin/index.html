@@ -722,10 +722,12 @@
 
             <!-- TAB 2: PORTFOLIO -->
             <section class="tab-content" id="portfolio-manager-tab">
-                <div class="data-card">
                     <div class="data-card-header">
                         <input type="text" class="search-input" id="searchProjects" placeholder="Search projects by title, desc...">
-                        <button class="btn btn-primary btn-sm" id="addNewProjectBtn">➕ Add Project</button>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-primary btn-sm" id="addNewProjectBtn">➕ Add Project</button>
+                            <button class="btn btn-secondary btn-sm" id="exportPortfolioBtn" onclick="exportPortfolioJSON()" title="Download portfolio.json — replace in /data/ folder then push to GitHub to update live site">📥 Export portfolio.json</button>
+                        </div>
                     </div>
                     <div class="data-table-wrapper">
                         <table class="data-table">
@@ -1244,6 +1246,22 @@
             populateCategoryCheckboxes();
         };
 
+        // Export portfolio.json for deployment
+        window.exportPortfolioJSON = () => {
+            const exportData = {
+                categories: database.categories,
+                projects: database.projects
+            };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'portfolio.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('✅ Downloaded portfolio.json — Replace file in /data/ folder and push to GitHub!', 'success');
+        };
+
         const updateDashboardStats = () => {
             document.getElementById('statTotalProjects').textContent = database.projects.length;
             document.getElementById('statTotalCategories').textContent = database.categories.length;
@@ -1315,21 +1333,28 @@
                 return;
             }
 
-            filtered.forEach((proj, idx) => {
+            filtered.forEach((proj) => {
                 const tr = document.createElement('tr');
                 let thumbHTML = proj.image ? `<img src="${proj.image}" style="width:50px; height:35px; object-fit:cover; border-radius:4px;">` : `<span style="font-size: 1.25rem;">${proj.emoji || '💻'}</span>`;
                 const tags = proj.categories.map(cId => `<span class="tag tag-cyan" style="font-size:0.65rem;margin-right:4px;">${cId}</span>`).join('');
                 const linkDisplay = proj.link ? `<a href="${proj.link}" target="_blank" style="color:var(--accent);">${proj.link}</a>` : '<span style="color:var(--text-muted);">None</span>';
+                const safeId = CSS.escape ? CSS.escape(proj.id) : proj.id;
 
+                tr.id = 'proj-row-' + proj.id;
                 tr.innerHTML = `
                     <td style="text-align:center;">${thumbHTML}</td>
                     <td style="font-weight:600;">${proj.title}</td>
                     <td>${tags}</td>
                     <td>${linkDisplay}</td>
                     <td>
-                        <div class="action-btns">
-                            <button class="action-btn" onclick="openEditProject(${idx})">✏️</button>
-                            <button class="action-btn delete" onclick="deleteProject(${idx})">🗑️</button>
+                        <div class="action-btns" id="proj-actions-${proj.id}">
+                            <button class="action-btn" onclick="openEditProject('${proj.id}')">✏️</button>
+                            <button class="action-btn delete" onclick="confirmDeleteProject('${proj.id}', this)">🗑️</button>
+                        </div>
+                        <div id="proj-confirm-${proj.id}" style="display:none;align-items:center;gap:8px;">
+                            <span style="font-size:0.8rem;color:var(--danger);font-weight:600;">Delete?</span>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProject('${proj.id}')">✔ Yes</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelDeleteProject('${proj.id}')">✖ No</button>
                         </div>
                     </td>
                 `;
@@ -1845,7 +1870,20 @@
             closeProjectModal();
         });
 
-        window.openEditProject = (idx) => {
+        window.confirmDeleteProject = (id, btn) => {
+            document.getElementById('proj-actions-' + id).style.display = 'none';
+            const confirm = document.getElementById('proj-confirm-' + id);
+            confirm.style.display = 'flex';
+        };
+
+        window.cancelDeleteProject = (id) => {
+            document.getElementById('proj-actions-' + id).style.display = 'flex';
+            document.getElementById('proj-confirm-' + id).style.display = 'none';
+        };
+
+        window.openEditProject = (id) => {
+            const idx = database.projects.findIndex(p => p.id === id);
+            if (idx === -1) { showToast('Project not found.', 'error'); return; }
             const proj = database.projects[idx];
             document.getElementById('editProjectIndex').value = idx;
             document.getElementById('projectModalTitle').textContent = 'Edit Portfolio Project';
@@ -1864,14 +1902,14 @@
             openProjectModal();
         };
 
-        window.deleteProject = (idx) => {
+        window.deleteProject = (id) => {
+            const idx = database.projects.findIndex(p => p.id === id);
+            if (idx === -1) { showToast('Project not found.', 'error'); return; }
             const proj = database.projects[idx];
-            if (confirm(`Are you sure you want to delete project "${proj.title}"?`)) {
-                database.projects.splice(idx, 1);
-                saveData();
-                renderProjectsTable();
-                showToast('Project deleted successfully.', 'success');
-            }
+            database.projects.splice(idx, 1);
+            saveData();
+            renderProjectsTable();
+            showToast('"' + proj.title + '" deleted successfully.', 'success');
         };
 
         // CATEGORY FORM SUBMIT handler

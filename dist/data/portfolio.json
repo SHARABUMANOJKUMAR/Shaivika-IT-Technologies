@@ -18,16 +18,6 @@
       "modalId": "#modal-manspharsh"
     },
     {
-      "id": "p2",
-      "title": "Siddartha Hostel Management",
-      "description": "Smart hostel management with room allocation, fee automation, and WhatsApp notification integration.",
-      "categories": ["webapp", "enterprise"],
-      "link": "https://siddarthainstitutions-boys-hostel.netlify.app/",
-      "image": "",
-      "emoji": "🏠",
-      "modalId": "#modal-hostel"
-    },
-    {
       "id": "p3",
       "title": "AI Lead Automation CRM",
       "description": "Intelligent lead scoring, WhatsApp follow-ups, pipeline management and conversion analytics.",

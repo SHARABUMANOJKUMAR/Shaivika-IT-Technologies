@@ -1,7 +1,8 @@
 /**
  * SHAIVIKA IT TECHNOLOGIES - Dynamic Portfolio Manager
- * Loads categories and portfolio projects from LocalStorage (with JSON & Inline Fallback),
- * renders filters dynamically, and implements full pagination and filtering.
+ * ALWAYS fetches fresh data from data/portfolio.json (server source of truth).
+ * Falls back to localStorage cache only when fetch fails (offline/file:// protocol).
+ * Admin changes to data/portfolio.json are immediately reflected for all visitors.
  */
 document.addEventListener('DOMContentLoaded', () => {
   const filterBar = document.querySelector('.filter-bar');
@@ -55,16 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       emoji: "🏥",
       modalId: "#modal-manspharsh"
     },
-    {
-      id: "p2",
-      title: "Siddartha Hostel Management",
-      description: "Smart hostel management with room allocation, fee automation, and WhatsApp notification integration.",
-      categories: ["webapp", "enterprise"],
-      link: "https://siddarthainstitutions-boys-hostel.netlify.app/",
-      image: "",
-      emoji: "🏠",
-      modalId: "#modal-hostel"
-    },
+
     {
       id: "p3",
       title: "AI Lead Automation CRM",
@@ -216,33 +208,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function initPortfolio() {
     try {
-      let loadedCategories = DEFAULT_CATEGORIES;
-      let loadedProjects = DEFAULT_PROJECTS;
+      let fetchedFromServer = false;
 
+      // ALWAYS try to fetch fresh data from server first (source of truth)
       try {
-        const response = await fetch('data/portfolio.json');
+        const response = await fetch('data/portfolio.json?v=' + Date.now());
         if (response.ok) {
           const data = await response.json();
-          if (data.categories && data.categories.length > 0) loadedCategories = data.categories;
-          if (data.projects && data.projects.length > 0) loadedProjects = data.projects;
+          if (data.categories && data.categories.length > 0) categories = data.categories;
+          if (data.projects && data.projects.length > 0) projects = data.projects;
+          // Update cache with fresh server data
+          localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
+          localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
+          localStorage.setItem('shaivika_portfolio_initialized', 'true');
+          fetchedFromServer = true;
         }
       } catch (err) {
-        console.warn('Using inline default portfolio dataset (file:// CORS fallback)');
+        console.warn('Server fetch failed — using cached/fallback data');
       }
 
-      const initialized = localStorage.getItem('shaivika_portfolio_initialized');
-      const cachedCategories = localStorage.getItem('shaivika_portfolio_categories');
-      const cachedProjects = localStorage.getItem('shaivika_portfolio_projects');
-
-      if (initialized === 'true' && cachedCategories && cachedProjects) {
-        categories = JSON.parse(cachedCategories);
-        projects = JSON.parse(cachedProjects);
-      } else {
-        categories = loadedCategories;
-        projects = loadedProjects;
-        localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
-        localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
-        localStorage.setItem('shaivika_portfolio_initialized', 'true');
+      // Only use cache/defaults if server fetch failed
+      if (!fetchedFromServer) {
+        const cachedCategories = localStorage.getItem('shaivika_portfolio_categories');
+        const cachedProjects = localStorage.getItem('shaivika_portfolio_projects');
+        if (cachedCategories && cachedProjects) {
+          categories = JSON.parse(cachedCategories);
+          projects = JSON.parse(cachedProjects);
+        } else {
+          categories = DEFAULT_CATEGORIES;
+          projects = DEFAULT_PROJECTS;
+        }
       }
 
       render();
