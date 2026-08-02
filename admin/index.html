@@ -59,13 +59,9 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* ===== BACKGROUND ANIMATIONS ===== */
         .background-blobs {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             z-index: -1;
             overflow: hidden;
             pointer-events: none;
@@ -73,128 +69,107 @@
 
         .blob {
             position: absolute;
-            width: 500px;
-            height: 500px;
+            width: 500px; height: 500px;
             border-radius: 50%;
             filter: blur(120px);
             opacity: 0.15;
             animation: float 20s infinite alternate;
         }
 
-        .blob-1 {
-            background: var(--primary);
-            top: -10%;
-            left: -10%;
-        }
-
-        .blob-2 {
-            background: var(--secondary);
-            bottom: -10%;
-            right: -10%;
-            animation-delay: -5s;
-        }
+        .blob-1 { background: var(--primary); top: -10%; left: -10%; }
+        .blob-2 { background: var(--secondary); bottom: -10%; right: -10%; animation-delay: -5s; }
 
         @keyframes float {
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(50px, 50px) scale(1.1); }
         }
 
-        /* ===== LOGIN CONTAINER ===== */
         .login-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-grow: 1;
+            min-height: 100vh;
             padding: 20px;
         }
 
         .login-card {
             background: var(--bg-glass);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-glass);
             border-radius: 24px;
-            width: 100%;
-            max-width: 440px;
             padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             text-align: center;
-            animation: fadeInUp 0.6s ease;
         }
 
         .login-logo {
             font-family: var(--font-display);
+            font-size: 1.8rem;
             font-weight: 700;
-            font-size: 2rem;
-            margin-bottom: 8px;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
         }
 
         .login-subtitle {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 32px;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
         }
 
         .form-group {
             margin-bottom: 20px;
             text-align: left;
-            position: relative;
         }
 
         .form-label {
             display: block;
             font-size: 0.85rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
             margin-bottom: 8px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
         }
 
-        .input-wrapper {
-            position: relative;
-        }
-
-        .form-input {
+        .form-input, .form-select {
             width: 100%;
-            padding: 14px 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-glass);
-            border-radius: 12px;
             color: var(--text-primary);
-            font-size: 1rem;
+            font-size: 0.95rem;
+            outline: none;
             transition: all 0.3s;
         }
 
-        .form-input:focus {
-            outline: none;
+        .form-input:focus, .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.15);
-            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 14px 28px;
+            padding: 12px 24px;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
-            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 8px;
+            text-decoration: none;
         }
 
         .btn-primary {
             background: var(--gradient-primary);
             color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
 
         .btn-primary:hover {
@@ -223,13 +198,17 @@
             transform: translateY(-1px);
         }
 
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
         .btn-sm {
             padding: 8px 16px;
             font-size: 0.85rem;
             border-radius: 8px;
         }
 
-        /* ===== MAIN DASHBOARD CONTAINER ===== */
         .dashboard-container {
             display: none;
             flex-grow: 1;
@@ -237,9 +216,8 @@
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 280px;
+            width: 290px;
             background: var(--bg-glass);
             backdrop-filter: blur(20px);
             border-right: 1px solid var(--border-glass);
@@ -256,7 +234,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .sidebar-logo {
@@ -274,13 +252,13 @@
         }
 
         .sidebar-item {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .sidebar-link {
             display: flex;
             align-items: center;
-            padding: 14px 18px;
+            padding: 12px 16px;
             color: var(--text-secondary);
             text-decoration: none;
             border-radius: 12px;
@@ -288,6 +266,7 @@
             transition: all 0.3s;
             gap: 12px;
             cursor: pointer;
+            font-size: 0.9rem;
         }
 
         .sidebar-link:hover, .sidebar-link.active {
@@ -296,7 +275,7 @@
         }
 
         .sidebar-link.active {
-            background: rgba(37, 99, 235, 0.1);
+            background: rgba(37, 99, 235, 0.12);
             border-left: 3px solid var(--primary);
             border-radius: 0 12px 12px 0;
         }
@@ -307,7 +286,6 @@
             padding-top: 20px;
         }
 
-        /* ===== MAIN CONTENT AREA ===== */
         .main-content {
             flex-grow: 1;
             padding: 40px;
@@ -330,22 +308,21 @@
             font-weight: 700;
         }
 
-        /* ===== DASHBOARD CARDS ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 36px;
         }
 
         .stat-card {
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
             border-radius: 20px;
-            padding: 24px;
+            padding: 22px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             transition: transform 0.3s;
         }
@@ -355,19 +332,20 @@
         }
 
         .stat-icon {
-            width: 60px;
-            height: 60px;
+            width: 54px;
+            height: 54px;
             border-radius: 16px;
             background: rgba(37, 99, 235, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             color: var(--primary);
+            flex-shrink: 0;
         }
 
         .stat-details h3 {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -376,11 +354,10 @@
 
         .stat-details p {
             font-family: var(--font-display);
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
         }
 
-        /* ===== TABS CONTENT ===== */
         .tab-content {
             display: none;
             animation: fadeIn 0.4s ease;
@@ -395,7 +372,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== TABLES & LISTS ===== */
         .data-card {
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
@@ -421,7 +397,7 @@
             border-radius: 10px;
             color: var(--text-primary);
             font-size: 0.9rem;
-            min-width: 260px;
+            min-width: 240px;
         }
 
         .data-table-wrapper {
@@ -435,14 +411,15 @@
         }
 
         .data-table th, .data-table td {
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-bottom: 1px solid var(--border-glass);
+            font-size: 0.9rem;
         }
 
         .data-table th {
             color: var(--text-secondary);
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -451,60 +428,62 @@
             border-bottom: none;
         }
 
-        .data-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        /* ===== TAGS ===== */
-        .tag {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .tag-blue { background: rgba(37, 99, 235, 0.15); color: #60a5fa; }
-        .tag-purple { background: rgba(124, 58, 237, 0.15); color: #c084fc; }
-        .tag-cyan { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
-        .tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-
-        /* ===== ACTION ICON BUTTONS ===== */
         .action-btns {
             display: flex;
             gap: 8px;
         }
 
         .action-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            padding: 6px 12px;
             border-radius: 8px;
+            cursor: pointer;
             transition: all 0.2s;
-            font-size: 1.1rem;
+            font-size: 0.85rem;
         }
 
         .action-btn:hover {
-            color: var(--text-primary);
-            background: rgba(255,255,255,0.05);
+            background: rgba(37, 99, 235, 0.2);
+            border-color: var(--primary);
         }
 
         .action-btn.delete:hover {
-            color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger);
         }
 
-        /* ===== MODALS ===== */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .tag-blue { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.3); }
+        .tag-purple { background: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.3); }
+        .tag-cyan { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
         .modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(8px);
             display: none;
@@ -514,17 +493,15 @@
             padding: 20px;
         }
 
-        .modal.open {
-            display: flex;
-        }
+        .modal.open { display: flex; }
 
         .modal-content {
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
             border-radius: 24px;
             width: 100%;
-            max-width: 600px;
-            padding: 36px;
+            max-width: 650px;
+            padding: 32px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             max-height: 90vh;
             overflow-y: auto;
@@ -545,7 +522,7 @@
 
         .modal-title {
             font-family: var(--font-display);
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
         }
 
@@ -557,111 +534,31 @@
             cursor: pointer;
         }
 
-        /* ===== FORMS INTERNAL ===== */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
         }
 
-        .form-full {
-            grid-column: 1 / -1;
-        }
+        .form-full { grid-column: 1 / -1; }
 
         .textarea-input {
             width: 100%;
-            height: 120px;
+            height: 100px;
             resize: vertical;
         }
 
-        /* Image upload preview */
-        .image-preview-box {
-            margin-top: 10px;
-            border: 2px dashed var(--border-glass);
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            position: relative;
-        }
+        .lead-detail-field { margin-bottom: 14px; }
+        .lead-detail-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
+        .lead-detail-value { font-size: 0.95rem; color: var(--text-primary); line-height: 1.5; background: rgba(255, 255, 255, 0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); }
 
-        .image-preview-box img {
-            max-height: 120px;
-            border-radius: 8px;
-            display: none;
-            margin: 0 auto;
-        }
-
-        .image-preview-box span {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        /* Lead detail fields */
-        .lead-detail-field {
-            margin-bottom: 18px;
-        }
-
-        .lead-detail-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .lead-detail-value {
-            font-size: 1rem;
-            color: var(--text-primary);
-            line-height: 1.5;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border-glass);
-        }
-
-        /* Responsive Breakpoints */
-        @media (max-width: 900px) {
-            .dashboard-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding: 20px;
-            }
-            .sidebar-header {
-                margin-bottom: 20px;
-            }
-            .sidebar-nav {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            .sidebar-item {
-                margin-bottom: 0;
-            }
-            .sidebar-link {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-            .main-content {
-                padding: 20px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Notification Toast */
         .toast {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 24px; right: 24px;
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
             border-radius: 12px;
-            padding: 16px 24px;
+            padding: 14px 22px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
@@ -672,13 +569,16 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast-icon { font-size: 1.25rem; }
 
-        .toast-icon {
-            font-size: 1.25rem;
+        @media (max-width: 900px) {
+            .dashboard-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; padding: 20px; }
+            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 6px; }
+            .sidebar-link { padding: 8px 12px; font-size: 0.8rem; }
+            .main-content { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -730,6 +630,15 @@
                     <span class="sidebar-link" data-tab="leads-manager-tab">✉️ Form Submissions</span>
                 </li>
                 <li class="sidebar-item">
+                    <span class="sidebar-link" data-tab="jobs-manager-tab">👔 Job Openings</span>
+                </li>
+                <li class="sidebar-item">
+                    <span class="sidebar-link" data-tab="applications-manager-tab" style="display:flex;align-items:center;justify-content:space-between;">
+                        <span>📄 Job Applications</span>
+                        <span id="pendingAppsBadge" class="status-badge badge-warning" style="display:none;font-size:0.7rem;padding:2px 7px;">0</span>
+                    </span>
+                </li>
+                <li class="sidebar-item">
                     <span class="sidebar-link" data-tab="settings-tab">⚙️ Settings & Backup</span>
                 </li>
             </ul>
@@ -766,8 +675,22 @@
                     <div class="stat-card">
                         <div class="stat-icon">✉️</div>
                         <div class="stat-details">
-                            <h3>Submissions</h3>
+                            <h3>Form Leads</h3>
                             <p id="statTotalSubmissions">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👔</div>
+                        <div class="stat-details">
+                            <h3>Active Jobs</h3>
+                            <p id="statTotalJobs">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📄</div>
+                        <div class="stat-details">
+                            <h3>Applications</h3>
+                            <p id="statTotalApplications">0</p>
                         </div>
                     </div>
                 </div>
@@ -826,7 +749,6 @@
             <!-- TAB 3: CATEGORIES -->
             <section class="tab-content" id="category-manager-tab">
                 <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;" id="catGridContainer">
-                    <!-- Left Form -->
                     <div class="data-card" style="height: fit-content;">
                         <h3 class="modal-title" style="margin-bottom: 20px;" id="catFormTitle">Add New Category</h3>
                         <form id="categoryForm">
@@ -838,12 +760,10 @@
                             <div class="form-group">
                                 <label class="form-label">Slug ID</label>
                                 <input type="text" class="form-input" id="catId" required placeholder="e.g. mobile-apps" pattern="[a-z0-9\-]+">
-                                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">Lowercase alphanumeric and dashes only.</small>
                             </div>
                             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Save Category</button>
                         </form>
                     </div>
-                    <!-- Right Table -->
                     <div class="data-card">
                         <h3 class="modal-title" style="margin-bottom: 20px;">Existing Categories</h3>
                         <div class="data-table-wrapper">
@@ -894,10 +814,77 @@
                 </div>
             </section>
 
-            <!-- TAB 5: SETTINGS -->
+            <!-- TAB 5: JOB OPENINGS -->
+            <section class="tab-content" id="jobs-manager-tab">
+                <div class="data-card">
+                    <div class="data-card-header">
+                        <input type="text" class="search-input" id="searchJobs" placeholder="Search job postings...">
+                        <button class="btn btn-primary btn-sm" id="addNewJobBtn">➕ Post New Job</button>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Icon</th>
+                                    <th>Job Title</th>
+                                    <th>Department</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobsTableBody">
+                                <!-- Dynamic job rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: JOB APPLICATIONS -->
+            <section class="tab-content" id="applications-manager-tab">
+                <div class="data-card">
+                    <div class="data-card-header">
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                            <input type="text" class="search-input" id="searchApplications" placeholder="Search candidate by name, email, skills...">
+                            <select class="form-select" id="filterAppStatus" style="width:auto;padding:8px 12px;">
+                                <option value="all">All Application Statuses</option>
+                                <option value="pending">Pending Review</option>
+                                <option value="shortlisted">Shortlisted</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-secondary btn-sm" id="exportAppsCsv">📥 Export Candidates CSV</button>
+                            <button class="btn btn-primary btn-sm" id="refreshApplicationsBtn" title="Reload applications from latest data">🔄 Refresh</button>
+                        </div>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Applied Date</th>
+                                    <th>Candidate Name</th>
+                                    <th>Target Position</th>
+                                    <th>Contact Info</th>
+                                    <th>Status / Exp</th>
+                                    <th>Resume</th>
+                                    <th>App Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationsTableBody">
+                                <!-- Dynamic application rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 7: SETTINGS -->
             <section class="tab-content" id="settings-tab">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
-                    <!-- Change Password -->
                     <div class="data-card">
                         <h3 class="modal-title" style="margin-bottom: 24px;">Change Admin Password</h3>
                         <form id="changePasswordForm">
@@ -917,20 +904,17 @@
                         </form>
                     </div>
 
-                    <!-- Database Management -->
                     <div class="data-card" style="height: fit-content;">
                         <h3 class="modal-title" style="margin-bottom: 24px;">Database Maintenance</h3>
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5;">
-                            Export the portfolio and leads database as a JSON file, or restore data from an existing backup.
+                            Export the full system database (projects, form leads, job postings, and applicant resumes) as a JSON backup.
                         </p>
                         <div style="display: flex; flex-direction: column; gap: 14px;">
-                            <button class="btn btn-secondary" id="btnExportDb" style="width: 100%;">📥 Export Database Backup</button>
-                            
+                            <button class="btn btn-secondary" id="btnExportDb" style="width: 100%;">📥 Export Full DB Backup</button>
                             <label class="btn btn-secondary" style="width: 100%; cursor: pointer;">
                                 📤 Import Database Restore
                                 <input type="file" id="btnImportDbFile" accept=".json" style="display: none;">
                             </label>
-
                             <button class="btn btn-danger btn-sm" id="btnResetDb" style="width: 100%; margin-top: 15px;">⚠️ Reset to Default Baseline</button>
                         </div>
                     </div>
@@ -939,7 +923,7 @@
         </main>
     </div>
 
-    <!-- ===== PROJECT ADD/EDIT MODAL ===== -->
+    <!-- PROJECT MODAL -->
     <div class="modal" id="projectModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -958,29 +942,16 @@
                         <textarea class="form-input textarea-input" id="projectDesc" required placeholder="Brief detail about what the project does..."></textarea>
                     </div>
                     <div class="form-group form-full">
-                        <label class="form-label">Categories (Select relevant)</label>
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;" id="projectCategoriesSelect">
-                            <!-- Dynamic category checkboxes -->
-                        </div>
+                        <label class="form-label">Categories</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;" id="projectCategoriesSelect"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Live Link / Target URL</label>
                         <input type="text" class="form-input" id="projectLink" placeholder="https://example.com or contact.html">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Fallback Emoji (if no image)</label>
+                        <label class="form-label">Fallback Emoji</label>
                         <input type="text" class="form-input" id="projectEmoji" placeholder="e.g. 📱 or 🏥" maxlength="4">
-                    </div>
-                    <div class="form-group form-full">
-                        <label class="form-label">Project Image (File Upload or Image URL)</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="text" class="form-input" id="projectImageUrl" placeholder="https://path/to/image.jpg">
-                            <input type="file" class="form-input" id="projectImageFile" accept="image/*" style="padding: 10px 16px;">
-                        </div>
-                        <div class="image-preview-box">
-                            <span id="previewPlaceholder">No image loaded (will use fallback emoji)</span>
-                            <img id="img-preview" src="#" alt="Preview">
-                        </div>
                     </div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
@@ -991,40 +962,133 @@
         </div>
     </div>
 
-    <!-- ===== LEAD DETAILS MODAL ===== -->
+    <!-- JOB POSTING MODAL -->
+    <div class="modal" id="jobModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="jobModalTitle">Post New Job Opening</h3>
+                <button class="modal-close" id="closeJobModal">✕</button>
+            </div>
+            <form id="jobForm">
+                <input type="hidden" id="editJobIndex" value="-1">
+                <div class="form-grid">
+                    <div class="form-group form-full">
+                        <label class="form-label">Job Title *</label>
+                        <input type="text" class="form-input" id="jobTitle" required placeholder="e.g. Full-Stack Web Developer">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department *</label>
+                        <select class="form-select" id="jobDepartment" required>
+                            <option value="sales">Sales & BD</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="ai">AI & Data</option>
+                            <option value="design">Design</option>
+                            <option value="general">General / Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Emoji Icon</label>
+                        <input type="text" class="form-input" id="jobEmoji" placeholder="e.g. 💻, 💼, 🤖" maxlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location *</label>
+                        <input type="text" class="form-input" id="jobLocation" required placeholder="e.g. Remote (India) / Kadapa">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Employment Type *</label>
+                        <select class="form-select" id="jobType" required>
+                            <option value="Full-Time">Full-Time</option>
+                            <option value="Part-Time">Part-Time</option>
+                            <option value="Commission / Partnership">Commission / Partnership</option>
+                            <option value="Internship">Internship</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Experience Required *</label>
+                        <input type="text" class="form-input" id="jobExperience" required placeholder="e.g. 0-2 Years / Freshers">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Salary / Incentive Package</label>
+                        <input type="text" class="form-input" id="jobSalary" placeholder="e.g. Competitive + Incentives">
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label">Position Overview *</label>
+                        <textarea class="form-input textarea-input" id="jobOverview" required placeholder="Describe the role overview and goals..."></textarea>
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label">Key Responsibilities (One per line) *</label>
+                        <textarea class="form-input textarea-input" id="jobResponsibilities" required placeholder="Build responsive web apps&#10;Integrate APIs and databases"></textarea>
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label">Required Skills (Comma separated) *</label>
+                        <input type="text" class="form-input" id="jobSkills" required placeholder="React, Node.js, Python, B2B Sales">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="jobStatus">
+                            <option value="active">Active (Visible on Site)</option>
+                            <option value="inactive">Inactive (Hidden)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" id="cancelJobModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Job Posting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CANDIDATE APPLICATION DETAIL MODAL -->
+    <div class="modal" id="applicationDetailModal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Candidate Profile & Application</h3>
+                <button class="modal-close" id="closeAppModal">✕</button>
+            </div>
+            <div id="appModalBody">
+                <!-- Dynamic details -->
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; pt-16; border-top:1px solid var(--border-glass);">
+                <div id="appStatusActionBtns" style="display:flex;gap:8px;">
+                    <!-- Action buttons -->
+                </div>
+                <button class="btn btn-primary btn-sm" id="closeAppModalBtn">Close Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEAD DETAILS MODAL -->
     <div class="modal" id="leadModal">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <h3 class="modal-title">Form Submission Details</h3>
                 <button class="modal-close" id="closeLeadModal">✕</button>
             </div>
-            <div id="leadModalBody">
-                <!-- Dynamic details -->
-            </div>
+            <div id="leadModalBody"></div>
             <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
                 <button class="btn btn-primary btn-sm" id="closeLeadModalBtn">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast system -->
+    <!-- Toast System -->
     <div class="toast" id="toastBox">
         <span class="toast-icon" id="toastIcon">✅</span>
         <span id="toastMsg">Action complete.</span>
     </div>
 
-    <!-- ===== ADMIN PORTAL JAVASCRIPT ===== -->
+    <!-- ADMIN JAVASCRIPT -->
     <script>
-        // Core state
         let database = {
             categories: [],
             projects: [],
-            submissions: []
+            submissions: [],
+            jobs: [],
+            applications: []
         };
         let currentActiveTab = 'dashboard-summary';
-        let projectImageBase64 = '';
 
-        // DOM Elements
         const loginWrapper = document.getElementById('loginWrapper');
         const loginForm = document.getElementById('loginForm');
         const dashboardContainer = document.getElementById('dashboardContainer');
@@ -1035,19 +1099,16 @@
         const currentTime = document.getElementById('currentTime');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-        // Initialize admin password if not present
         if (!localStorage.getItem('shaivika_admin_password')) {
             localStorage.setItem('shaivika_admin_password', 'adminpassword123');
         }
 
-        // Live Clock
         setInterval(() => {
             const now = new Date();
             currentTime.textContent = now.toLocaleString();
         }, 1000);
         currentTime.textContent = new Date().toLocaleString();
 
-        // Check authentication state
         const checkAuth = () => {
             if (localStorage.getItem('shaivika_admin_logged_in') === 'true') {
                 loginWrapper.style.display = 'none';
@@ -1059,7 +1120,6 @@
             }
         };
 
-        // Theme management
         const initTheme = () => {
             const currentTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', currentTheme);
@@ -1074,7 +1134,6 @@
             themeToggleBtn.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
         });
 
-        // Login Submit
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const user = document.getElementById('username').value.trim();
@@ -1083,37 +1142,31 @@
 
             if (user === 'admin' && pass === storedPass) {
                 localStorage.setItem('shaivika_admin_logged_in', 'true');
-                showToast('Login successful! Welcome to the admin portal.', 'success');
+                showToast('Login successful!', 'success');
                 checkAuth();
             } else {
-                showToast('Invalid credentials. Please try again.', 'error');
+                showToast('Invalid credentials.', 'error');
             }
         });
 
-        // Logout
         logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('shaivika_admin_logged_in');
             showToast('Logged out successfully.', 'success');
             checkAuth();
         });
 
-        // Tabs switching
         sidebarLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const targetTab = link.dataset.tab;
-                
                 sidebarLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
-
                 tabContents.forEach(tc => tc.classList.remove('active'));
                 document.getElementById(targetTab).classList.add('active');
-
-                contentTitle.textContent = link.textContent.substring(2);
+                contentTitle.textContent = link.textContent.trim().replace(/^[\p{Emoji}\s]+/u, '');
                 currentActiveTab = targetTab;
             });
         });
 
-        // Toast notifications
         const showToast = (msg, type = 'success') => {
             const toastBox = document.getElementById('toastBox');
             const toastIcon = document.getElementById('toastIcon');
@@ -1121,17 +1174,13 @@
 
             toastIcon.textContent = type === 'success' ? '✅' : '❌';
             toastMsg.textContent = msg;
-            
             toastBox.classList.add('show');
-            setTimeout(() => {
-                toastBox.classList.remove('show');
-            }, 3500);
+            setTimeout(() => toastBox.classList.remove('show'), 3500);
         };
 
-        // Load & Synchronize Database
         const loadData = async () => {
             try {
-                // Portfolio Categories
+                // Categories
                 let cats = localStorage.getItem('shaivika_portfolio_categories');
                 if (cats) {
                     database.categories = JSON.parse(cats);
@@ -1146,7 +1195,7 @@
                     localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(database.categories));
                 }
 
-                // Portfolio Projects
+                // Projects
                 let projs = localStorage.getItem('shaivika_portfolio_projects');
                 if (projs) {
                     database.projects = JSON.parse(projs);
@@ -1163,40 +1212,60 @@
                 let subs = localStorage.getItem('shaivika_submissions');
                 database.submissions = subs ? JSON.parse(subs) : [];
 
+                // Jobs
+                let jbs = localStorage.getItem('shaivika_job_postings');
+                database.jobs = jbs ? JSON.parse(jbs) : [];
+
+                // Applications
+                let apps = localStorage.getItem('shaivika_job_applications');
+                database.applications = apps ? JSON.parse(apps) : [];
+
                 updateDashboardStats();
                 renderDashboardRecentSubmissions();
                 renderProjectsTable();
                 renderCategoriesTable();
                 renderLeadsTable();
+                renderJobsTable();
+                renderApplicationsTable();
                 populateCategoryCheckboxes();
             } catch (err) {
                 console.error(err);
-                showToast('Error syncing with LocalStorage.', 'error');
+                showToast('Error syncing database.', 'error');
             }
         };
 
-        // Save Data to LocalStorage
         const saveData = () => {
             localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(database.categories));
             localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(database.projects));
             localStorage.setItem('shaivika_submissions', JSON.stringify(database.submissions));
+            localStorage.setItem('shaivika_job_postings', JSON.stringify(database.jobs));
+            localStorage.setItem('shaivika_job_applications', JSON.stringify(database.applications));
             updateDashboardStats();
             populateCategoryCheckboxes();
         };
 
-        // Stats Updates
         const updateDashboardStats = () => {
             document.getElementById('statTotalProjects').textContent = database.projects.length;
             document.getElementById('statTotalCategories').textContent = database.categories.length;
             document.getElementById('statTotalSubmissions').textContent = database.submissions.length;
+            document.getElementById('statTotalJobs').textContent = database.jobs.filter(j => j.status !== 'inactive').length;
+            document.getElementById('statTotalApplications').textContent = database.applications.length;
+
+            const pendingCount = database.applications.filter(a => a.appStatus === 'pending').length;
+            const badge = document.getElementById('pendingAppsBadge');
+            if (badge) {
+                if (pendingCount > 0) {
+                    badge.textContent = pendingCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
         };
 
-        // Render Summary Recent Leads (max 5)
         const renderDashboardRecentSubmissions = () => {
             const tbody = document.getElementById('recentLeadsBody');
             tbody.innerHTML = '';
-            
-            // Sorted date-wise descending
             const sortedSubmissions = [...database.submissions].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
             const recent = sortedSubmissions.slice(0, 5);
 
@@ -1224,11 +1293,10 @@
         };
 
         document.getElementById('viewAllLeadsBtn').addEventListener('click', () => {
-            const leadsTabLink = document.querySelector('.sidebar-link[data-tab="leads-manager-tab"]');
-            leadsTabLink.click();
+            document.querySelector('.sidebar-link[data-tab="leads-manager-tab"]').click();
         });
 
-        // ===== PORTFOLIO PROJECTS MANAGEMENT =====
+        // PROJECTS TABLE
         const renderProjectsTable = (searchQuery = '') => {
             const tbody = document.getElementById('projectsTableBody');
             tbody.innerHTML = '';
@@ -1238,8 +1306,7 @@
                 const query = searchQuery.toLowerCase();
                 filtered = database.projects.filter(p => 
                     p.title.toLowerCase().includes(query) || 
-                    p.description.toLowerCase().includes(query) ||
-                    p.categories.some(cat => cat.toLowerCase().includes(query))
+                    p.description.toLowerCase().includes(query)
                 );
             }
 
@@ -1250,23 +1317,9 @@
 
             filtered.forEach((proj, idx) => {
                 const tr = document.createElement('tr');
-                
-                // thumbnail setup
-                let thumbHTML = '';
-                if (proj.image) {
-                    thumbHTML = `<img src="${proj.image}" style="width:50px; height:35px; object-fit:cover; border-radius:4px; border:1px solid var(--border-glass);">`;
-                } else {
-                    thumbHTML = `<span style="font-size: 1.25rem;">${proj.emoji || '💻'}</span>`;
-                }
-
-                // tags
-                const tags = proj.categories.map(cId => {
-                    const cat = database.categories.find(c => c.id === cId);
-                    const name = cat ? cat.name : cId;
-                    return `<span class="tag tag-cyan" style="font-size: 0.65rem; margin-right:4px;">${name}</span>`;
-                }).join('');
-
-                const linkDisplay = proj.link ? `<a href="${proj.link}" target="_blank" style="color:var(--accent); text-decoration:none; font-size:0.85rem;">${proj.link}</a>` : '<span style="color:var(--text-muted);">None</span>';
+                let thumbHTML = proj.image ? `<img src="${proj.image}" style="width:50px; height:35px; object-fit:cover; border-radius:4px;">` : `<span style="font-size: 1.25rem;">${proj.emoji || '💻'}</span>`;
+                const tags = proj.categories.map(cId => `<span class="tag tag-cyan" style="font-size:0.65rem;margin-right:4px;">${cId}</span>`).join('');
+                const linkDisplay = proj.link ? `<a href="${proj.link}" target="_blank" style="color:var(--accent);">${proj.link}</a>` : '<span style="color:var(--text-muted);">None</span>';
 
                 tr.innerHTML = `
                     <td style="text-align:center;">${thumbHTML}</td>
@@ -1288,178 +1341,30 @@
             renderProjectsTable(e.target.value);
         });
 
-        // Populate Category Checkboxes in Project Modal
         const populateCategoryCheckboxes = () => {
             const wrapper = document.getElementById('projectCategoriesSelect');
+            if (!wrapper) return;
             wrapper.innerHTML = '';
             database.categories.forEach(cat => {
                 const label = document.createElement('label');
-                label.style.cssText = 'display:flex; align-items:center; gap:6px; cursor:pointer; background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px; border:1px solid var(--border-glass); font-size:0.85rem;';
-                label.innerHTML = `
-                    <input type="checkbox" name="projCatCheckbox" value="${cat.id}" style="cursor:pointer;">
-                    ${cat.name}
-                `;
+                label.style.cssText = 'display:flex; align-items:center; gap:6px; cursor:pointer; background:rgba(255,255,255,0.03); padding:6px 12px; border-radius:8px; border:1px solid var(--border-glass); font-size:0.85rem;';
+                label.innerHTML = `<input type="checkbox" name="projCatCheckbox" value="${cat.id}"> ${cat.name}`;
                 wrapper.appendChild(label);
             });
         };
 
-        // File reader base64 conversion
-        document.getElementById('projectImageFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    projectImageBase64 = evt.target.result;
-                    document.getElementById('img-preview').src = projectImageBase64;
-                    document.getElementById('img-preview').style.display = 'block';
-                    document.getElementById('previewPlaceholder').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Add URL preview
-        document.getElementById('projectImageUrl').addEventListener('input', function(e) {
-            if (e.target.value.trim()) {
-                projectImageBase64 = ''; // Clear file base64 if URL is written
-                document.getElementById('img-preview').src = e.target.value.trim();
-                document.getElementById('img-preview').style.display = 'block';
-                document.getElementById('previewPlaceholder').style.display = 'none';
-            }
-        });
-
-        // Modals opening/closing
-        const projectModal = document.getElementById('projectModal');
-        const openProjectModal = () => {
-            projectModal.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        };
-        const closeProjectModal = () => {
-            projectModal.classList.remove('open');
-            document.body.style.overflow = '';
-            // Reset form
-            document.getElementById('projectForm').reset();
-            document.getElementById('editProjectIndex').value = '-1';
-            projectImageBase64 = '';
-            document.getElementById('img-preview').style.display = 'none';
-            document.getElementById('previewPlaceholder').style.display = 'block';
-        };
-
-        document.getElementById('addNewProjectBtn').addEventListener('click', () => {
-            document.getElementById('projectModalTitle').textContent = 'Add Portfolio Project';
-            openProjectModal();
-        });
-        document.getElementById('closeProjectModal').addEventListener('click', closeProjectModal);
-        document.getElementById('cancelProjectModal').addEventListener('click', closeProjectModal);
-
-        // Project Submit
-        document.getElementById('projectForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const editIdx = parseInt(document.getElementById('editProjectIndex').value);
-            const title = document.getElementById('projectTitle').value.trim();
-            const description = document.getElementById('projectDesc').value.trim();
-            const link = document.getElementById('projectLink').value.trim();
-            const emoji = document.getElementById('projectEmoji').value.trim();
-            const imageUrl = document.getElementById('projectImageUrl').value.trim();
-
-            const selectedCats = [];
-            document.querySelectorAll('input[name="projCatCheckbox"]:checked').forEach(cb => {
-                selectedCats.push(cb.value);
-            });
-
-            if (selectedCats.length === 0) {
-                showToast('Please select at least one category.', 'error');
-                return;
-            }
-
-            const imageSource = projectImageBase64 || imageUrl || '';
-
-            const projectData = {
-                title,
-                description,
-                categories: selectedCats,
-                link,
-                emoji,
-                image: imageSource
-            };
-
-            if (editIdx > -1) {
-                // Update
-                // Preserve modalId if existing
-                if (database.projects[editIdx].modalId) {
-                    projectData.modalId = database.projects[editIdx].modalId;
-                }
-                database.projects[editIdx] = {
-                    id: database.projects[editIdx].id || 'p_' + Date.now(),
-                    ...projectData
-                };
-                showToast('Project updated successfully.', 'success');
-            } else {
-                // Create
-                projectData.id = 'p_' + Date.now();
-                database.projects.push(projectData);
-                showToast('New project created successfully.', 'success');
-            }
-
-            saveData();
-            renderProjectsTable();
-            closeProjectModal();
-        });
-
-        // Open Edit Project
-        window.openEditProject = (idx) => {
-            const proj = database.projects[idx];
-            document.getElementById('editProjectIndex').value = idx;
-            document.getElementById('projectModalTitle').textContent = 'Edit Portfolio Project';
-            
-            document.getElementById('projectTitle').value = proj.title;
-            document.getElementById('projectDesc').value = proj.description;
-            document.getElementById('projectLink').value = proj.link || '';
-            document.getElementById('projectEmoji').value = proj.emoji || '';
-
-            // Check checkboxes
-            document.querySelectorAll('input[name="projCatCheckbox"]').forEach(cb => {
-                cb.checked = proj.categories.includes(cb.value);
-            });
-
-            // Image Preview
-            if (proj.image) {
-                if (proj.image.startsWith('data:image')) {
-                    projectImageBase64 = proj.image;
-                    document.getElementById('projectImageUrl').value = '';
-                } else {
-                    document.getElementById('projectImageUrl').value = proj.image;
-                }
-                document.getElementById('img-preview').src = proj.image;
-                document.getElementById('img-preview').style.display = 'block';
-                document.getElementById('previewPlaceholder').style.display = 'none';
-            } else {
-                document.getElementById('img-preview').style.display = 'none';
-                document.getElementById('previewPlaceholder').style.display = 'block';
-            }
-
-            openProjectModal();
-        };
-
-        // Delete Project
-        window.deleteProject = (idx) => {
-            if (confirm('Are you sure you want to delete this project?')) {
-                database.projects.splice(idx, 1);
-                saveData();
-                renderProjectsTable();
-                showToast('Project deleted successfully.', 'success');
-            }
-        };
-
-        // ===== CATEGORIES MANAGEMENT =====
+        // CATEGORIES TABLE
         const renderCategoriesTable = () => {
             const tbody = document.getElementById('categoriesTableBody');
             tbody.innerHTML = '';
-
+            if (database.categories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No categories created.</td></tr>';
+                return;
+            }
             database.categories.forEach((cat, idx) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><code>${cat.id}</code></td>
+                    <td><code style="color:var(--cyan);">${cat.id}</code></td>
                     <td style="font-weight:600;">${cat.name}</td>
                     <td>
                         <div class="action-btns">
@@ -1472,122 +1377,19 @@
             });
         };
 
-        // Auto Slugify category name
-        document.getElementById('catName').addEventListener('input', (e) => {
-            const editIdx = parseInt(document.getElementById('editCatIndex').value);
-            if (editIdx === -1) { // Only auto slugify on new category
-                const slug = e.target.value.toLowerCase()
-                    .replace(/[^a-z0-9\s\-]/g, '') // remove spec chars
-                    .replace(/\s+/g, '-') // spaces to dashes
-                    .replace(/-+/g, '-'); // collapse multiple dashes
-                document.getElementById('catId').value = slug;
-            }
-        });
-
-        // Category Submit
-        document.getElementById('categoryForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const editIdx = parseInt(document.getElementById('editCatIndex').value);
-            const id = document.getElementById('catId').value.trim();
-            const name = document.getElementById('catName').value.trim();
-
-            const catData = { id, name };
-
-            if (editIdx > -1) {
-                // Update
-                const oldId = database.categories[editIdx].id;
-                
-                // Update projects mapping if category id changed
-                if (oldId !== id) {
-                    database.projects.forEach(p => {
-                        p.categories = p.categories.map(c => c === oldId ? id : c);
-                    });
-                }
-                
-                database.categories[editIdx] = catData;
-                showToast('Category updated successfully.', 'success');
-            } else {
-                // Check uniqueness
-                if (database.categories.some(c => c.id === id)) {
-                    showToast('Category Slug ID already exists.', 'error');
-                    return;
-                }
-                database.categories.push(catData);
-                showToast('Category added successfully.', 'success');
-            }
-
-            saveData();
-            renderCategoriesTable();
-            renderProjectsTable();
-            resetCategoryForm();
-        });
-
-        const resetCategoryForm = () => {
-            document.getElementById('categoryForm').reset();
-            document.getElementById('editCatIndex').value = '-1';
-            document.getElementById('catFormTitle').textContent = 'Add New Category';
-            document.getElementById('catId').disabled = false;
-        };
-
-        window.openEditCategory = (idx) => {
-            const cat = database.categories[idx];
-            document.getElementById('editCatIndex').value = idx;
-            document.getElementById('catName').value = cat.name;
-            document.getElementById('catId').value = cat.id;
-            // Prevent changing baseline IDs to avoid breaking existing styles if they prefer
-            document.getElementById('catFormTitle').textContent = 'Edit Category';
-            document.getElementById('catId').disabled = true; // slug id cannot be changed to prevent broken matches
-        };
-
-        window.deleteCategory = (idx) => {
-            const cat = database.categories[idx];
-            
-            // Check if any projects use this category
-            const linkedProjects = database.projects.filter(p => p.categories.includes(cat.id));
-            if (linkedProjects.length > 0) {
-                if (!confirm(`Warning: ${linkedProjects.length} projects are associated with this category. If you delete it, they will lose this category tag. Proceed?`)) {
-                    return;
-                }
-                // Strip category from projects
-                database.projects.forEach(p => {
-                    p.categories = p.categories.filter(c => c !== cat.id);
-                });
-            } else {
-                if (!confirm('Are you sure you want to delete this category?')) {
-                    return;
-                }
-            }
-
-            database.categories.splice(idx, 1);
-            saveData();
-            renderCategoriesTable();
-            renderProjectsTable();
-            showToast('Category deleted successfully.', 'success');
-        };
-
-        // ===== FORM SUBMISSIONS (LEADS) =====
+        // LEADS TABLE
         const renderLeadsTable = (searchQuery = '') => {
             const tbody = document.getElementById('leadsTableBody');
             tbody.innerHTML = '';
-
-            // Sort date-wise descending
             let filtered = [...database.submissions].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-
             if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                filtered = filtered.filter(l => 
-                    l.name.toLowerCase().includes(query) || 
-                    l.email.toLowerCase().includes(query) ||
-                    l.subject.toLowerCase().includes(query) ||
-                    l.message.toLowerCase().includes(query)
-                );
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(l => l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q));
             }
-
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No form submissions found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No form submissions.</td></tr>';
                 return;
             }
-
             filtered.forEach(sub => {
                 const tr = document.createElement('tr');
                 const date = new Date(sub.timestamp).toLocaleString();
@@ -1613,209 +1415,448 @@
             renderLeadsTable(e.target.value);
         });
 
-        // View Lead details
-        const leadModal = document.getElementById('leadModal');
-        window.viewLeadDetails = (id) => {
-            const sub = database.submissions.find(s => s.id === id);
-            if (!sub) return;
+        // JOBS MANAGEMENT TABLE
+        const renderJobsTable = (searchQuery = '') => {
+            const tbody = document.getElementById('jobsTableBody');
+            tbody.innerHTML = '';
 
-            const modalBody = document.getElementById('leadModalBody');
-            modalBody.innerHTML = `
-                <div class="lead-detail-field">
-                    <div class="lead-detail-label">Submitted On</div>
-                    <div class="lead-detail-value">${new Date(sub.timestamp).toLocaleString()}</div>
-                </div>
-                <div class="lead-detail-field">
-                    <div class="lead-detail-label">Submission Type</div>
-                    <div class="lead-detail-value">${sub.type}</div>
-                </div>
-                <div class="lead-detail-field">
-                    <div class="lead-detail-label">Full Name</div>
-                    <div class="lead-detail-value">${sub.name}</div>
-                </div>
-                <div class="lead-detail-field">
-                    <div class="lead-detail-label">Email Address</div>
-                    <div class="lead-detail-value">${sub.email}</div>
-                </div>
-                <div class="lead-detail-field">
-                    <div class="lead-detail-label">Subject</div>
-                    <div class="lead-detail-value">${sub.subject}</div>
-                </div>
-                <div class="lead-detail-field">
-                    <div class="lead-detail-label">Message / Notes</div>
-                    <div class="lead-detail-value" style="white-space: pre-wrap;">${sub.message}</div>
-                </div>
-            `;
+            let filtered = database.jobs;
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(j => j.title.toLowerCase().includes(q) || (j.departmentName || '').toLowerCase().includes(q) || (j.location || '').toLowerCase().includes(q));
+            }
 
-            leadModal.classList.add('open');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No job postings active. Click "Post New Job" to add one.</td></tr>';
+                return;
+            }
+
+            filtered.forEach((job, idx) => {
+                const tr = document.createElement('tr');
+                const statusBadge = job.status === 'inactive' ? '<span class="status-badge badge-danger">Inactive</span>' : '<span class="status-badge badge-success">Active</span>';
+
+                tr.innerHTML = `
+                    <td style="font-size:1.4rem;text-align:center;">${job.emoji || '💼'}</td>
+                    <td style="font-weight:700;">${job.title}</td>
+                    <td><span class="tag tag-purple">${job.departmentName || job.department}</span></td>
+                    <td>📍 ${job.location || 'Remote'}</td>
+                    <td>${job.type || 'Full-Time'}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="openEditJob(${idx})" title="Edit Job">✏️</button>
+                            <button class="action-btn" onclick="toggleJobStatus(${idx})" title="Toggle Active Status">🔄</button>
+                            <button class="action-btn delete" onclick="deleteJob(${idx})" title="Delete Job">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        document.getElementById('searchJobs').addEventListener('input', (e) => {
+            renderJobsTable(e.target.value);
+        });
+
+        // JOB APPLICATIONS TABLE
+        const renderApplicationsTable = (searchQuery = '') => {
+            const tbody = document.getElementById('applicationsTableBody');
+            tbody.innerHTML = '';
+
+            const statusFilter = document.getElementById('filterAppStatus').value;
+            let filtered = [...database.applications].sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(a => a.appStatus === statusFilter);
+            }
+
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(a => 
+                    a.name.toLowerCase().includes(q) || 
+                    a.email.toLowerCase().includes(q) || 
+                    a.jobTitle.toLowerCase().includes(q) || 
+                    (a.skills || '').toLowerCase().includes(q)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No candidate job applications found.</td></tr>';
+                return;
+            }
+
+            filtered.forEach((app) => {
+                const tr = document.createElement('tr');
+                const dateStr = app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : 'N/A';
+
+                let statusBadge = '<span class="status-badge badge-warning">Pending</span>';
+                if (app.appStatus === 'shortlisted') statusBadge = '<span class="status-badge badge-success">Shortlisted</span>';
+                if (app.appStatus === 'rejected') statusBadge = '<span class="status-badge badge-danger">Rejected</span>';
+
+                const hasResume = app.resumeBase64 ? `<span style="color:var(--success);font-weight:600;">📎 ${app.resumeFileName}</span>` : '<span style="color:var(--text-muted);">No file</span>';
+
+                tr.innerHTML = `
+                    <td>${dateStr}</td>
+                    <td style="font-weight:700;">${app.name}</td>
+                    <td><span class="tag tag-cyan">${app.jobTitle}</span></td>
+                    <td>
+                        <div style="font-size:0.85rem;">📧 ${app.email}</div>
+                        <div style="font-size:0.8rem;color:var(--text-secondary);">📱 ${app.phone}</div>
+                    </td>
+                    <td>${app.status || 'N/A'} <br><small style="color:var(--text-muted);">${app.experience || ''}</small></td>
+                    <td>${hasResume}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="viewApplicationDetails('${app.id}')" title="View Full Candidate Profile & Resume">👁️ Profile</button>
+                            <button class="action-btn delete" onclick="deleteApplication('${app.id}')" title="Delete Application">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        document.getElementById('searchApplications').addEventListener('input', (e) => {
+            renderApplicationsTable(e.target.value);
+        });
+
+        document.getElementById('filterAppStatus').addEventListener('change', () => {
+            renderApplicationsTable(document.getElementById('searchApplications').value);
+        });
+
+        // Refresh button: reload from localStorage live
+        document.getElementById('refreshApplicationsBtn').addEventListener('click', () => {
+            const apps = localStorage.getItem('shaivika_job_applications');
+            database.applications = apps ? JSON.parse(apps) : [];
+            updateDashboardStats();
+            renderApplicationsTable(document.getElementById('searchApplications').value);
+            showToast('Applications refreshed!', 'success');
+        });
+
+        // Auto-detect new applications from other tabs/pages (Careers page submission)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'shaivika_job_applications') {
+                database.applications = e.newValue ? JSON.parse(e.newValue) : [];
+                updateDashboardStats();
+                renderApplicationsTable(document.getElementById('searchApplications')?.value || '');
+                showToast('🔔 New job application received!', 'success');
+            }
+        });
+
+        // JOB MODAL LOGIC
+        const jobModal = document.getElementById('jobModal');
+        const openJobModal = () => {
+            jobModal.classList.add('open');
             document.body.style.overflow = 'hidden';
         };
 
-        const closeLeadModal = () => {
-            leadModal.classList.remove('open');
+        const closeJobModal = () => {
+            jobModal.classList.remove('open');
+            document.body.style.overflow = '';
+            document.getElementById('jobForm').reset();
+            document.getElementById('editJobIndex').value = '-1';
+            document.getElementById('jobModalTitle').textContent = 'Post New Job Opening';
+        };
+
+        document.getElementById('addNewJobBtn').addEventListener('click', () => {
+            closeJobModal();
+            openJobModal();
+        });
+
+        document.getElementById('closeJobModal').addEventListener('click', closeJobModal);
+        document.getElementById('cancelJobModal').addEventListener('click', closeJobModal);
+
+        document.getElementById('jobForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editJobIndex').value);
+            const title = document.getElementById('jobTitle').value.trim();
+            const department = document.getElementById('jobDepartment').value;
+            const emoji = document.getElementById('jobEmoji').value.trim() || '💼';
+            const location = document.getElementById('jobLocation').value.trim();
+            const type = document.getElementById('jobType').value;
+            const experience = document.getElementById('jobExperience').value.trim();
+            const salary = document.getElementById('jobSalary').value.trim();
+            const overview = document.getElementById('jobOverview').value.trim();
+            const responsibilities = document.getElementById('jobResponsibilities').value.split('\n').filter(r => r.trim().length > 0);
+            const skills = document.getElementById('jobSkills').value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            const status = document.getElementById('jobStatus').value;
+
+            const deptNames = { sales: 'Sales & Partnership', engineering: 'Engineering', ai: 'AI & Data', design: 'Design', general: 'General' };
+
+            const jobData = {
+                id: editIdx > -1 ? database.jobs[editIdx].id : 'job_' + Date.now(),
+                title,
+                department,
+                departmentName: deptNames[department] || 'General',
+                emoji,
+                location,
+                type,
+                experience,
+                salary,
+                overview,
+                responsibilities,
+                skills,
+                status,
+                postedDate: new Date().toLocaleDateString()
+            };
+
+            if (editIdx > -1) {
+                database.jobs[editIdx] = jobData;
+                showToast('Job posting updated.', 'success');
+            } else {
+                database.jobs.unshift(jobData);
+                showToast('New job posted successfully!', 'success');
+            }
+
+            saveData();
+            renderJobsTable();
+            closeJobModal();
+        });
+
+        window.openEditJob = (idx) => {
+            const job = database.jobs[idx];
+            document.getElementById('editJobIndex').value = idx;
+            document.getElementById('jobModalTitle').textContent = 'Edit Job Opening';
+
+            document.getElementById('jobTitle').value = job.title;
+            document.getElementById('jobDepartment').value = job.department || 'general';
+            document.getElementById('jobEmoji').value = job.emoji || '💼';
+            document.getElementById('jobLocation').value = job.location || '';
+            document.getElementById('jobType').value = job.type || 'Full-Time';
+            document.getElementById('jobExperience').value = job.experience || '';
+            document.getElementById('jobSalary').value = job.salary || '';
+            document.getElementById('jobOverview').value = job.overview || '';
+            document.getElementById('jobResponsibilities').value = (job.responsibilities || []).join('\n');
+            document.getElementById('jobSkills').value = (job.skills || []).join(', ');
+            document.getElementById('jobStatus').value = job.status || 'active';
+
+            openJobModal();
+        };
+
+        window.toggleJobStatus = (idx) => {
+            database.jobs[idx].status = database.jobs[idx].status === 'inactive' ? 'active' : 'inactive';
+            saveData();
+            renderJobsTable();
+            showToast(`Job status changed to ${database.jobs[idx].status}.`, 'success');
+        };
+
+        window.deleteJob = (idx) => {
+            if (confirm(`Are you sure you want to delete "${database.jobs[idx].title}"?`)) {
+                database.jobs.splice(idx, 1);
+                saveData();
+                renderJobsTable();
+                showToast('Job posting deleted.', 'success');
+            }
+        };
+
+        // CANDIDATE APPLICATION MODAL LOGIC
+        const applicationDetailModal = document.getElementById('applicationDetailModal');
+
+        window.viewApplicationDetails = (appId) => {
+            const app = database.applications.find(a => a.id === appId);
+            if (!app) return;
+
+            const modalBody = document.getElementById('appModalBody');
+            const actionContainer = document.getElementById('appStatusActionBtns');
+
+            let resumeSectionHTML = '';
+            if (app.resumeBase64) {
+                resumeSectionHTML = `
+                    <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.3);padding:16px;border-radius:12px;margin-top:16px;">
+                        <div style="font-weight:700;font-size:14px;color:var(--success);margin-bottom:8px;">📄 Resume File Attached</div>
+                        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Filename: <strong>${app.resumeFileName}</strong></div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <a href="${app.resumeBase64}" download="${app.resumeFileName}" class="btn btn-success btn-sm">📥 Download Resume</a>
+                            <button onclick="window.open('${app.resumeBase64}')" class="btn btn-secondary btn-sm">👁️ Open Resume Preview</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resumeSectionHTML = `
+                    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);padding:14px;border-radius:12px;margin-top:16px;color:var(--danger);font-size:13px;">
+                        ⚠️ No resume file uploaded with this application.
+                    </div>
+                `;
+            }
+
+            modalBody.innerHTML = `
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Candidate Name</div>
+                    <div class="lead-detail-value" style="font-size:1.1rem;font-weight:800;color:var(--primary);">${app.name}</div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Applied Position</div>
+                    <div class="lead-detail-value"><span class="tag tag-cyan">${app.jobTitle}</span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="lead-detail-field">
+                        <div class="lead-detail-label">Email Address</div>
+                        <div class="lead-detail-value"><a href="mailto:${app.email}" style="color:var(--accent);">${app.email}</a></div>
+                    </div>
+                    <div class="lead-detail-field">
+                        <div class="lead-detail-label">Mobile (WhatsApp)</div>
+                        <div class="lead-detail-value"><a href="https://wa.me/${app.phone.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--success);">📱 ${app.phone} (Chat)</a></div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="lead-detail-field">
+                        <div class="lead-detail-label">Current Status</div>
+                        <div class="lead-detail-value">${app.status || 'N/A'}</div>
+                    </div>
+                    <div class="lead-detail-field">
+                        <div class="lead-detail-label">Passout / Experience</div>
+                        <div class="lead-detail-value">${app.experience || 'N/A'}</div>
+                    </div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Primary Skills</div>
+                    <div class="lead-detail-value">${app.skills || 'N/A'}</div>
+                </div>
+                ${app.portfolio ? `
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Portfolio / LinkedIn</div>
+                    <div class="lead-detail-value"><a href="${app.portfolio}" target="_blank" style="color:var(--accent);">${app.portfolio}</a></div>
+                </div>` : ''}
+                ${app.message ? `
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Cover Statement / Note</div>
+                    <div class="lead-detail-value" style="white-space:pre-wrap;">${app.message}</div>
+                </div>` : ''}
+                ${resumeSectionHTML}
+            `;
+
+            actionContainer.innerHTML = `
+                <button class="btn btn-success btn-sm" onclick="updateAppStatus('${app.id}', 'shortlisted')">Mark Shortlisted</button>
+                <button class="btn btn-danger btn-sm" onclick="updateAppStatus('${app.id}', 'rejected')">Mark Rejected</button>
+                <button class="btn btn-secondary btn-sm" onclick="updateAppStatus('${app.id}', 'pending')">Set Pending</button>
+            `;
+
+            applicationDetailModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeAppModal = () => {
+            applicationDetailModal.classList.remove('open');
             document.body.style.overflow = '';
         };
 
-        document.getElementById('closeLeadModal').addEventListener('click', closeLeadModal);
-        document.getElementById('closeLeadModalBtn').addEventListener('click', closeLeadModal);
+        document.getElementById('closeAppModal').addEventListener('click', closeAppModal);
+        document.getElementById('closeAppModalBtn').addEventListener('click', closeAppModal);
 
-        window.deleteLead = (id) => {
-            if (confirm('Are you sure you want to delete this form submission?')) {
-                database.submissions = database.submissions.filter(s => s.id !== id);
+        window.updateAppStatus = (appId, newStatus) => {
+            const app = database.applications.find(a => a.id === appId);
+            if (app) {
+                app.appStatus = newStatus;
                 saveData();
-                renderLeadsTable();
-                renderDashboardRecentSubmissions();
-                showToast('Form submission deleted.', 'success');
+                renderApplicationsTable();
+                closeAppModal();
+                showToast(`Candidate status updated to ${newStatus}.`, 'success');
             }
         };
 
-        // CSV Export
-        document.getElementById('exportLeadsCsv').addEventListener('click', () => {
-            if (database.submissions.length === 0) {
-                showToast('No submissions to export.', 'error');
+        window.deleteApplication = (appId) => {
+            if (confirm('Are you sure you want to delete this job application?')) {
+                database.applications = database.applications.filter(a => a.id !== appId);
+                saveData();
+                renderApplicationsTable();
+                showToast('Application deleted.', 'success');
+            }
+        };
+
+        // EXPORT APPS CSV
+        document.getElementById('exportAppsCsv').addEventListener('click', () => {
+            if (database.applications.length === 0) {
+                showToast('No job applications to export.', 'error');
                 return;
             }
-            let csv = 'ID,Date,Type,Name,Email,Subject,Message\r\n';
-            database.submissions.forEach(sub => {
-                const date = new Date(sub.timestamp).toISOString();
-                const msgClean = (sub.message || '').replace(/"/g, '""');
-                csv += `"${sub.id}","${date}","${sub.type}","${sub.name}","${sub.email}","${sub.subject}","${msgClean}"\r\n`;
+            let csv = 'ID,Applied Date,Candidate Name,Email,Phone,Position,Status,Experience,Skills,Portfolio,AppStatus\r\n';
+            database.applications.forEach(a => {
+                csv += `"${a.id}","${a.submittedAt}","${a.name}","${a.email}","${a.phone}","${a.jobTitle}","${a.status || ''}","${a.experience || ''}","${(a.skills||'').replace(/"/g, '""')}","${a.portfolio||''}","${a.appStatus}"\r\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", `submissions_export_${Date.now()}.csv`);
+            link.setAttribute("download", `job_applications_export_${Date.now()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('CSV export complete.', 'success');
+            showToast('Applications CSV exported successfully.', 'success');
         });
 
-        // JSON Export
-        document.getElementById('exportLeadsJson').addEventListener('click', () => {
-            if (database.submissions.length === 0) {
-                showToast('No submissions to export.', 'error');
-                return;
+        // OTHER MODALS & EXPORTS
+        const projectModal = document.getElementById('projectModal');
+        const openProjectModal = () => { projectModal.classList.add('open'); document.body.style.overflow = 'hidden'; };
+        const closeProjectModal = () => { projectModal.classList.remove('open'); document.body.style.overflow = ''; };
+        document.getElementById('addNewProjectBtn').addEventListener('click', openProjectModal);
+        document.getElementById('closeProjectModal').addEventListener('click', closeProjectModal);
+        document.getElementById('cancelProjectModal').addEventListener('click', closeProjectModal);
+
+        const leadModal = document.getElementById('leadModal');
+        window.viewLeadDetails = (id) => {
+            const sub = database.submissions.find(s => s.id === id);
+            if (!sub) return;
+            document.getElementById('leadModalBody').innerHTML = `
+                <div class="lead-detail-field"><div class="lead-detail-label">Name</div><div class="lead-detail-value">${sub.name}</div></div>
+                <div class="lead-detail-field"><div class="lead-detail-label">Email</div><div class="lead-detail-value">${sub.email}</div></div>
+                <div class="lead-detail-field"><div class="lead-detail-label">Subject</div><div class="lead-detail-value">${sub.subject}</div></div>
+                <div class="lead-detail-field"><div class="lead-detail-label">Message</div><div class="lead-detail-value" style="white-space:pre-wrap;">${sub.message}</div></div>
+            `;
+            leadModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+        const closeLeadModal = () => { leadModal.classList.remove('open'); document.body.style.overflow = ''; };
+        document.getElementById('closeLeadModal').addEventListener('click', closeLeadModal);
+        document.getElementById('closeLeadModalBtn').addEventListener('click', closeLeadModal);
+
+        window.deleteLead = (id) => {
+            if (confirm('Delete form submission?')) {
+                database.submissions = database.submissions.filter(s => s.id !== id);
+                saveData();
+                renderLeadsTable();
+                renderDashboardRecentSubmissions();
+                showToast('Submission deleted.', 'success');
             }
-            const blob = new Blob([JSON.stringify(database.submissions, null, 2)], { type: 'application/json' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", `submissions_export_${Date.now()}.json`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast('JSON export complete.', 'success');
-        });
+        };
 
-        // ===== SETTINGS & CREDENTIALS =====
-        document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const curr = document.getElementById('currentPass').value.trim();
-            const newP = document.getElementById('newPass').value.trim();
-            const conf = document.getElementById('confirmPass').value.trim();
-
-            const stored = localStorage.getItem('shaivika_admin_password');
-
-            if (curr !== stored) {
-                showToast('Current password does not match.', 'error');
-                return;
-            }
-            if (newP !== conf) {
-                showToast('New passwords do not match.', 'error');
-                return;
-            }
-            if (newP.length < 6) {
-                showToast('Password should be at least 6 characters long.', 'error');
-                return;
-            }
-
-            localStorage.setItem('shaivika_admin_password', newP);
-            showToast('Password changed successfully.', 'success');
-            document.getElementById('changePasswordForm').reset();
-        });
-
-        // Database Backup Export
+        // EXPORT DB BACKUP
         document.getElementById('btnExportDb').addEventListener('click', () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(database, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `shaivika_db_backup_${Date.now()}.json`);
+            downloadAnchor.setAttribute("download", `shaivika_full_db_backup_${Date.now()}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-            showToast('Database backup downloaded.', 'success');
+            showToast('Full database backup downloaded.', 'success');
         });
 
-        // Database Backup Restore
         document.getElementById('btnImportDbFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
                     const parsed = JSON.parse(evt.target.result);
-                    if (parsed.categories && parsed.projects) {
-                        database.categories = parsed.categories;
-                        database.projects = parsed.projects;
+                    if (parsed.categories || parsed.projects) {
+                        database.categories = parsed.categories || database.categories;
+                        database.projects = parsed.projects || database.projects;
                         database.submissions = parsed.submissions || [];
+                        database.jobs = parsed.jobs || database.jobs;
+                        database.applications = parsed.applications || [];
                         saveData();
                         loadData();
-                        showToast('Database restored successfully from backup!', 'success');
-                    } else {
-                        showToast('Invalid backup file structure.', 'error');
+                        showToast('Database restored successfully!', 'success');
                     }
                 } catch (err) {
-                    showToast('Failed to parse JSON file.', 'error');
+                    showToast('Invalid backup file JSON.', 'error');
                 }
             };
             reader.readAsText(file);
-            // Reset file input
             e.target.value = '';
         });
 
-        // Database Reset
-        document.getElementById('btnResetDb').addEventListener('click', async () => {
-            if (confirm('Warning: This will reset all portfolio items, categories, and delete all form submissions, reverting back to baseline defaults. Are you absolutely sure?')) {
-                try {
-                    const response = await fetch('../data/portfolio.json');
-                    if (response.ok) {
-                        const data = await response.json();
-                        database.categories = data.categories;
-                        database.projects = data.projects;
-                        database.submissions = [];
-                        saveData();
-                        loadData();
-                        showToast('Database has been reset to defaults.', 'success');
-                    } else {
-                        showToast('Failed to fetch default database config.', 'error');
-                    }
-                } catch (e) {
-                    showToast('Error resetting database.', 'error');
-                }
-            }
-        });
-
-        // Close modal clicking outside
-        window.onclick = (e) => {
-            if (e.target === projectModal) {
-                closeProjectModal();
-            }
-            if (e.target === leadModal) {
-                closeLeadModal();
-            }
-        };
-
-        // Esc key to close modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeProjectModal();
-                closeLeadModal();
-            }
-        });
-
-        // Bootstrapping
         checkAuth();
         initTheme();
     </script>

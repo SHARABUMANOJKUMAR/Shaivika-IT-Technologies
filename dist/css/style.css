@@ -2499,3 +2499,68 @@ footer {
     padding-bottom: 70px !important;
   }
 }
+
+/* ============================================
+   PORTFOLIO PAGINATION STYLES
+   ============================================ */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.15));
+  background: var(--bg-glass, rgba(255, 255, 255, 0.05));
+  color: var(--text-primary, #fff);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.15);
+  color: #6366f1;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
+}
+
+.page-btn.active {
+  background: linear-gradient(135deg, #2563eb 0%, #6366f1 100%);
+  border-color: transparent;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.badge-hiring {
+  background: #10b981;
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 100px;
+  margin-left: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+}

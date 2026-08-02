@@ -62,6 +62,114 @@
       "link": "contact.html",
       "image": "",
       "emoji": "🎓"
+    },
+    {
+      "id": "p7",
+      "title": "Smart Clinic AI Triage & Slotting",
+      "description": "AI-driven triage assistant for medical clinics automating slot booking, patient queries, and lab status updates.",
+      "categories": ["ai", "webapp"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🩺"
+    },
+    {
+      "id": "p8",
+      "title": "Cloud Fleet Telematics & GPS Portal",
+      "description": "Real-time fleet tracking, live GPS map streaming, driver safety analytics, and automated fuel reporting.",
+      "categories": ["enterprise", "saas"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🚚"
+    },
+    {
+      "id": "p9",
+      "title": "E-Commerce Multi-Vendor Marketplace",
+      "description": "High-speed multi-vendor shopping engine with UPI instant checkout, vendor dashboard, and order sync.",
+      "categories": ["webapp", "ui"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🛍️"
+    },
+    {
+      "id": "p10",
+      "title": "FinTech Investment & Crypto Tracker",
+      "description": "Next-gen wealth management app with stock API integration, crypto portfolio rebalancing, and tax reporting.",
+      "categories": ["saas", "ui"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "📈"
+    },
+    {
+      "id": "p11",
+      "title": "Hospital Bed & Pharmacy ERP",
+      "description": "Enterprise resource planning system for regional hospitals covering ICU beds, emergency queuing, and pharmacy stock.",
+      "categories": ["enterprise", "webapp"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🏥"
+    },
+    {
+      "id": "p12",
+      "title": "AI Document OCR & Extraction Engine",
+      "description": "Automated document intelligence tool reading invoices, receipts, and government IDs with 99.4% precision.",
+      "categories": ["ai", "saas"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "📄"
+    },
+    {
+      "id": "p13",
+      "title": "Smart City IoT Traffic Console",
+      "description": "Real-time urban telemetry processing live camera feeds, signal optimization, and emergency vehicle priority.",
+      "categories": ["enterprise", "ai"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🚦"
+    },
+    {
+      "id": "p14",
+      "title": "Restaurant Digital POS & QR Ordering",
+      "description": "Touchless QR table ordering, kitchen display system (KDS), cloud inventory, and WhatsApp receipt delivery.",
+      "categories": ["webapp", "ui"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🍔"
+    },
+    {
+      "id": "p15",
+      "title": "SaaS Subscription & Invoicing Engine",
+      "description": "Automated recurring billing gateway handling multi-currency invoices, dunning recovery, and Stripe tax logic.",
+      "categories": ["saas", "enterprise"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "💳"
+    },
+    {
+      "id": "p16",
+      "title": "AI Conversational Support Voice Bot",
+      "description": "Voice-enabled AI customer representative handling inbound support, call routing, and CRM ticket creation.",
+      "categories": ["ai", "enterprise"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "🎙️"
+    },
+    {
+      "id": "p17",
+      "title": "Neobank Mobile Banking Interface",
+      "description": "Glassmorphism design system for modern banking apps with biometric login, card lock controls, and visual budget analytics.",
+      "categories": ["ui", "webapp"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "📱"
+    },
+    {
+      "id": "p18",
+      "title": "Supply Chain & Warehouse Manager",
+      "description": "Industrial warehouse tracking with barcode integration, automated reorder thresholds, and dispatch manifests.",
+      "categories": ["enterprise", "saas"],
+      "link": "contact.html",
+      "image": "",
+      "emoji": "📦"
     }
   ]
 }
