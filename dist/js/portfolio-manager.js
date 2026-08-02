@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: "Automated recurring billing gateway handling multi-currency invoices, dunning recovery, and Stripe tax logic.",
       categories: ["saas", "enterprise"],
       link: "contact.html",
-      image": "",
+      image: "",
       emoji: "💳"
     },
     {
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: "Voice-enabled AI customer representative handling inbound support, call routing, and CRM ticket creation.",
       categories: ["ai", "enterprise"],
       link: "contact.html",
-      image": "",
+      image: "",
       emoji: "🎙️"
     },
     {
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: "Glassmorphism design system for modern banking apps with biometric login, card lock controls, and visual budget analytics.",
       categories: ["ui", "webapp"],
       link: "contact.html",
-      image": "",
+      image: "",
       emoji: "📱"
     },
     {
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: "Industrial warehouse tracking with barcode integration, automated reorder thresholds, and dispatch manifests.",
       categories: ["enterprise", "saas"],
       link: "contact.html",
-      image": "",
+      image: "",
       emoji: "📦"
     }
   ];
@@ -230,31 +230,21 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Using inline default portfolio dataset (file:// CORS fallback)');
       }
 
+      const initialized = localStorage.getItem('shaivika_portfolio_initialized');
       const cachedCategories = localStorage.getItem('shaivika_portfolio_categories');
       const cachedProjects = localStorage.getItem('shaivika_portfolio_projects');
 
-      if (cachedCategories && cachedProjects) {
+      if (initialized === 'true' && cachedCategories && cachedProjects) {
         categories = JSON.parse(cachedCategories);
-        const parsedCachedProjects = JSON.parse(cachedProjects);
-
-        if (loadedProjects.length > 0 && parsedCachedProjects.length < loadedProjects.length) {
-          const cachedIds = new Set(parsedCachedProjects.map(p => p.id));
-          loadedProjects.forEach(dp => {
-            if (!cachedIds.has(dp.id)) {
-              parsedCachedProjects.push(dp);
-            }
-          });
-          projects = parsedCachedProjects;
-          localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
-        } else {
-          projects = parsedCachedProjects;
-        }
+        projects = JSON.parse(cachedProjects);
       } else {
         categories = loadedCategories;
         projects = loadedProjects;
         localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
         localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
+        localStorage.setItem('shaivika_portfolio_initialized', 'true');
       }
+
       render();
     } catch (e) {
       console.error('Error initializing portfolio:', e);

@@ -230,31 +230,21 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Using inline default portfolio dataset (file:// CORS fallback)');
       }
 
+      const initialized = localStorage.getItem('shaivika_portfolio_initialized');
       const cachedCategories = localStorage.getItem('shaivika_portfolio_categories');
       const cachedProjects = localStorage.getItem('shaivika_portfolio_projects');
 
-      if (cachedCategories && cachedProjects) {
+      if (initialized === 'true' && cachedCategories && cachedProjects) {
         categories = JSON.parse(cachedCategories);
-        const parsedCachedProjects = JSON.parse(cachedProjects);
-
-        if (loadedProjects.length > 0 && parsedCachedProjects.length < loadedProjects.length) {
-          const cachedIds = new Set(parsedCachedProjects.map(p => p.id));
-          loadedProjects.forEach(dp => {
-            if (!cachedIds.has(dp.id)) {
-              parsedCachedProjects.push(dp);
-            }
-          });
-          projects = parsedCachedProjects;
-          localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
-        } else {
-          projects = parsedCachedProjects;
-        }
+        projects = JSON.parse(cachedProjects);
       } else {
         categories = loadedCategories;
         projects = loadedProjects;
         localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
         localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
+        localStorage.setItem('shaivika_portfolio_initialized', 'true');
       }
+
       render();
     } catch (e) {
       console.error('Error initializing portfolio:', e);

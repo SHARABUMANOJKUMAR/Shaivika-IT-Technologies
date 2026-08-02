@@ -1756,8 +1756,6 @@
             let csv = 'ID,Applied Date,Candidate Name,Email,Phone,Position,Status,Experience,Skills,Portfolio,AppStatus\r\n';
             database.applications.forEach(a => {
                 csv += `"${a.id}","${a.submittedAt}","${a.name}","${a.email}","${a.phone}","${a.jobTitle}","${a.status || ''}","${a.experience || ''}","${(a.skills||'').replace(/"/g, '""')}","${a.portfolio||''}","${a.appStatus}"\r\n`;
-            });
-
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
@@ -1768,12 +1766,215 @@
             showToast('Applications CSV exported successfully.', 'success');
         });
 
+        // OTHER MODALS & EXPORTS
         const projectModal = document.getElementById('projectModal');
-        const openProjectModal = () => { projectModal.classList.add('open'); document.body.style.overflow = 'hidden'; };
-        const closeProjectModal = () => { projectModal.classList.remove('open'); document.body.style.overflow = ''; };
+        const openProjectModal = () => { 
+            projectModal.classList.add('open'); 
+            document.body.style.overflow = 'hidden'; 
+        };
+        const closeProjectModal = () => { 
+            projectModal.classList.remove('open'); 
+            document.body.style.overflow = ''; 
+            document.getElementById('projectForm').reset();
+            document.getElementById('editProjectIndex').value = '-1';
+            document.getElementById('projectModalTitle').textContent = 'Add Portfolio Project';
+            // Uncheck all category checkboxes
+            document.querySelectorAll('input[name="projCatCheckbox"]').forEach(cb => cb.checked = false);
+        };
         document.getElementById('addNewProjectBtn').addEventListener('click', openProjectModal);
         document.getElementById('closeProjectModal').addEventListener('click', closeProjectModal);
         document.getElementById('cancelProjectModal').addEventListener('click', closeProjectModal);
+
+        // PROJECT FORM SUBMIT handler
+        document.getElementById('projectForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editProjectIndex').value);
+            const title = document.getElementById('projectTitle').value.trim();
+            const description = document.getElementById('projectDesc').value.trim();
+            const link = document.getElementById('projectLink').value.trim();
+            const emoji = document.getElementById('projectEmoji').value.trim() || '💻';
+            
+            // Get selected categories
+            const checkboxes = document.querySelectorAll('input[name="projCatCheckbox"]:checked');
+            const categories = Array.from(checkboxes).map(cb => cb.value);
+
+            if (!title || !description) {
+                showToast('Title and Description are required.', 'error');
+                return;
+            }
+
+            const projData = {
+                id: editIdx > -1 ? database.projects[editIdx].id : 'proj_' + Date.now(),
+                title,
+                description,
+                categories,
+                link,
+                emoji,
+                image: editIdx > -1 ? database.projects[editIdx].image : ""
+            };
+
+            if (editIdx > -1) {
+                database.projects[editIdx] = projData;
+                showToast('Project updated successfully.', 'success');
+            } else {
+                database.projects.unshift(projData);
+                showToast('New project added successfully.', 'success');
+            }
+
+            saveData();
+            renderProjectsTable();
+            closeProjectModal();
+        });
+
+        window.openEditProject = (idx) => {
+            const proj = database.projects[idx];
+            document.getElementById('editProjectIndex').value = idx;
+            document.getElementById('projectModalTitle').textContent = 'Edit Portfolio Project';
+
+            document.getElementById('projectTitle').value = proj.title;
+            document.getElementById('projectDesc').value = proj.description;
+            document.getElementById('projectLink').value = proj.link || '';
+            document.getElementById('projectEmoji').value = proj.emoji || '💻';
+
+            // Check matching category checkboxes
+            const selectedCats = proj.categories || [];
+            document.querySelectorAll('input[name="projCatCheckbox"]').forEach(cb => {
+                cb.checked = selectedCats.includes(cb.value);
+            });
+
+            openProjectModal();
+        };
+
+        window.deleteProject = (idx) => {
+            const proj = database.projects[idx];
+            if (confirm(`Are you sure you want to delete project "${proj.title}"?`)) {
+                database.projects.splice(idx, 1);
+                saveData();
+                renderProjectsTable();
+                showToast('Project deleted successfully.', 'success');
+            }
+        };
+
+        // CATEGORY FORM SUBMIT handler
+        document.getElementById('categoryForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editCatIndex').value);
+            const name = document.getElementById('catName').value.trim();
+            const id = document.getElementById('catId').value.trim();
+
+            if (!name || !id) {
+                showToast('Name and Slug ID are required.', 'error');
+                return;
+            }
+
+            // Check if slug ID is unique (excluding currently edited item)
+            const duplicate = database.categories.some((c, idx) => c.id === id && idx !== editIdx);
+            if (duplicate) {
+                showToast('Category Slug ID must be unique.', 'error');
+                return;
+            }
+
+            const catData = { id, name };
+
+            if (editIdx > -1) {
+                const oldId = database.categories[editIdx].id;
+                database.categories[editIdx] = catData;
+                
+                // Update any projects referencing this category if the ID changed
+                if (oldId !== id) {
+                    database.projects.forEach(proj => {
+                        if (proj.categories && proj.categories.includes(oldId)) {
+                            proj.categories = proj.categories.map(c => c === oldId ? id : c);
+                        }
+                    });
+                }
+                showToast('Category updated successfully.', 'success');
+            } else {
+                database.categories.push(catData);
+                showToast('New category added.', 'success');
+            }
+
+            saveData();
+            renderCategoriesTable();
+            populateCategoryCheckboxes();
+            
+            // Reset form
+            document.getElementById('categoryForm').reset();
+            document.getElementById('editCatIndex').value = '-1';
+            document.getElementById('catFormTitle').textContent = 'Add New Category';
+        });
+
+        window.openEditCategory = (idx) => {
+            const cat = database.categories[idx];
+            document.getElementById('editCatIndex').value = idx;
+            document.getElementById('catFormTitle').textContent = 'Edit Category';
+            document.getElementById('catName').value = cat.name;
+            document.getElementById('catId').value = cat.id;
+        };
+
+        window.deleteCategory = (idx) => {
+            const cat = database.categories[idx];
+            if (confirm(`Are you sure you want to delete category "${cat.name}"? This will remove it from all projects.`)) {
+                // Remove category from projects
+                database.projects.forEach(proj => {
+                    if (proj.categories) {
+                        proj.categories = proj.categories.filter(cId => cId !== cat.id);
+                    }
+                });
+                
+                database.categories.splice(idx, 1);
+                saveData();
+                renderCategoriesTable();
+                populateCategoryCheckboxes();
+                
+                // Reset form in case we were editing it
+                document.getElementById('categoryForm').reset();
+                document.getElementById('editCatIndex').value = '-1';
+                document.getElementById('catFormTitle').textContent = 'Add New Category';
+                
+                showToast('Category deleted.', 'success');
+            }
+        };
+
+        // CHANGE PASSWORD FORM handler
+        document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const currentPass = document.getElementById('currentPass').value;
+            const newPass = document.getElementById('newPass').value;
+            const confirmPass = document.getElementById('confirmPass').value;
+            const storedPass = localStorage.getItem('shaivika_admin_password') || 'adminpassword123';
+
+            if (currentPass !== storedPass) {
+                showToast('Current password is incorrect.', 'error');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                showToast('New password and confirmation do not match.', 'error');
+                return;
+            }
+
+            localStorage.setItem('shaivika_admin_password', newPass);
+            showToast('Admin password updated successfully!', 'success');
+            document.getElementById('changePasswordForm').reset();
+        });
+
+        // RESET TO DEFAULT BASELINE handler
+        document.getElementById('btnResetDb').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset the database to default baseline? This will clear all custom projects, categories, job applications, job postings, and submissions.')) {
+                // Clear all local storage keys related to database
+                localStorage.removeItem('shaivika_portfolio_categories');
+                localStorage.removeItem('shaivika_portfolio_projects');
+                localStorage.removeItem('shaivika_submissions');
+                localStorage.removeItem('shaivika_job_postings');
+                localStorage.removeItem('shaivika_job_applications');
+                
+                showToast('Database reset to defaults.', 'success');
+                
+                // Reload data
+                loadData();
+            }
+        });
 
         const leadModal = document.getElementById('leadModal');
         window.viewLeadDetails = (id) => {

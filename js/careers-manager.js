@@ -128,20 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initCareers() {
     try {
+      const initialized = localStorage.getItem('shaivika_careers_initialized');
       const cached = localStorage.getItem('shaivika_job_postings');
-      if (cached) {
+
+      if (initialized === 'true' && cached) {
         activeJobs = JSON.parse(cached);
-        // Ensure default jobs exist if array is empty or partial
-        if (activeJobs.length < DEFAULT_JOBS.length) {
-          const ids = new Set(activeJobs.map(j => j.id));
-          DEFAULT_JOBS.forEach(dj => {
-            if (!ids.has(dj.id)) activeJobs.push(dj);
-          });
-          localStorage.setItem('shaivika_job_postings', JSON.stringify(activeJobs));
-        }
       } else {
         activeJobs = DEFAULT_JOBS;
         localStorage.setItem('shaivika_job_postings', JSON.stringify(activeJobs));
+        localStorage.setItem('shaivika_careers_initialized', 'true');
       }
     } catch (e) {
       console.warn('Error reading job postings, using default list:', e);
