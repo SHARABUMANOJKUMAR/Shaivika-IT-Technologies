@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'light';
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <title>Careers & Jobs | Join Shaivika IT Technologies Kadapa</title>
+  <meta name="description"
+    content="Explore career opportunities at Shaivika IT Technologies. Apply for Full-Stack Web Development, AI Engineering, B2B Business Development, and UI/UX roles." />
+  <meta name="keywords"
+    content="Shaivika IT Technologies careers, software jobs Kadapa, web developer jobs Andhra Pradesh, AI jobs remote, business development partner program" />
+  <meta name="author" content="Shaivika IT Technologies">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Careers at Shaivika IT Technologies | We Are Hiring">
+  <meta property="og:description"
+    content="Build mission-critical AI systems, web platforms, and enterprise solutions with us. Explore open positions.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shaivikagroups.in/careers.html">
+  <meta property="og:image" content="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" />
+  <link rel="stylesheet" href="css/style.min.css?v=2" />
+  <style>
+    .careers-hero-badge {
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #6366f1;
+    }
+
+    .careers-filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .jobs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 28px;
+      margin-bottom: 60px;
+    }
+
+    .job-card {
+      padding: 28px;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all var(--transition-smooth);
+    }
+
+    .job-card-header {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .job-icon {
+      font-size: 2.2rem;
+      width: 54px;
+      height: 54px;
+      background: var(--gradient-card);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-glass);
+      flex-shrink: 0;
+    }
+
+    .job-department-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+    }
+
+    .job-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    .job-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .job-meta {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-glass);
+    }
+
+    .job-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .culture-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .culture-card {
+      padding: 24px;
+      border-radius: 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      text-align: center;
+    }
+
+    .culture-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .culture-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .culture-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ===== FORM STYLES — Light Mode (default) ===== */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(37, 99, 235, 0.2);
+      background: #f1f5f9;
+      color: #0f172a;
+      font-size: 14px;
+      font-family: var(--font-primary);
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    .form-group select option {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #2563eb;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* ===== FORM STYLES — Dark Mode ===== */
+    [data-theme="dark"] .form-group label {
+      color: #94a3b8;
+    }
+
+    [data-theme="dark"] .form-group input,
+    [data-theme="dark"] .form-group select,
+    [data-theme="dark"] .form-group textarea {
+      background: rgba(15, 23, 42, 0.85);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+    }
+
+    [data-theme="dark"] .form-group input::placeholder,
+    [data-theme="dark"] .form-group textarea::placeholder {
+      color: #475569;
+    }
+
+    [data-theme="dark"] .form-group select option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    [data-theme="dark"] .form-group input:focus,
+    [data-theme="dark"] .form-group select:focus,
+    [data-theme="dark"] .form-group textarea:focus {
+      border-color: #3b82f6;
+      background: rgba(15, 23, 42, 0.95);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+    }
+
+    /* ===== APPLY MODAL BOX THEMING ===== */
+    #applyModal .modal-box,
+    #jobDetailModal .modal-box {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] #applyModal .modal-box,
+    [data-theme="dark"] #jobDetailModal .modal-box {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* ===== FILE UPLOAD BOX ===== */
+    .file-upload-box {
+      border: 2px dashed rgba(37, 99, 235, 0.35);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      background: rgba(37, 99, 235, 0.04);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-box:hover {
+      background: rgba(37, 99, 235, 0.09);
+      border-color: #2563eb;
+    }
+
+    [data-theme="dark"] .file-upload-box {
+      border-color: rgba(99, 102, 241, 0.4);
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    [data-theme="dark"] .file-upload-box:hover {
+      background: rgba(37, 99, 235, 0.12);
+      border-color: #6366f1;
+    }
+
+    /* ===== BADGE HIRING ===== */
+    .badge-hiring {
+      background: #10b981;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 100px;
+      margin-left: 6px;
+      vertical-align: middle;
+      text-transform: uppercase;
+    }
+
+    @media(max-width:768px) {
+      .jobs-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+</head>
+
+<body>
+  <!-- GLOBAL PRELOADER -->
+  <div id="global-preloader" class="preloader-hidden">
+    <div class="preloader-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; max-width: 400px; width: 100%;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; color: var(--neon-purple, #6366f1);">
+        <path d="M12 21v.01" />
+        <path d="M19.386 15.386a9 9 0 0 0-12.772 0" />
+        <path d="M22.062 12.693a13 13 0 0 0-18.124 0" />
+        <path d="M24.739 10.001a17 17 0 0 0-23.478 0" />
+        <path d="m2 2 20 20" />
+      </svg>
+      <h2 style="font-family: var(--font-display, 'Orbitron', sans-serif); font-size: 24px; font-weight: 700; color: var(--text-primary, #f8fafc); margin-bottom: 12px; letter-spacing: 1px;">CONNECTION LOST</h2>
+      <p style="font-family: var(--font-primary, 'Inter', sans-serif); font-size: 15px; color: var(--text-secondary, #94a3b8); line-height: 1.6; margin-bottom: 24px;">Please check your internet connection. This page will automatically reconnect once your online status is restored.</p>
+    </div>
+  </div>
+  <script>
+    (function() {
+      const loader = document.getElementById('global-preloader');
+      if (!loader) return;
+      function updateOnlineStatus() {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || navigator.onLine) {
+          loader.classList.add('preloader-hidden');
+        } else {
+          loader.classList.remove('preloader-hidden');
+        }
+      }
+      updateOnlineStatus();
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+    })();
+  </script>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" alt="Shaivika IT Technologies Logo" class="logo-main-img">
+        <div class="nav-logo-text-wrapper" style="display: flex; flex-direction: column; justify-content: center; margin-left: 8px;">
+          <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
+          <div class="nav-brand-sub" style="font-family: var(--font-primary), sans-serif; font-size: 11px; font-weight: 700; color: #a272eb; letter-spacing: 3.5px; line-height: 1; margin-top: 5px;">IT TECHNOLOGIES</div>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="theme-toggle-btn" aria-label="Toggle Theme">🌙</button>
+        <a href="contact.html" class="btn btn-ghost btn-sm">Get in Touch</a>
+        <a href="services.html" class="btn btn-primary btn-sm">Our Services</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="careers.html" class="active">Careers <span class="badge-hiring">Hiring</span></a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <button class="theme-toggle-btn" aria-label="Toggle Theme" style="margin-right: 15px;">🌙</button>
+      <a href="contact.html" class="btn btn-ghost">Get in Touch</a>
+      <a href="services.html" class="btn btn-primary">Our Services</a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="hero-content">
+      <div class="section-badge careers-hero-badge">⚡ We Are Hiring</div>
+      <h1 class="section-title" style="font-size:clamp(2.5rem,5vw,4rem);">Join Our Team & <span class="gradient-text">Shape the Future</span></h1>
+      <p class="section-subtitle" style="margin:0 auto;">Work on cutting-edge AI automation pipelines, web applications, and enterprise products with a high-growth tech team in Kadapa & remote India.</p>
+    </div>
+  </section>
+
+  <!-- WHY WORK WITH US -->
+  <section style="background:var(--bg-secondary);padding:50px 0;">
+    <div class="container">
+      <div class="section-header" style="margin-bottom:20px;">
+        <div class="section-badge">Workplace Culture</div>
+        <h2 class="section-title">Why Build Your Career at <span class="gradient-text">Shaivika?</span></h2>
+      </div>
+      <div class="culture-grid">
+        <div class="culture-card">
+          <div class="culture-icon">🚀</div>
+          <h3>Rapid Growth & Impact</h3>
+          <p>Direct ownership of production systems with fast-tracked career progression and skill building.</p>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🤖</div>
+          <h3>Cutting-Edge AI Tech</h3>
+          <p>Work with Next.js, Python, OpenAI, LangChain, WhatsApp API, and cloud telemetry microservices.</p>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">🏡</div>
+          <h3>Remote & Hybrid Flexibility</h3>
+          <p>Flexible work arrangements with supportive team mentorship and collaborative modern workflows.</p>
+        </div>
+        <div class="culture-card">
+          <div class="culture-icon">💰</div>
+          <h3>Competitive Rewards</h3>
+          <p>Performance incentives, project bonuses, commission partner models, and paid learning stipends.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN POSITIONS -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">Current Opportunities</div>
+        <h2 class="section-title">Explore Open <span class="gradient-text">Positions</span></h2>
+        <p class="section-subtitle">Find your next role and apply directly in under 2 minutes.</p>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="careers-filter-bar">
+        <!-- Dynamically rendered filters -->
+      </div>
+
+      <!-- Jobs Grid -->
+      <div class="jobs-grid">
+        <!-- Dynamically rendered job cards -->
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB DETAIL MODAL -->
+  <div class="modal-overlay" id="jobDetailModal">
+    <div class="modal-box" style="max-width:700px;">
+      <button class="modal-close">✕</button>
+      <div class="modal-body-content">
+        <!-- Dynamically filled -->
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION FORM MODAL -->
+  <div class="modal-overlay" id="applyModal">
+    <div class="modal-box" style="max-width:680px;">
+      <button class="modal-close">✕</button>
+      <div style="text-align:center;margin-bottom:20px;">
+        <span class="section-badge" style="margin-bottom:8px;">Job Application</span>
+        <h2 style="font-size:1.5rem;font-weight:800;color:var(--text-primary);">Apply for <span id="applyJobTitleDisplay" class="gradient-text">Position</span></h2>
+        <p style="font-size:13px;color:var(--text-secondary);">Fill in your details below. Upload your resume to complete application.</p>
+      </div>
+
+      <form id="jobApplicationForm">
+        <input type="hidden" id="applyJobId" value="" />
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="applicantName" placeholder="e.g. Rahul Sharma" required />
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="applicantEmail" placeholder="e.g. rahul@gmail.com" required />
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Mobile Number (WhatsApp) *</label>
+            <input type="tel" id="applicantPhone" placeholder="+91 9876543210" required />
+          </div>
+          <div class="form-group">
+            <label>Current Status *</label>
+            <select id="applicantStatus" required>
+              <option value="Fresher / Graduate">Fresher / Recent Graduate</option>
+              <option value="Working Professional">Working Professional</option>
+              <option value="College Student">Final Year Student</option>
+              <option value="Freelancer">Freelancer / Independent</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Passout Year / Experience Years *</label>
+            <input type="text" id="applicantExperience" placeholder="e.g. 2024 Passout OR 2 Years Exp" required />
+          </div>
+          <div class="form-group">
+            <label>Primary Skills & Tech Stack *</label>
+            <input type="text" id="applicantSkills" placeholder="e.g. React, Node.js, Python, Sales" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Portfolio / GitHub / LinkedIn URL (Optional)</label>
+          <input type="url" id="applicantPortfolio" placeholder="https://linkedin.com/in/yourprofile" />
+        </div>
+
+        <div class="form-group">
+          <label>Upload Resume / CV (PDF, DOCX, JPG, PNG) *</label>
+          <div class="file-upload-box" onclick="document.getElementById('applicantResume').click()">
+            <input type="file" id="applicantResume" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display:none;" required />
+            <div style="font-size:1.8rem;margin-bottom:6px;">📄</div>
+            <div style="font-weight:600;font-size:14px;color:var(--primary);">Click to upload your resume</div>
+            <div id="resumeFileStatus" style="font-size:12px;color:var(--text-muted);margin-top:4px;">No file selected (Max 5MB)</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Why do you want to join Shaivika IT Technologies? (Optional)</label>
+          <textarea id="applicantMessage" rows="3" placeholder="Briefly describe your interest or achievements..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;">
+          <button type="button" class="btn btn-ghost modal-close">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-lg">Submit Application 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo" style="margin-bottom:4px;">
+            <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" alt="Shaivika IT Technologies Footer Logo" class="logo-main-img" loading="lazy">
+            <div class="nav-logo-text-wrapper" style="display: flex; flex-direction: column; justify-content: center; margin-left: 8px;">
+              <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
+              <div class="nav-brand-sub" style="font-family: var(--font-primary), sans-serif; font-size: 11px; font-weight: 700; color: #a272eb; letter-spacing: 3.5px; line-height: 1; margin-top: 5px;">IT TECHNOLOGIES</div>
+            </div>
+          </a>
+          <p>
+            Shaivika IT Technologies is a trusted software company in Kadapa, Andhra Pradesh.
+            We provide AI automation services, web development, SaaS solutions, CRM systems,
+            and digital business tools for startups and enterprises across India.
+          </p>
+          <div class="footer-socials">
+            <a href="https://wa.me/917013550760" class="social-btn" title="WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22"><path fill="#40c351" d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z"/><path fill="#fff" fill-rule="evenodd" d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z" clip-rule="evenodd"/></svg></a>
+            <a href="mailto:shaivikagroups@gmail.com" class="social-btn" title="Email"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22"><path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"/><path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"/><polygon fill="#e53935" points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17"/><path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"/><path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z"/></svg></a>
+            <a href="https://www.linkedin.com/in/shaivika-groups-7823ab362" class="social-btn" title="LinkedIn" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22"><path fill="#0288D1" d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5V37z"/><path fill="#FFF" d="M12 19H17V36H12zM14.485 17h-.028C12.965 17 12 15.888 12 14.499 12 13.08 12.995 12 14.514 12c1.521 0 2.458 1.08 2.486 2.499C17 15.887 16.035 17 14.485 17zM36 36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698-1.501 0-2.313 1.012-2.707 1.99C24.957 25.543 25 26.511 25 27v9h-5V19h5v2.616C25.721 20.5 26.85 19 29.738 19c3.578 0 6.261 2.25 6.261 7.274L36 36 36 36z"/></svg></a>
+            <a href="https://www.instagram.com/shaivika_india" class="social-btn" title="Instagram" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22"><radialGradient id="ig_gr1" cx="19.38" cy="42.035" r="44.899" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fd5"/><stop offset=".328" stop-color="#ff543f"/><stop offset=".348" stop-color="#fc5245"/><stop offset=".504" stop-color="#e64771"/><stop offset=".643" stop-color="#d53e91"/><stop offset=".761" stop-color="#cc39a4"/><stop offset=".841" stop-color="#c837ab"/></radialGradient><path fill="url(#ig_gr1)" d="M34.017,41.99l-20,0.019c-4.4,0.004-8.003-3.592-8.008-7.992l-0.019-20c-0.004-4.4,3.592-8.003,7.992-8.008l20-0.019c4.4-0.004,8.003,3.592,8.008,7.992l0.019,20C42.014,38.383,38.417,41.986,34.017,41.99z"/><path fill="#fff" d="M24,31c-3.859,0-7-3.14-7-7s3.141-7,7-7s7,3.14,7,7S27.859,31,24,31z M24,19c-2.757,0-5,2.243-5,5s2.243,5,5,5s5-2.243,5-5S26.757,19,24,19z"/><circle cx="31.5" cy="16.5" r="1.5" fill="#fff"/><path fill="#fff" d="M30,37H18c-3.859,0-7-3.14-7-7V18c0-3.86,3.141-7,7-7h12c3.859,0,7,3.14,7,7v12C37,33.86,33.859,37,30,37z M18,13c-2.757,0-5,2.243-5,5v12c0,2.757,2.243,5,5,5h12c2.757,0,5-2.243,5-5V18c0-2.757-2.243-5-5-5H18z"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="careers.html">Careers <span class="badge-hiring">Hiring</span></a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <ul class="footer-links">
+            <li><a href="services.html#web-dev">Web Development</a></li>
+            <li><a href="services.html#ai-automation">AI Automations</a></li>
+            <li><a href="services.html#saas">SaaS Platforms</a></li>
+            <li><a href="services.html#dashboards">Dashboards</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul class="footer-links">
+            <li><a href="tel:+917013550760"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink:0;"><path fill="#43a047" d="M13.25 21.59c2.88 5.66 7.51 10.29 13.18 13.17l4.4-4.41c.55-.55 1.34-.71 2.03-.49C35.1 30.6 37.51 31 40 31c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2C21.22 42 6 26.78 6 8c0-1.1.9-2 2-2h7c1.1 0 2 .9 2 2 0 2.5.4 4.9 1.14 7.14.22.69.06 1.48-.49 2.03l-4.4 4.42z"/></svg> +91 7013550760</a></li>
+            <li><a href="mailto:shaivikagroups@gmail.com"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink:0;"><path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"/><path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"/><polygon fill="#e53935" points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17"/><path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"/><path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z"/></svg> shaivikagroups</a></li>
+            <li><a href="https://wa.me/917013550760"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink:0;"><path fill="#40c351" d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z"/><path fill="#fff" fill-rule="evenodd" d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z" clip-rule="evenodd"/></svg> WhatsApp</a></li>
+            <li><a href="contact.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink:0;"><path fill="#e53935" d="M24 4C16.27 4 10 10.27 10 18c0 11.25 14 26 14 26s14-14.75 14-26c0-7.73-6.27-14-14-14zm0 19c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg> Kadapa, AP</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Shaivika IT Technologies. All rights reserved.</p>
+        <p>Crafted with ❤️ in Kadapa, Andhra Pradesh</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.min.js?v=2" defer></script>
+  <script src="js/careers-manager.js" defer></script>
+
+  <!-- WHATSAPP FLOATING BUTTON -->
+  <a href="https://wa.me/917013550760" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="30" height="30" fill="currentColor">
+      <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3 18.7-68.1-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+    </svg>
+  </a>
+</body>
+
+</html>
