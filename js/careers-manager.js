@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let resumeBase64 = '';
   let resumeFileName = '';
   let currentPage = 1;
-  const itemsPerPage = 3;
+  const itemsPerPage = 6;
 
   const DEFAULT_JOBS = [
     {
@@ -131,16 +131,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initCareers() {
     try {
-      const initialized = localStorage.getItem('shaivika_careers_initialized');
       const cached = localStorage.getItem('shaivika_job_postings');
 
-      if (initialized === 'true' && cached) {
+      if (cached) {
         activeJobs = JSON.parse(cached);
       } else {
         activeJobs = DEFAULT_JOBS;
         localStorage.setItem('shaivika_job_postings', JSON.stringify(activeJobs));
-        localStorage.setItem('shaivika_careers_initialized', 'true');
       }
+      localStorage.setItem('shaivika_careers_initialized', 'true');
     } catch (e) {
       console.warn('Error reading job postings, using default list:', e);
       activeJobs = DEFAULT_JOBS;

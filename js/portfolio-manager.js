@@ -208,33 +208,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function initPortfolio() {
     try {
-      let fetchedFromServer = false;
+      const cachedCategories = localStorage.getItem('shaivika_portfolio_categories');
+      const cachedProjects = localStorage.getItem('shaivika_portfolio_projects');
 
-      // ALWAYS try to fetch fresh data from server first (source of truth)
-      try {
-        const response = await fetch('data/portfolio.json?v=' + Date.now());
-        if (response.ok) {
-          const data = await response.json();
-          if (data.categories && data.categories.length > 0) categories = data.categories;
-          if (data.projects && data.projects.length > 0) projects = data.projects;
-          // Update cache with fresh server data
-          localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
-          localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
-          localStorage.setItem('shaivika_portfolio_initialized', 'true');
-          fetchedFromServer = true;
-        }
-      } catch (err) {
-        console.warn('Server fetch failed — using cached/fallback data');
-      }
-
-      // Only use cache/defaults if server fetch failed
-      if (!fetchedFromServer) {
-        const cachedCategories = localStorage.getItem('shaivika_portfolio_categories');
-        const cachedProjects = localStorage.getItem('shaivika_portfolio_projects');
-        if (cachedCategories && cachedProjects) {
-          categories = JSON.parse(cachedCategories);
-          projects = JSON.parse(cachedProjects);
-        } else {
+      if (cachedCategories && cachedProjects) {
+        categories = JSON.parse(cachedCategories);
+        projects = JSON.parse(cachedProjects);
+      } else {
+        try {
+          const response = await fetch('data/portfolio.json?v=' + Date.now());
+          if (response.ok) {
+            const data = await response.json();
+            if (data.categories && data.categories.length > 0) categories = data.categories;
+            if (data.projects && data.projects.length > 0) projects = data.projects;
+            
+            localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
+            localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
+            localStorage.setItem('shaivika_portfolio_initialized', 'true');
+          }
+        } catch (err) {
+          console.warn('Server fetch failed, using fallback data:', err);
           categories = DEFAULT_CATEGORIES;
           projects = DEFAULT_PROJECTS;
         }
