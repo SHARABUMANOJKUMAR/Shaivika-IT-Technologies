@@ -722,6 +722,7 @@
 
             <!-- TAB 2: PORTFOLIO -->
             <section class="tab-content" id="portfolio-manager-tab">
+                <div class="data-card">
                     <div class="data-card-header">
                         <input type="text" class="search-input" id="searchProjects" placeholder="Search projects by title, desc...">
                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -903,6 +904,24 @@
                                 <input type="password" class="form-input" id="confirmPass" required autocomplete="new-password">
                             </div>
                             <button type="submit" class="btn btn-primary" style="width: 100%;">Update Password</button>
+                        </form>
+                    </div>
+
+                    <div class="data-card" style="height: fit-content;">
+                        <h3 class="modal-title" style="margin-bottom: 12px;">📊 Google Sheets Integration</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px; line-height: 1.5;">
+                            Connect your website forms, job applications, and leads directly to Google Sheets via Google Apps Script Web App.
+                        </p>
+                        <form id="googleSheetForm">
+                            <div class="form-group">
+                                <label class="form-label">Apps Script Web App URL</label>
+                                <input type="url" class="form-input" id="googleSheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+                            </div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button type="submit" class="btn btn-primary btn-sm" style="flex:1;">💾 Save URL</button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btnTestGoogleSheet" style="flex:1;">🧪 Test Ping</button>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" id="btnSyncAllToSheet" style="width: 100%; margin-top: 10px;">🚀 Sync All Existing Data to Google Sheet</button>
                         </form>
                     </div>
 
@@ -1164,7 +1183,8 @@
                 link.classList.add('active');
                 tabContents.forEach(tc => tc.classList.remove('active'));
                 document.getElementById(targetTab).classList.add('active');
-                contentTitle.textContent = link.textContent.trim().replace(/^[\p{Emoji}\s]+/u, '');
+                const firstSpan = link.querySelector('span') || link;
+                contentTitle.textContent = firstSpan.textContent.trim().replace(/^[\p{Emoji}\s]+/u, '');
                 currentActiveTab = targetTab;
             });
         });
@@ -1174,17 +1194,39 @@
             const toastIcon = document.getElementById('toastIcon');
             const toastMsg = document.getElementById('toastMsg');
 
-            toastIcon.textContent = type === 'success' ? '✅' : '❌';
+            if (type === 'success') {
+                toastIcon.textContent = '✅';
+            } else if (type === 'info') {
+                toastIcon.textContent = 'ℹ️';
+            } else {
+                toastIcon.textContent = '❌';
+            }
             toastMsg.textContent = msg;
             toastBox.classList.add('show');
             setTimeout(() => toastBox.classList.remove('show'), 3500);
         };
 
+        const DEFAULT_FALLBACK_PROJECTS = [
+            { id: "p1", title: "Manspharshcare Platform", description: "Comprehensive healthcare web platform built for Manspharshcare.xyz — featuring patient portal, appointment booking, and telemedicine.", categories: ["webapp", "ui"], link: "https://mansparshcare.xyz/", emoji: "🏥" },
+            { id: "p3", title: "AI Lead Automation CRM", description: "Intelligent lead scoring, WhatsApp follow-ups, pipeline management and conversion analytics.", categories: ["ai", "saas"], link: "contact.html", emoji: "🤖" },
+            { id: "p4", title: "Business Analytics Dashboard", description: "Real-time data visualization platform with Google Sheets integration, KPI tracking, and automated reports.", categories: ["saas", "enterprise"], link: "contact.html", emoji: "📊" },
+            { id: "p5", title: "Real Estate WhatsApp Bot", description: "Intelligent WhatsApp bot that qualifies property leads, shares listings, and schedules site visits automatically.", categories: ["ai", "webapp"], link: "contact.html", emoji: "💬" },
+            { id: "p6", title: "EdTech Learning Platform", description: "Dark-themed e-learning platform with video courses, progress tracking, gamification, and certificate generation.", categories: ["ui", "webapp"], link: "contact.html", emoji: "🎓" }
+        ];
+
+        const DEFAULT_FALLBACK_JOBS = [
+            { id: "job_bdp", title: "Business Development Partner", department: "sales", location: "Remote (India) / Hybrid", type: "Commission / Partnership", experience: "1+ Years in B2B / Sales", salary: "High Performance Incentives + Commission", status: "active", emoji: "💼", overview: "Shaivika IT Technologies invites ambitious business development professionals to join our BD Partner Program.", responsibilities: ["Identify and engage prospective business clients across targeted industries.", "Build relationships with founders, directors, CXOs, and key decision-makers."], skills: ["B2B Sales", "Client Acquisition", "IT Consulting"] },
+            { id: "job_fullstack", title: "Full-Stack Web Developer", department: "engineering", location: "Kadapa / Hybrid", type: "Full-Time", experience: "0-2 Years (Freshers Welcome)", salary: "Competitive + Performance Bonus", status: "active", emoji: "💻", overview: "We are seeking a talented Full-Stack Web Developer proficient in modern frontend frameworks and backend systems.", responsibilities: ["Develop high-performance, responsive web applications using modern JavaScript/React.", "Integrate RESTful APIs and database architecture."], skills: ["JavaScript", "React", "Node.js", "REST APIs"] },
+            { id: "job_ai", title: "AI & Automation Engineer", department: "ai", location: "Remote / Hybrid", type: "Full-Time / Part-Time", experience: "1+ Years in AI/NLP", salary: "Industry Standard + Perks", status: "active", emoji: "🤖", overview: "Join our core AI team to design and build intelligent automation bots and LLM integrations.", responsibilities: ["Design AI agent workflows and conversational bots.", "Integrate OpenAI/Gemini APIs and LangChain."], skills: ["Python", "OpenAI APIs", "WhatsApp API", "LangChain"] },
+            { id: "job_uiux", title: "UI/UX & Product Designer", department: "design", location: "Remote (India)", type: "Full-Time", experience: "1+ Years Portfolio Required", salary: "Competitive", status: "active", emoji: "🎨", overview: "Craft visually stunning digital interfaces and dark-mode themes.", responsibilities: ["Design high-fidelity wireframes and Figma prototypes."], skills: ["Figma", "UI Design", "Glassmorphism"] },
+            { id: "job_mobile", title: "Flutter / Mobile App Developer", department: "engineering", location: "Hybrid / Remote", type: "Full-Time", experience: "1+ Years", salary: "Competitive", status: "active", emoji: "📱", overview: "Build cross-platform mobile apps for Android and iOS using Flutter.", responsibilities: ["Develop high-performance Flutter applications."], skills: ["Flutter", "Dart", "Firebase"] }
+        ];
+
         const loadData = async () => {
+            // Categories
             try {
-                // Categories
                 let cats = localStorage.getItem('shaivika_portfolio_categories');
-                if (cats) {
+                if (cats && JSON.parse(cats).length > 0) {
                     database.categories = JSON.parse(cats);
                 } else {
                     database.categories = [
@@ -1196,44 +1238,77 @@
                     ];
                     localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(database.categories));
                 }
+            } catch (e) {
+                database.categories = [
+                    { id: "webapp", name: "Web Apps" },
+                    { id: "ai", name: "AI & Automation" },
+                    { id: "ui", name: "UI Design" },
+                    { id: "saas", name: "SaaS" },
+                    { id: "enterprise", name: "Enterprise" }
+                ];
+            }
 
-                // Projects
+            // Projects
+            try {
                 let projs = localStorage.getItem('shaivika_portfolio_projects');
-                if (projs) {
+                if (projs && JSON.parse(projs).length > 0) {
                     database.projects = JSON.parse(projs);
                 } else {
-                    const fallback = await fetch('../data/portfolio.json');
-                    if (fallback.ok) {
-                        const data = await fallback.json();
-                        database.projects = data.projects;
+                    try {
+                        const fallback = await fetch('../data/portfolio.json');
+                        if (fallback.ok) {
+                            const data = await fallback.json();
+                            database.projects = data.projects && data.projects.length ? data.projects : DEFAULT_FALLBACK_PROJECTS;
+                        } else {
+                            database.projects = DEFAULT_FALLBACK_PROJECTS;
+                        }
+                    } catch (e) {
+                        database.projects = DEFAULT_FALLBACK_PROJECTS;
                     }
                     localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(database.projects));
                 }
+            } catch (e) {
+                database.projects = DEFAULT_FALLBACK_PROJECTS;
+            }
 
-                // Submissions
+            // Submissions
+            try {
                 let subs = localStorage.getItem('shaivika_submissions');
                 database.submissions = subs ? JSON.parse(subs) : [];
+            } catch (e) {
+                database.submissions = [];
+            }
 
-                // Jobs
+            // Jobs
+            try {
                 let jbs = localStorage.getItem('shaivika_job_postings');
-                database.jobs = jbs ? JSON.parse(jbs) : [];
+                if (jbs && JSON.parse(jbs).length > 0) {
+                    database.jobs = JSON.parse(jbs);
+                } else {
+                    database.jobs = DEFAULT_FALLBACK_JOBS;
+                    localStorage.setItem('shaivika_job_postings', JSON.stringify(database.jobs));
+                }
+            } catch (e) {
+                database.jobs = DEFAULT_FALLBACK_JOBS;
+            }
 
-                // Applications
+            // Applications
+            try {
                 let apps = localStorage.getItem('shaivika_job_applications');
                 database.applications = apps ? JSON.parse(apps) : [];
-
-                updateDashboardStats();
-                renderDashboardRecentSubmissions();
-                renderProjectsTable();
-                renderCategoriesTable();
-                renderLeadsTable();
-                renderJobsTable();
-                renderApplicationsTable();
-                populateCategoryCheckboxes();
-            } catch (err) {
-                console.error(err);
-                showToast('Error syncing database.', 'error');
+            } catch (e) {
+                database.applications = [];
             }
+
+            // Always render everything safely!
+            try { updateDashboardStats(); } catch(e) {}
+            try { renderDashboardRecentSubmissions(); } catch(e) {}
+            try { renderProjectsTable(); } catch(e) {}
+            try { renderCategoriesTable(); } catch(e) {}
+            try { renderLeadsTable(); } catch(e) {}
+            try { renderJobsTable(); } catch(e) {}
+            try { renderApplicationsTable(); } catch(e) {}
+            try { populateCategoryCheckboxes(); } catch(e) {}
         };
 
         const saveData = () => {
@@ -1632,6 +1707,21 @@
             } else {
                 database.jobs.unshift(jobData);
                 showToast('New job posted successfully!', 'success');
+
+                // Send to Google Sheet
+                const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
+                if (sheetUrl) {
+                    fetch(sheetUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            targetTab: 'Jobs',
+                            ...jobData
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => console.log('Job posting sent to Google Sheet:', data))
+                    .catch(err => console.error('Google Sheet error:', err));
+                }
             }
 
             saveData();
@@ -1668,10 +1758,27 @@
 
         window.deleteJob = (idx) => {
             if (confirm(`Are you sure you want to delete "${database.jobs[idx].title}"?`)) {
+                const jobToDelete = database.jobs[idx];
                 database.jobs.splice(idx, 1);
                 saveData();
                 renderJobsTable();
                 showToast('Job posting deleted.', 'success');
+
+                // Also delete from Google Sheet
+                const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
+                if (sheetUrl && jobToDelete.id) {
+                    fetch(sheetUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'delete',
+                            targetTab: 'Jobs',
+                            id: jobToDelete.id
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => console.log('Job deleted from Google Sheet:', data))
+                    .catch(err => console.error('Google Sheet delete error:', err));
+                }
             }
         };
 
@@ -1863,6 +1970,21 @@
             } else {
                 database.projects.unshift(projData);
                 showToast('New project added successfully.', 'success');
+
+                // Send to Google Sheet
+                const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
+                if (sheetUrl) {
+                    fetch(sheetUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            targetTab: 'Portfolios',
+                            ...projData
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => console.log('Project sent to Google Sheet:', data))
+                    .catch(err => console.error('Google Sheet error:', err));
+                }
             }
 
             saveData();
@@ -1910,6 +2032,22 @@
             saveData();
             renderProjectsTable();
             showToast('"' + proj.title + '" deleted successfully.', 'success');
+
+            // Also delete from Google Sheet
+            const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
+            if (sheetUrl && proj.id) {
+                fetch(sheetUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'delete',
+                        targetTab: 'Portfolios',
+                        id: proj.id
+                    })
+                })
+                .then(res => res.json())
+                .then(data => console.log('Project deleted from Google Sheet:', data))
+                .catch(err => console.error('Google Sheet delete error:', err));
+            }
         };
 
         // CATEGORY FORM SUBMIT handler
@@ -2015,6 +2153,101 @@
             showToast('Admin password updated successfully!', 'success');
             document.getElementById('changePasswordForm').reset();
         });
+
+        // GOOGLE SHEET SETTINGS HANDLER
+        const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwYuaFSFAUMMYrPyNnTqlZRxNJ1IKGZcUem-hvs1b4FBZmRjfr6vYXioxrN8_W_QMKSEA/exec';
+        const sheetUrlInput = document.getElementById('googleSheetUrlInput');
+        if (sheetUrlInput) {
+            sheetUrlInput.value = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
+            document.getElementById('googleSheetForm')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const url = sheetUrlInput.value.trim();
+                if (url) {
+                    localStorage.setItem('shaivika_google_sheet_url', url);
+                    showToast('Google Sheet Web App URL saved successfully!', 'success');
+                } else {
+                    localStorage.removeItem('shaivika_google_sheet_url');
+                    showToast('Google Sheet Web App URL cleared.', 'info');
+                }
+            });
+
+            document.getElementById('btnTestGoogleSheet')?.addEventListener('click', () => {
+                const url = sheetUrlInput.value.trim();
+                if (!url) {
+                    showToast('Please enter a Google Apps Script Web App URL first.', 'error');
+                    return;
+                }
+                showToast('Sending test ping to Google Sheet...', 'info');
+                fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        sheetName: 'Form Submissions',
+                        id: 'test_ping_' + Date.now(),
+                        type: 'Test Connection',
+                        name: 'Admin Test',
+                        email: 'test@shaivika.com',
+                        subject: 'Google Sheet Connection Test',
+                        message: 'Connection successfully established from Shaivika Admin!'
+                    })
+                }).then(() => {
+                    showToast('Test ping sent! Check your Google Sheet for new row.', 'success');
+                }).catch(err => {
+                    showToast('Failed to send test ping: ' + err.message, 'error');
+                });
+            });
+
+            document.getElementById('btnSyncAllToSheet')?.addEventListener('click', async () => {
+                const url = sheetUrlInput.value.trim() || DEFAULT_SHEET_URL;
+                showToast('Syncing all jobs, applications, & submissions to Google Sheet...', 'info');
+
+                let count = 0;
+                if (database.jobs && database.jobs.length) {
+                    for (const job of database.jobs) {
+                        try {
+                            await fetch(url, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'text/plain' },
+                                body: JSON.stringify({ sheetName: 'Job Openings', ...job })
+                            });
+                            count++;
+                        } catch (e) {}
+                    }
+                }
+
+                if (database.submissions && database.submissions.length) {
+                    for (const sub of database.submissions) {
+                        try {
+                            await fetch(url, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'text/plain' },
+                                body: JSON.stringify({ sheetName: 'Form Submissions', ...sub })
+                            });
+                            count++;
+                        } catch (e) {}
+                    }
+                }
+
+                if (database.applications && database.applications.length) {
+                    for (const app of database.applications) {
+                        try {
+                            await fetch(url, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'text/plain' },
+                                body: JSON.stringify({ sheetName: 'Job Applications', ...app })
+                            });
+                            count++;
+                        } catch (e) {}
+                    }
+                }
+
+                showToast(`Synced ${count} records to Google Sheet! Check your tabs.`, 'success');
+            });
+        }
 
         // RESET TO DEFAULT BASELINE handler
         document.getElementById('btnResetDb').addEventListener('click', () => {
