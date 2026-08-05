@@ -1693,24 +1693,35 @@
             if (editIdx > -1) {
                 database.jobs[editIdx] = jobData;
                 showToast('Job posting updated.', 'success');
+
+                const JOBS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbw2QB_wFrV8JAPsA-bEfEJ8ivdXkRUTXVZFurC6q9_bD5ntxY2pXH2HlSzllULQp3Jd/exec';
+                fetch(JOBS_SHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'edit',
+                        ...jobData
+                    })
+                })
+                .then(() => console.log('Job updated in Google Sheet'))
+                .catch(err => console.error('Google Sheet error:', err));
             } else {
                 database.jobs.unshift(jobData);
                 showToast('New job posted successfully!', 'success');
 
-                // Send to Google Sheet
-                const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
-                if (sheetUrl) {
-                    fetch(sheetUrl, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            targetTab: 'Jobs',
-                            ...jobData
-                        })
+                const JOBS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbw2QB_wFrV8JAPsA-bEfEJ8ivdXkRUTXVZFurC6q9_bD5ntxY2pXH2HlSzllULQp3Jd/exec';
+                fetch(JOBS_SHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'add',
+                        ...jobData
                     })
-                    .then(res => res.json())
-                    .then(data => console.log('Job posting sent to Google Sheet:', data))
-                    .catch(err => console.error('Google Sheet error:', err));
-                }
+                })
+                .then(() => console.log('Job posting sent to Google Sheet'))
+                .catch(err => console.error('Google Sheet error:', err));
             }
 
             saveData();
@@ -1754,18 +1765,18 @@
                 showToast('Job posting deleted.', 'success');
 
                 // Also delete from Google Sheet
-                const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
-                if (sheetUrl && jobToDelete.id) {
-                    fetch(sheetUrl, {
+                const JOBS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbw2QB_wFrV8JAPsA-bEfEJ8ivdXkRUTXVZFurC6q9_bD5ntxY2pXH2HlSzllULQp3Jd/exec';
+                if (jobToDelete.id) {
+                    fetch(JOBS_SHEET_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
                         body: JSON.stringify({
                             action: 'delete',
-                            targetTab: 'Jobs',
                             id: jobToDelete.id
                         })
                     })
-                    .then(res => res.json())
-                    .then(data => console.log('Job deleted from Google Sheet:', data))
+                    .then(() => console.log('Job deleted from Google Sheet'))
                     .catch(err => console.error('Google Sheet delete error:', err));
                 }
             }
@@ -1952,24 +1963,36 @@
             if (editIdx > -1) {
                 database.projects[editIdx] = projData;
                 showToast('Project updated successfully.', 'success');
+                
+                const PORTFOLIO_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
+                fetch(PORTFOLIO_SHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'edit',
+                        ...projData
+                    })
+                })
+                .then(() => console.log('✅ Project updated in Portfolio Sheet'))
+                .catch(err => console.error('❌ Portfolio Sheet update error:', err));
             } else {
                 database.projects.unshift(projData);
                 showToast('New project added successfully.', 'success');
 
-                // Send to Google Sheet
-                const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
-                if (sheetUrl) {
-                    fetch(sheetUrl, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            targetTab: 'Portfolios',
-                            ...projData
-                        })
+                // Send to dedicated Portfolio Google Sheet
+                const PORTFOLIO_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
+                fetch(PORTFOLIO_SHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'add',
+                        ...projData
                     })
-                    .then(res => res.json())
-                    .then(data => console.log('Project sent to Google Sheet:', data))
-                    .catch(err => console.error('Google Sheet error:', err));
-                }
+                })
+                .then(() => console.log('✅ Project saved to Portfolio Sheet'))
+                .catch(err => console.error('❌ Portfolio Sheet error:', err));
             }
 
             saveData();
@@ -2017,20 +2040,20 @@
             renderProjectsTable();
             showToast('"' + proj.title + '" deleted successfully.', 'success');
 
-            // Also delete from Google Sheet
-            const sheetUrl = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_SHEET_URL;
-            if (sheetUrl && proj.id) {
-                fetch(sheetUrl, {
+            // Also delete from dedicated Portfolio Google Sheet
+            const PORTFOLIO_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
+            if (proj.id) {
+                fetch(PORTFOLIO_SHEET_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         action: 'delete',
-                        targetTab: 'Portfolios',
                         id: proj.id
                     })
                 })
-                .then(res => res.json())
-                .then(data => console.log('Project deleted from Google Sheet:', data))
-                .catch(err => console.error('Google Sheet delete error:', err));
+                .then(() => console.log('✅ Project deleted from Portfolio Sheet'))
+                .catch(err => console.error('❌ Portfolio Sheet delete error:', err));
             }
         };
 
