@@ -126,10 +126,16 @@ function initNewsletter() {
 // ===== SMOOTH SCROLL =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', e => {
-    const target = document.querySelector(anchor.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const href = anchor.getAttribute('href');
+    if (!href || href === '#' || href === '#!') return;
+    try {
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } catch (err) {
+      // Ignore invalid or empty selector
     }
   });
 });
@@ -271,14 +277,27 @@ function initServicesSidebar() {
 
   sidebarLinks.forEach(link => {
     link.addEventListener('click', (e) => {
-      e.preventDefault();
-      sidebarLinks.forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-      const target = document.querySelector(link.getAttribute('href'));
-      if (target) {
-        const offset = 100;
-        const top = target.getBoundingClientRect().top + window.scrollY - offset;
-        window.scrollTo({ top, behavior: 'smooth' });
+      const panel = link.dataset.panel;
+      if (typeof window.switchPanel === 'function' && panel) {
+        e.preventDefault();
+        window.switchPanel(panel);
+        return;
+      }
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && href.startsWith('#')) {
+        try {
+          const target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            sidebarLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            const offset = 100;
+            const top = target.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        } catch (err) {
+          // Ignore invalid selector
+        }
       }
     });
   });

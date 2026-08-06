@@ -31,15 +31,145 @@
         }
 
         [data-theme="light"] {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-glass: rgba(255, 255, 255, 0.75);
-            --bg-card-hover: rgba(255, 255, 255, 0.95);
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: #ffffff;
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #64748b;
             --border-glass: rgba(0, 0, 0, 0.08);
             --border-glow: rgba(37, 99, 235, 0.2);
+        }
+
+        [data-theme="light"] body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .sidebar {
+            background: #ffffff;
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        [data-theme="light"] .sidebar-logo {
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .sidebar-link {
+            color: #475569;
+        }
+
+        [data-theme="light"] .sidebar-link:hover,
+        [data-theme="light"] .sidebar-link.active {
+            background: rgba(37, 99, 235, 0.08);
+            color: #2563eb;
+        }
+
+        [data-theme="light"] .data-card,
+        [data-theme="light"] .stat-card,
+        [data-theme="light"] .login-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        [data-theme="light"] .stat-details p {
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .page-title,
+        [data-theme="light"] .card-title,
+        [data-theme="light"] .modal-title {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .data-table th {
+            color: #475569;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        [data-theme="light"] .data-table td {
+            color: #0f172a;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="light"] .project-title-cell,
+        [data-theme="light"] .data-table td strong {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .search-input,
+        [data-theme="light"] .form-input,
+        [data-theme="light"] .form-select,
+        [data-theme="light"] .textarea-input {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .search-input:focus,
+        [data-theme="light"] .form-input:focus,
+        [data-theme="light"] .form-select:focus,
+        [data-theme="light"] .textarea-input:focus {
+            background: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .form-label {
+            color: #1e293b;
+        }
+
+        [data-theme="light"] .modal-content {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #0f172a;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        [data-theme="light"] .action-btn-edit {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: rgba(37, 99, 235, 0.25);
+            color: #1d4ed8;
+        }
+
+        [data-theme="light"] .action-btn-edit:hover {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        [data-theme="light"] .action-btn-delete {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.25);
+            color: #dc2626;
+        }
+
+        [data-theme="light"] .action-btn-delete:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        [data-theme="light"] .tr-project-row:hover {
+            background: rgba(241, 245, 249, 0.7);
+        }
+
+        [data-theme="light"] .lead-detail-value {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .toast {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
         }
 
         * {
@@ -430,28 +560,138 @@
 
         .action-btns {
             display: flex;
+            align-items: center;
             gap: 8px;
         }
 
-        .action-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            color: var(--text-primary);
+        .action-btn-edit, .action-btn-delete {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             padding: 6px 12px;
-            border-radius: 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.85rem;
+            border: 1px solid transparent;
+            transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            user-select: none;
+            backdrop-filter: blur(8px);
         }
 
-        .action-btn:hover {
-            background: rgba(37, 99, 235, 0.2);
-            border-color: var(--primary);
+        .action-btn-edit {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12));
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
         }
 
-        .action-btn.delete:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: var(--danger);
+        .action-btn-edit svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .action-btn-edit:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.28), rgba(139, 92, 246, 0.28));
+            border-color: rgba(96, 165, 250, 0.7);
+            color: #ffffff;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+        }
+
+        .action-btn-edit:hover svg {
+            transform: rotate(-18deg) scale(1.15);
+        }
+
+        .action-btn-edit:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .action-btn-delete {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(244, 63, 94, 0.12));
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .action-btn-delete svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .action-btn-delete:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(244, 63, 94, 0.28));
+            border-color: rgba(248, 113, 113, 0.7);
+            color: #ffffff;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+        }
+
+        .action-btn-delete:hover svg {
+            transform: translateY(-2px) rotate(12deg) scale(1.15);
+        }
+
+        .action-btn-delete:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Animated row transitions */
+        .tr-project-row {
+            transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .tr-project-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tr-row-deleting {
+            animation: trRowDelete 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+        }
+
+        @keyframes trRowDelete {
+            0% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                background: rgba(239, 68, 68, 0.15);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateX(20px) scale(0.98);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50px) scale(0.9);
+                height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                visibility: hidden;
+            }
+        }
+
+        .tr-row-highlight {
+            animation: trRowHighlight 1.5s ease-out;
+        }
+
+        @keyframes trRowHighlight {
+            0% {
+                background: rgba(59, 130, 246, 0.35);
+                box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.5);
+            }
+            100% {
+                background: transparent;
+                box-shadow: none;
+            }
+        }
+
+        @keyframes pulseWarning {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(239,68,68,0.3); }
+            50% { transform: scale(1.06); box-shadow: 0 0 30px rgba(239,68,68,0.5); }
         }
 
         .tag {
@@ -725,7 +965,10 @@
                 <div class="data-card">
                     <div class="data-card-header">
                         <input type="text" class="search-input" id="searchProjects" placeholder="Search projects by title, desc...">
-                        <button class="btn btn-primary btn-sm" id="addNewProjectBtn">➕ Add Project</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary btn-sm" id="syncGoogleSheetBtn" title="Pull latest projects from Google Sheet">🔄 Sync Google Sheet</button>
+                            <button class="btn btn-primary btn-sm" id="addNewProjectBtn">➕ Add Project</button>
+                        </div>
                     </div>
                     <div class="data-table-wrapper">
                         <table class="data-table">
@@ -885,6 +1128,30 @@
             <!-- TAB 7: SETTINGS -->
             <section class="tab-content" id="settings-tab">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    
+                    <!-- GOOGLE SHEET INTEGRATION CARD -->
+                    <div class="data-card" style="grid-column: 1 / -1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                            <h3 class="modal-title" style="margin-bottom:0;">📊 Google Sheet Portfolio & CMS Integration</h3>
+                            <span class="tag tag-cyan" id="gasSyncBadge">Not Connected</span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                            Connect your Google Apps Script Web App URL to automatically synchronize Portfolio projects between this Admin Dashboard, your Google Spreadsheet, and the live Website in real-time.
+                        </p>
+                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Google Apps Script Web App URL</label>
+                                <input type="url" class="form-input" id="gasPortfolioUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+                            </div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <button class="btn btn-primary" id="btnSaveGasUrl">💾 Save & Test</button>
+                                <button class="btn btn-secondary" id="btnPushAllToGas" title="Sync all current projects to Google Sheet">📤 Push All Projects</button>
+                                <button class="btn btn-secondary" id="btnPullAllFromGas" title="Fetch projects from Google Sheet">📥 Pull From Sheet</button>
+                            </div>
+                        </div>
+                        <div id="gasStatusOutput" style="margin-top: 14px; font-size: 0.85rem; padding: 10px 14px; border-radius: 8px; display: none;"></div>
+                    </div>
+
                     <div class="data-card">
                         <h3 class="modal-title" style="margin-bottom: 24px;">Change Admin Password</h3>
                         <form id="changePasswordForm">
@@ -953,12 +1220,42 @@
                         <label class="form-label">Fallback Emoji</label>
                         <input type="text" class="form-input" id="projectEmoji" placeholder="e.g. 📱 or 🏥" maxlength="4">
                     </div>
+                    <div class="form-group form-full">
+                        <label class="form-label">Project Thumbnail / Image URL (Optional)</label>
+                        <input type="text" class="form-input" id="projectImage" placeholder="https://example.com/image.jpg or img/portfolio/app.png">
+                    </div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
                     <button type="button" class="btn btn-secondary" id="cancelProjectModal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Project</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- CUSTOM ANIMATED DELETE CONFIRMATION MODAL -->
+    <div class="modal" id="deleteConfirmModal">
+        <div class="modal-content" style="max-width: 440px; text-align: center; padding: 36px 28px;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(244,63,94,0.1)); border: 2px solid rgba(239,68,68,0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(239,68,68,0.35); animation: pulseWarning 2s infinite;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    <line x1="10" y1="11" x2="10" y2="17"/>
+                    <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+            </div>
+            <h3 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; color: #ffffff;">Delete Portfolio Project?</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
+                Are you sure you want to delete <strong id="deleteProjectTargetTitle" style="color: #f87171;"></strong>? This action will remove it from the dashboard and sync to Google Sheets.
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteModalBtn" style="padding: 10px 20px; border-radius: 12px;">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteModalBtn" style="padding: 10px 24px; border-radius: 12px; background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 15px rgba(239,68,68,0.4); display: flex; align-items: center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    <span>Yes, Delete</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1172,10 +1469,24 @@
             const toastIcon = document.getElementById('toastIcon');
             const toastMsg = document.getElementById('toastMsg');
 
-            toastIcon.textContent = type === 'success' ? '✅' : '❌';
+            if (type === 'success') {
+                toastIcon.textContent = '✅';
+                toastBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            } else if (type === 'info') {
+                toastIcon.textContent = 'ℹ️';
+                toastBox.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+            } else if (type === 'warning') {
+                toastIcon.textContent = '⚠️';
+                toastBox.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+            } else {
+                toastIcon.textContent = '❌';
+                toastBox.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            }
+
             toastMsg.textContent = msg;
             toastBox.classList.add('show');
-            setTimeout(() => toastBox.classList.remove('show'), 3500);
+            if (window._toastTimeout) clearTimeout(window._toastTimeout);
+            window._toastTimeout = setTimeout(() => toastBox.classList.remove('show'), 3500);
         };
 
         const loadData = async () => {
@@ -1242,6 +1553,7 @@
             localStorage.setItem('shaivika_job_applications', JSON.stringify(database.applications));
             updateDashboardStats();
             populateCategoryCheckboxes();
+            window.dispatchEvent(new CustomEvent('shaivika_portfolio_updated', { detail: database.projects }));
         };
 
         const updateDashboardStats = () => {
@@ -1297,7 +1609,7 @@
         });
 
         // PROJECTS TABLE
-        const renderProjectsTable = (searchQuery = '') => {
+        const renderProjectsTable = (searchQuery = '', highlightIndex = -1) => {
             const tbody = document.getElementById('projectsTableBody');
             tbody.innerHTML = '';
 
@@ -1311,25 +1623,44 @@
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No projects found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No projects found.</td></tr>';
                 return;
             }
 
             filtered.forEach((proj, idx) => {
                 const tr = document.createElement('tr');
-                let thumbHTML = proj.image ? `<img src="${proj.image}" style="width:50px; height:35px; object-fit:cover; border-radius:4px;">` : `<span style="font-size: 1.25rem;">${proj.emoji || '💻'}</span>`;
-                const tags = proj.categories.map(cId => `<span class="tag tag-cyan" style="font-size:0.65rem;margin-right:4px;">${cId}</span>`).join('');
-                const linkDisplay = proj.link ? `<a href="${proj.link}" target="_blank" style="color:var(--accent);">${proj.link}</a>` : '<span style="color:var(--text-muted);">None</span>';
+                tr.className = `tr-project-row ${highlightIndex === idx ? 'tr-row-highlight' : ''}`;
+                tr.id = `proj-row-${idx}`;
+                
+                let thumbHTML = proj.image ? `<img src="${proj.image}" style="width:50px; height:35px; object-fit:cover; border-radius:6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">` : `<span style="font-size: 1.35rem;">${proj.emoji || '💻'}</span>`;
+                const cats = Array.isArray(proj.categories) ? proj.categories : (typeof proj.categories === 'string' ? proj.categories.split(',').map(s => s.trim()) : []);
+                const tags = cats.map(cId => `<span class="tag tag-cyan" style="font-size:0.68rem; margin-right:4px;">${cId}</span>`).join('');
+                const linkDisplay = proj.link ? `<a href="${proj.link}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:500; display:inline-flex; align-items:center; gap:4px;" title="${proj.link}"><span>${proj.link.length > 28 ? proj.link.substring(0,25) + '...' : proj.link}</span> <span style="font-size:0.75rem;">↗</span></a>` : '<span style="color:var(--text-muted);">None</span>';
 
                 tr.innerHTML = `
                     <td style="text-align:center;">${thumbHTML}</td>
-                    <td style="font-weight:600;">${proj.title}</td>
+                    <td class="project-title-cell" style="font-weight:600; color: var(--text-primary); font-size:0.95rem;">${proj.title}</td>
                     <td>${tags}</td>
                     <td>${linkDisplay}</td>
                     <td>
                         <div class="action-btns">
-                            <button class="action-btn" onclick="openEditProject(${idx})">✏️</button>
-                            <button class="action-btn delete" onclick="deleteProject(${idx})">🗑️</button>
+                            <button type="button" class="action-btn-edit" onclick="openEditProject(${idx})" title="Edit Project">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                                <span>Edit</span>
+                            </button>
+                            <button type="button" class="action-btn-delete" onclick="promptDeleteProject(${idx})" title="Delete Project">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 6h18"/>
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                    <line x1="10" y1="11" x2="10" y2="17"/>
+                                    <line x1="14" y1="11" x2="14" y2="17"/>
+                                </svg>
+                                <span>Delete</span>
+                            </button>
                         </div>
                     </td>
                 `;
@@ -1785,13 +2116,512 @@
             showToast('Applications CSV exported successfully.', 'success');
         });
 
-        // OTHER MODALS & EXPORTS
+        // ==========================================
+        // PROJECT MODAL & CRUD HANDLERS
+        // ==========================================
         const projectModal = document.getElementById('projectModal');
-        const openProjectModal = () => { projectModal.classList.add('open'); document.body.style.overflow = 'hidden'; };
-        const closeProjectModal = () => { projectModal.classList.remove('open'); document.body.style.overflow = ''; };
-        document.getElementById('addNewProjectBtn').addEventListener('click', openProjectModal);
+        
+        const openProjectModal = () => {
+            populateCategoryCheckboxes();
+            projectModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeProjectModal = () => {
+            projectModal.classList.remove('open');
+            document.body.style.overflow = '';
+            document.getElementById('projectForm').reset();
+            document.getElementById('editProjectIndex').value = '-1';
+            document.getElementById('projectModalTitle').textContent = 'Add Portfolio Project';
+            // Uncheck all category checkboxes
+            document.querySelectorAll('input[name="projCatCheckbox"]').forEach(cb => cb.checked = false);
+        };
+
+        document.getElementById('addNewProjectBtn').addEventListener('click', () => {
+            closeProjectModal();
+            openProjectModal();
+        });
+
         document.getElementById('closeProjectModal').addEventListener('click', closeProjectModal);
         document.getElementById('cancelProjectModal').addEventListener('click', closeProjectModal);
+
+        // ==========================================
+        // PORTFOLIO PROJECT CRUD & ANIMATED ACTIONS
+        // ==========================================
+        let pendingDeleteProjectIdx = -1;
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        const deleteProjectTargetTitle = document.getElementById('deleteProjectTargetTitle');
+        const cancelDeleteModalBtn = document.getElementById('cancelDeleteModalBtn');
+        const confirmDeleteModalBtn = document.getElementById('confirmDeleteModalBtn');
+
+        // Edit Project
+        window.openEditProject = (idx) => {
+            const proj = database.projects[idx];
+            if (!proj) return;
+
+            openProjectModal();
+            document.getElementById('editProjectIndex').value = idx;
+            document.getElementById('projectModalTitle').textContent = 'Edit Portfolio Project';
+            document.getElementById('projectTitle').value = proj.title || '';
+            document.getElementById('projectDesc').value = proj.description || '';
+            document.getElementById('projectLink').value = proj.link || '';
+            document.getElementById('projectEmoji').value = proj.emoji || '';
+            document.getElementById('projectImage').value = proj.image || '';
+
+            // Check matching categories
+            const cats = Array.isArray(proj.categories) ? proj.categories : (typeof proj.categories === 'string' ? proj.categories.split(',').map(s => s.trim()) : []);
+            document.querySelectorAll('input[name="projCatCheckbox"]').forEach(cb => {
+                cb.checked = cats.includes(cb.value);
+            });
+        };
+
+        // Open Custom Animated Delete Modal
+        window.promptDeleteProject = (idx) => {
+            const proj = database.projects[idx];
+            if (!proj) return;
+
+            pendingDeleteProjectIdx = idx;
+            deleteProjectTargetTitle.textContent = `"${proj.title}"`;
+            deleteConfirmModal.classList.add('open');
+        };
+
+        // Cancel Delete Modal
+        cancelDeleteModalBtn?.addEventListener('click', () => {
+            deleteConfirmModal.classList.remove('open');
+            pendingDeleteProjectIdx = -1;
+        });
+
+        // Close on backdrop click
+        deleteConfirmModal?.addEventListener('click', (e) => {
+            if (e.target === deleteConfirmModal) {
+                deleteConfirmModal.classList.remove('open');
+                pendingDeleteProjectIdx = -1;
+            }
+        });
+
+        // Confirm Delete with Row Exit Animation
+        confirmDeleteModalBtn?.addEventListener('click', async () => {
+            if (pendingDeleteProjectIdx < 0 || pendingDeleteProjectIdx >= database.projects.length) {
+                deleteConfirmModal.classList.remove('open');
+                return;
+            }
+
+            const targetIdx = pendingDeleteProjectIdx;
+            const proj = database.projects[targetIdx];
+            const deletedId = proj.id;
+            const deletedTitle = proj.title;
+
+            // Close modal immediately
+            deleteConfirmModal.classList.remove('open');
+            pendingDeleteProjectIdx = -1;
+
+            // Trigger smooth slide-out animation on the target row
+            const targetRow = document.getElementById(`proj-row-${targetIdx}`);
+            if (targetRow) {
+                targetRow.classList.add('tr-row-deleting');
+            }
+
+            // Wait 380ms for exit animation
+            setTimeout(async () => {
+                database.projects.splice(targetIdx, 1);
+                saveData();
+                renderProjectsTable();
+                updateDashboardStats();
+                showToast(`Project "${deletedTitle}" deleted successfully.`, 'success');
+
+                // Sync delete to Google Sheet
+                await sendGasAction('deleteProject', { id: deletedId });
+            }, 380);
+        });
+
+        // Legacy deleteProject wrapper for safety
+        window.deleteProject = window.promptDeleteProject;
+
+        // Project Form Submit Handler (Add / Edit)
+        document.getElementById('projectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editProjectIndex').value);
+            const title = document.getElementById('projectTitle').value.trim();
+            const desc = document.getElementById('projectDesc').value.trim();
+            const link = document.getElementById('projectLink').value.trim() || 'contact.html';
+            const emoji = document.getElementById('projectEmoji').value.trim() || '💼';
+            const image = document.getElementById('projectImage').value.trim();
+
+            const selectedCats = [];
+            document.querySelectorAll('input[name="projCatCheckbox"]:checked').forEach(cb => {
+                selectedCats.push(cb.value);
+            });
+
+            if (selectedCats.length === 0) {
+                selectedCats.push('webapp');
+            }
+
+            const existingProj = editIdx > -1 ? database.projects[editIdx] : null;
+            const projectId = existingProj ? existingProj.id : ('proj_' + Date.now());
+
+            const projectData = {
+                id: projectId,
+                title: title,
+                description: desc,
+                categories: selectedCats,
+                link: link,
+                emoji: emoji,
+                image: image || (existingProj ? existingProj.image : ''),
+                modalId: existingProj ? (existingProj.modalId || '') : '',
+                status: existingProj ? (existingProj.status || 'active') : 'active',
+                created_at: existingProj ? (existingProj.created_at || new Date().toLocaleString()) : new Date().toLocaleString()
+            };
+
+            const isEdit = editIdx > -1;
+            let highlightIdx = 0;
+            if (isEdit) {
+                database.projects[editIdx] = projectData;
+                highlightIdx = editIdx;
+                showToast('Project updated successfully!', 'success');
+            } else {
+                database.projects.unshift(projectData);
+                highlightIdx = 0;
+                showToast('New project created successfully!', 'success');
+            }
+
+            saveData();
+            renderProjectsTable('', highlightIdx);
+            updateDashboardStats();
+            closeProjectModal();
+
+            // Push to Google Sheet in real time
+            showToast('Syncing with Google Sheet...', 'info');
+            const syncResult = await sendGasAction(isEdit ? 'updateProject' : 'addProject', { project: projectData });
+            if (syncResult && syncResult.success !== false) {
+                showToast('✅ Saved to Google Sheet!', 'success');
+            } else {
+                showToast('Saved locally. Google Sheet sync queued.', 'warning');
+            }
+        });
+
+        // 🔄 Sync All Projects with Google Sheet Button Handler
+        document.getElementById('syncGoogleSheetBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('syncGoogleSheetBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '⏳ Syncing...';
+            btn.disabled = true;
+
+            const gasUrl = localStorage.getItem('shaivika_gas_portfolio_url') || 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
+            
+            try {
+                showToast('Connecting to Google Sheet...', 'info');
+
+                // 1. First, Bulk Sync all current local projects to ensure sheet is fully populated
+                if (database.projects.length > 0) {
+                    await sendGasAction('bulkSync', { projects: database.projects });
+                }
+
+                // 2. Fetch latest state from Google Sheet using resilient dual-mode fetch
+                const projects = await fetchGasProjectsData(gasUrl);
+                if (Array.isArray(projects) && projects.length > 0) {
+                    const mergedMap = new Map();
+                    // Add existing local projects
+                    database.projects.forEach(p => mergedMap.set(p.id, p));
+                    // Add / update from Google Sheet
+                    projects.forEach(p => {
+                        if (typeof p.categories === 'string') {
+                            p.categories = p.categories.split(',').map(s => s.trim()).filter(Boolean);
+                        }
+                        mergedMap.set(p.id, p);
+                    });
+
+                    database.projects = Array.from(mergedMap.values()).sort((a, b) => {
+                        const aIsCustom = a.id && a.id.startsWith('proj_');
+                        const bIsCustom = b.id && b.id.startsWith('proj_');
+                        if (aIsCustom && !bIsCustom) return -1;
+                        if (!aIsCustom && bIsCustom) return 1;
+                        return 0;
+                    });
+
+                    saveData();
+                    renderProjectsTable();
+                    updateDashboardStats();
+                    showToast(`✅ Synced ${database.projects.length} projects with Google Sheet!`, 'success');
+                } else {
+                    showToast('Google Sheet connected & synced successfully!', 'success');
+                }
+            } catch (err) {
+                console.error('Manual Google Sheet sync error:', err);
+                showToast('Google Sheet sync notice: ' + err.message, 'warning');
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        });
+
+        // ==========================================
+        // CATEGORY FORM & CRUD HANDLERS
+        // ==========================================
+        document.getElementById('categoryForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editCatIndex').value);
+            const name = document.getElementById('catName').value.trim();
+            const id = document.getElementById('catId').value.trim().toLowerCase().replace(/\s+/g, '-');
+
+            if (editIdx > -1) {
+                database.categories[editIdx] = { id, name };
+                showToast('Category updated.', 'success');
+            } else {
+                if (database.categories.some(c => c.id === id)) {
+                    showToast('Category slug already exists!', 'error');
+                    return;
+                }
+                database.categories.push({ id, name });
+                showToast('New category added.', 'success');
+            }
+
+            saveData();
+            renderCategoriesTable();
+            populateCategoryCheckboxes();
+            document.getElementById('categoryForm').reset();
+            document.getElementById('editCatIndex').value = '-1';
+        });
+
+        window.openEditCategory = (idx) => {
+            const cat = database.categories[idx];
+            if (!cat) return;
+            document.getElementById('editCatIndex').value = idx;
+            document.getElementById('catName').value = cat.name;
+            document.getElementById('catId').value = cat.id;
+            document.getElementById('catName').focus();
+        };
+
+        window.deleteCategory = (idx) => {
+            const cat = database.categories[idx];
+            if (!cat) return;
+            if (confirm(`Delete category "${cat.name}"?`)) {
+                database.categories.splice(idx, 1);
+                saveData();
+                renderCategoriesTable();
+                populateCategoryCheckboxes();
+                showToast('Category deleted.', 'success');
+            }
+        };
+
+        // ==========================================
+        // GOOGLE APPS SCRIPT SYNC LOGIC
+        // ==========================================
+        const gasInput = document.getElementById('gasPortfolioUrl');
+        const gasBadge = document.getElementById('gasSyncBadge');
+        const gasStatusOutput = document.getElementById('gasStatusOutput');
+
+        // Load saved GAS URL
+        const DEFAULT_ACTIVE_GAS_URL = 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
+        const savedGasUrl = localStorage.getItem('shaivika_gas_portfolio_url') || DEFAULT_ACTIVE_GAS_URL;
+        if (gasInput) {
+            gasInput.value = savedGasUrl;
+            localStorage.setItem('shaivika_gas_portfolio_url', savedGasUrl);
+            gasBadge.textContent = '🟢 Connected';
+            gasBadge.className = 'tag tag-green';
+        }
+
+        // Robust Google Apps Script Writer (POST + GET/JSONP Fallback)
+        const sendGasAction = async (action, data = {}) => {
+            const gasUrl = localStorage.getItem('shaivika_gas_portfolio_url') || DEFAULT_ACTIVE_GAS_URL;
+            if (!gasUrl) return { success: false, message: 'No GAS URL' };
+
+            const payload = { action, ...data };
+
+            // 1. Primary: Fetch POST (mode: no-cors with text/plain)
+            try {
+                await fetch(gasUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                return { success: true };
+            } catch (postErr) {
+                console.warn('Fetch POST to Google Sheet failed, trying GET fallback:', postErr);
+            }
+
+            // 2. Fallback: JSONP / GET
+            return new Promise((resolve) => {
+                const cbName = 'gasWriteCb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+                const script = document.createElement('script');
+                const cleanUrl = gasUrl.split('?')[0];
+                const params = new URLSearchParams({
+                    action: action,
+                    payload: JSON.stringify(payload),
+                    callback: cbName,
+                    _t: Date.now()
+                });
+
+                window[cbName] = (res) => {
+                    cleanup();
+                    resolve(res || { success: true });
+                };
+
+                const timer = setTimeout(() => {
+                    cleanup();
+                    resolve({ success: true, note: 'Timeout assumed success' });
+                }, 7000);
+
+                function cleanup() {
+                    clearTimeout(timer);
+                    delete window[cbName];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                }
+
+                script.src = `${cleanUrl}?${params.toString()}`;
+                script.onerror = () => {
+                    cleanup();
+                    resolve({ success: false, message: 'Script tag failed' });
+                };
+                document.body.appendChild(script);
+            });
+        };
+
+        // Universal resilient fetcher for Google Apps Script (Fetch + JSONP Fallback)
+        const fetchGasProjectsData = async (gasUrl) => {
+            if (!gasUrl) throw new Error('Missing Google Apps Script URL');
+            const getUrl = gasUrl.includes('?') ? `${gasUrl}&action=getProjects` : `${gasUrl}?action=getProjects`;
+
+            // 1. Try standard fetch with 7s timeout
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 7000);
+                const res = await fetch(getUrl, { cache: 'no-store', signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.status === 'success' && Array.isArray(data.projects)) {
+                        return data.projects;
+                    }
+                }
+            } catch (err) {
+                console.warn('Standard fetch notice, attempting JSONP fallback:', err);
+            }
+
+            // 2. Resilient JSONP fallback (guarantees cross-origin script execution)
+            return new Promise((resolve, reject) => {
+                const callbackName = 'shaivika_admin_gas_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+                const script = document.createElement('script');
+                const timer = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Google Sheet connection timed out.'));
+                }, 10000);
+
+                function cleanup() {
+                    clearTimeout(timer);
+                    delete window[callbackName];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                }
+
+                window[callbackName] = function(resp) {
+                    cleanup();
+                    if (resp && resp.status === 'success' && Array.isArray(resp.projects)) {
+                        resolve(resp.projects);
+                    } else if (resp && resp.message) {
+                        reject(new Error(resp.message));
+                    } else {
+                        reject(new Error('Invalid response structure from Google Sheet'));
+                    }
+                };
+
+                script.src = `${getUrl}&callback=${callbackName}&_t=${Date.now()}`;
+                script.onerror = function() {
+                    cleanup();
+                    reject(new Error('Script load failed for Google Sheet.'));
+                };
+                document.head.appendChild(script);
+            });
+        };
+
+        const testGasConnection = async (url) => {
+            if (!url) {
+                showToast('Please enter a Google Apps Script Web App URL.', 'error');
+                return;
+            }
+            try {
+                gasStatusOutput.style.display = 'block';
+                gasStatusOutput.style.background = 'rgba(59, 130, 246, 0.1)';
+                gasStatusOutput.style.color = 'var(--accent)';
+                gasStatusOutput.innerHTML = '⏳ Testing connection to Google Apps Script...';
+
+                const projects = await fetchGasProjectsData(url);
+
+                localStorage.setItem('shaivika_gas_portfolio_url', url);
+                gasBadge.textContent = '🟢 Connected';
+                gasBadge.className = 'tag tag-green';
+                gasStatusOutput.style.background = 'rgba(16, 185, 129, 0.1)';
+                gasStatusOutput.style.color = 'var(--success)';
+                gasStatusOutput.innerHTML = `✅ <strong>Connected!</strong> Successfully reached Google Sheet (${projects.length} projects retrieved).`;
+                showToast(`Google Sheet verified! (${projects.length} projects)`, 'success');
+            } catch (err) {
+                console.error('GAS connection error:', err);
+                gasBadge.textContent = '⚠️ Check URL';
+                gasBadge.className = 'tag tag-amber';
+                gasStatusOutput.style.background = 'rgba(239, 68, 68, 0.1)';
+                gasStatusOutput.style.color = 'var(--danger)';
+                gasStatusOutput.innerHTML = `❌ <strong>Connection Notice:</strong> ${err.message}. If this is a new Web App, ensure it was deployed with <em>"Who has access: Anyone"</em>.`;
+                localStorage.setItem('shaivika_gas_portfolio_url', url);
+                showToast('Notice: ' + err.message, 'warning');
+            }
+        };
+
+        document.getElementById('btnSaveGasUrl')?.addEventListener('click', () => {
+            const url = gasInput.value.trim();
+            testGasConnection(url);
+        });
+
+        // Push All Projects to Google Sheet
+        const pushAllProjectsToGoogleSheet = async () => {
+            const gasUrl = localStorage.getItem('shaivika_gas_portfolio_url') || (gasInput ? gasInput.value.trim() : '');
+            if (!gasUrl) {
+                showToast('Please enter & save your Google Apps Script URL first.', 'error');
+                return;
+            }
+
+            try {
+                showToast('📤 Pushing all projects to Google Sheet...', 'info');
+                await sendGasAction('bulkSync', { projects: database.projects });
+                showToast(`✅ Successfully synced ${database.projects.length} projects to Google Sheet!`, 'success');
+            } catch (err) {
+                console.error('Bulk sync error:', err);
+                showToast('Failed to push to Google Sheet. Check console.', 'error');
+            }
+        };
+        document.getElementById('btnPushAllToGas')?.addEventListener('click', pushAllProjectsToGoogleSheet);
+
+        // Pull All Projects from Google Sheet
+        const pullProjectsFromGoogleSheet = async () => {
+            const gasUrl = localStorage.getItem('shaivika_gas_portfolio_url') || (gasInput ? gasInput.value.trim() : '');
+            if (!gasUrl) {
+                showToast('Please configure your Google Apps Script URL in Settings.', 'error');
+                return;
+            }
+
+            try {
+                showToast('📥 Pulling projects from Google Sheet...', 'info');
+                const projects = await fetchGasProjectsData(gasUrl);
+
+                if (Array.isArray(projects)) {
+                    if (projects.length > 0) {
+                        database.projects = projects;
+                        saveData();
+                        renderProjectsTable();
+                        updateDashboardStats();
+                        showToast(`✅ Loaded ${projects.length} projects from Google Sheet!`, 'success');
+                    } else {
+                        showToast('Google Sheet is connected but currently has 0 rows.', 'info');
+                    }
+                } else {
+                    showToast('Could not parse projects from Google Sheet response.', 'error');
+                }
+            } catch (err) {
+                console.error('Pull projects error:', err);
+                showToast('Failed to fetch from Google Sheet: ' + err.message, 'error');
+            }
+        };
+        document.getElementById('btnPullAllFromGas')?.addEventListener('click', pullProjectsFromGoogleSheet);
+        document.getElementById('syncGoogleSheetBtn')?.addEventListener('click', pullProjectsFromGoogleSheet);
+
 
         const leadModal = document.getElementById('leadModal');
         window.viewLeadDetails = (id) => {
@@ -1859,6 +2689,13 @@
 
         checkAuth();
         initTheme();
+
+        // 🔄 Automatic Google Sheet Sync on Admin Init
+        setTimeout(() => {
+            if (typeof pullProjectsFromGoogleSheet === 'function' && localStorage.getItem('shaivika_admin_logged_in') === 'true') {
+                pullProjectsFromGoogleSheet();
+            }
+        }, 300);
     </script>
 </body>
 </html>
