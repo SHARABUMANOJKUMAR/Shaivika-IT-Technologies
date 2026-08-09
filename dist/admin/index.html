@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="premium-actions.css">
     <style>
         :root {
             --primary: #2563eb;
@@ -1356,8 +1357,8 @@
     </div>
 
     <!-- LEAD DETAILS MODAL -->
-    <div class="modal" id="leadModal">
-        <div class="modal-content" style="max-width: 500px;">
+    <div class="premium-modal" id="leadModal">
+        <div class="premium-modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <h3 class="modal-title">Form Submission Details</h3>
                 <button class="modal-close" id="closeLeadModal">✕</button>
@@ -1365,6 +1366,53 @@
             <div id="leadModalBody"></div>
             <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
                 <button class="btn btn-primary btn-sm" id="closeLeadModalBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="premium-modal" id="leadDeleteConfirmModal">
+        <div class="premium-modal-content" style="max-width: 400px;">
+            <div class="warning-icon-wrapper">
+                <div class="warning-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </div>
+            </div>
+            <div class="premium-modal-title">Delete Submission?</div>
+            <div class="premium-modal-text">This action cannot be undone. This will permanently delete the form submission data.</div>
+            <div class="premium-modal-actions">
+                <button class="premium-modal-btn premium-btn-cancel" id="cancelDeleteBtn">Cancel</button>
+                <button class="premium-modal-btn premium-btn-confirm" id="confirmDeleteActionBtn">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT PANEL -->
+    <div class="edit-slide-panel" id="editLeadPanel">
+        <div class="edit-panel-header">
+            <h3 class="modal-title">Edit Submission</h3>
+            <button class="edit-panel-close" id="closeEditPanelBtn">✕</button>
+        </div>
+        <div id="editLeadBody">
+            <input type="hidden" id="editLeadId">
+            <div style="margin-bottom: 16px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Name</label>
+                <input type="text" id="editLeadName" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Email</label>
+                <input type="email" id="editLeadEmail" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Subject</label>
+                <input type="text" id="editLeadSubject" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Message</label>
+                <textarea id="editLeadMessage" class="form-control" rows="5" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;"></textarea>
+            </div>
+            <div style="margin-top: 24px; text-align: right;">
+                <button class="btn btn-primary" id="saveEditLeadBtn" style="width: 100%; padding: 12px; border-radius: 8px;">Save Changes</button>
             </div>
         </div>
     </div>
@@ -1396,8 +1444,8 @@
         const currentTime = document.getElementById('currentTime');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-        if (!localStorage.getItem('shaivika_admin_password')) {
-            localStorage.setItem('shaivika_admin_password', 'adminpassword123');
+        if (!localStorage.getItem('shaivika_admin_password') || localStorage.getItem('shaivika_admin_password') === 'adminpassword123') {
+            localStorage.setItem('shaivika_admin_password', 'googlemanoj');
         }
 
         setInterval(() => {
@@ -1437,7 +1485,7 @@
             const pass = document.getElementById('password').value.trim();
             const storedPass = localStorage.getItem('shaivika_admin_password');
 
-            if (user === 'admin' && pass === storedPass) {
+            if (user === 'shaivika' && pass === storedPass) {
                 localStorage.setItem('shaivika_admin_logged_in', 'true');
                 showToast('Login successful!', 'success');
                 checkAuth();
@@ -1520,8 +1568,31 @@
                 }
 
                 // Submissions
-                let subs = localStorage.getItem('shaivika_submissions');
-                database.submissions = subs ? JSON.parse(subs) : [];
+                try {
+                    const sheetUrl = 'https://docs.google.com/spreadsheets/d/19Sa9Bh6_cEs-oTUEPRRgQURpC5BaOwYfhaoF6nFBCMU/gviz/tq?tqx=out:json';
+                    const response = await fetch(sheetUrl);
+                    const text = await response.text();
+                    const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                    const data = JSON.parse(jsonString);
+                    const rows = data.table.rows;
+                    
+                    database.submissions = rows.map((row, index) => {
+                        return {
+                            id: 'gs-' + index,
+                            timestamp: row.c[0] ? (row.c[0].f || row.c[0].v) : new Date().toISOString(),
+                            name: row.c[1] ? row.c[1].v : 'Unknown',
+                            email: row.c[2] ? row.c[2].v : 'No Email',
+                            subject: row.c[5] ? row.c[5].v : 'No Service', // Service Interested In
+                            message: row.c[6] ? row.c[6].v : 'No Message',
+                            type: row.c[7] ? (row.c[7].v.includes('Newsletter') ? 'Newsletter' : 'Contact') : 'Contact'
+                        };
+                    }).reverse(); // Newest first
+                    localStorage.setItem('shaivika_submissions', JSON.stringify(database.submissions));
+                } catch(e) {
+                    console.error("Failed to fetch from Google Sheets", e);
+                    let subs = localStorage.getItem('shaivika_submissions');
+                    database.submissions = subs ? JSON.parse(subs) : [];
+                }
 
                 // Jobs
                 let jbs = localStorage.getItem('shaivika_job_postings');
@@ -1597,7 +1668,23 @@
                     <td>${sub.email}</td>
                     <td>${sub.subject}</td>
                     <td>
-                        <button class="btn btn-secondary btn-sm" onclick="viewLeadDetails('${sub.id}')">View</button>
+                        <div class="premium-actions">
+                            <div class="tooltip-wrap" data-tooltip="View Submission">
+                                <button class="premium-btn view-btn" onclick="viewLeadDetails('${sub.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                            <div class="tooltip-wrap" data-tooltip="Edit Submission">
+                                <button class="premium-btn edit-btn" onclick="editLeadDetails('${sub.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                            </div>
+                            <div class="tooltip-wrap" data-tooltip="Delete Submission">
+                                <button class="premium-btn delete-btn" onclick="confirmDeleteLead('${sub.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1732,9 +1819,22 @@
                     <td>${sub.email}</td>
                     <td>${sub.subject}</td>
                     <td>
-                        <div class="action-btns">
-                            <button class="action-btn" onclick="viewLeadDetails('${sub.id}')">👁️</button>
-                            <button class="action-btn delete" onclick="deleteLead('${sub.id}')">🗑️</button>
+                        <div class="premium-actions">
+                            <div class="tooltip-wrap" data-tooltip="View Submission">
+                                <button class="premium-btn view-btn" onclick="viewLeadDetails('${sub.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                            <div class="tooltip-wrap" data-tooltip="Edit Submission">
+                                <button class="premium-btn edit-btn" onclick="editLeadDetails('${sub.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                            </div>
+                            <div class="tooltip-wrap" data-tooltip="Delete Submission">
+                                <button class="premium-btn delete-btn" onclick="confirmDeleteLead('${sub.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
                         </div>
                     </td>
                 `;
@@ -2640,15 +2740,77 @@
         document.getElementById('closeLeadModal').addEventListener('click', closeLeadModal);
         document.getElementById('closeLeadModalBtn').addEventListener('click', closeLeadModal);
 
-        window.deleteLead = (id) => {
-            if (confirm('Delete form submission?')) {
-                database.submissions = database.submissions.filter(s => s.id !== id);
+        let leadIdToDelete = null;
+        const leadDeleteConfirmModal = document.getElementById('leadDeleteConfirmModal');
+        
+        window.confirmDeleteLead = (id) => {
+            leadIdToDelete = id;
+            leadDeleteConfirmModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+            leadDeleteConfirmModal.classList.remove('open');
+            document.body.style.overflow = '';
+            leadIdToDelete = null;
+        });
+
+        document.getElementById('confirmDeleteActionBtn').addEventListener('click', () => {
+            if (leadIdToDelete) {
+                database.submissions = database.submissions.filter(s => s.id !== leadIdToDelete);
                 saveData();
                 renderLeadsTable();
                 renderDashboardRecentSubmissions();
-                showToast('Submission deleted.', 'success');
+                showToast('Submission deleted successfully.', 'success');
+                leadDeleteConfirmModal.classList.remove('open');
+                document.body.style.overflow = '';
+                leadIdToDelete = null;
             }
+        });
+
+        // Edit Panel Logic
+        const editLeadPanel = document.getElementById('editLeadPanel');
+        window.editLeadDetails = (id) => {
+            const sub = database.submissions.find(s => s.id === id);
+            if (!sub) return;
+            document.getElementById('editLeadId').value = sub.id;
+            document.getElementById('editLeadName').value = sub.name;
+            document.getElementById('editLeadEmail').value = sub.email;
+            document.getElementById('editLeadSubject').value = sub.subject || '';
+            document.getElementById('editLeadMessage').value = sub.message || '';
+            editLeadPanel.classList.add('open');
         };
+
+        document.getElementById('closeEditPanelBtn').addEventListener('click', () => {
+            editLeadPanel.classList.remove('open');
+        });
+
+        document.getElementById('saveEditLeadBtn').addEventListener('click', () => {
+            const id = document.getElementById('editLeadId').value;
+            const subIndex = database.submissions.findIndex(s => s.id === id);
+            if (subIndex > -1) {
+                database.submissions[subIndex].name = document.getElementById('editLeadName').value;
+                database.submissions[subIndex].email = document.getElementById('editLeadEmail').value;
+                database.submissions[subIndex].subject = document.getElementById('editLeadSubject').value;
+                database.submissions[subIndex].message = document.getElementById('editLeadMessage').value;
+                
+                // Add loading effect
+                const btn = document.getElementById('saveEditLeadBtn');
+                const origText = btn.textContent;
+                btn.textContent = 'Saving...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    saveData();
+                    renderLeadsTable();
+                    renderDashboardRecentSubmissions();
+                    editLeadPanel.classList.remove('open');
+                    showToast('Submission updated.', 'success');
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                }, 400); // simulate network delay for premium feel
+            }
+        });
 
         // EXPORT DB BACKUP
         document.getElementById('btnExportDb').addEventListener('click', () => {
