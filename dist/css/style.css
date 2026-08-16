@@ -2037,7 +2037,7 @@ footer {
   transform: scale(1);
 }
 
-.modal-close {
+.modal-close-top {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -2055,7 +2055,7 @@ footer {
   transition: all var(--transition-fast);
 }
 
-.modal-close:hover {
+.modal-close-top:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
 }
@@ -2564,3 +2564,41 @@ footer {
   vertical-align: middle;
   text-transform: uppercase;
 }
+/* 3D Animated Close Button */
+.modal-close-3d {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4b4b, #d32f2f);
+  color: transparent;
+  border: none;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4), inset 0 2px 0 rgba(255,255,255,0.4), inset 0 -4px 0 rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 20;
+}
+.modal-close-3d:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 8px 20px rgba(211, 47, 47, 0.5), inset 0 2px 0 rgba(255,255,255,0.5), inset 0 -4px 0 rgba(0,0,0,0.2);
+}
+.modal-close-3d:active {
+  transform: scale(0.9) translateY(2px);
+  box-shadow: 0 2px 5px rgba(211, 47, 47, 0.4), inset 0 2px 5px rgba(0,0,0,0.4);
+}
+.modal-close-3d::before, .modal-close-3d::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 3px;
+  background: #ffffff;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.modal-close-3d::before { transform: rotate(45deg); }
+.modal-close-3d::after { transform: rotate(-45deg); }

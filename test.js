@@ -1,1432 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Shaivika IT Technologies</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="premium-actions.css">
-    <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #4f46e5;
-            --accent: #38bdf8;
-            --cyan: #22d3ee;
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --bg-primary: #050505;
-            --bg-secondary: #0f172a;
-            --bg-glass: rgba(15, 23, 42, 0.75);
-            --bg-card-hover: rgba(15, 23, 42, 0.95);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #475569;
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(37, 99, 235, 0.4);
-            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #38bdf8 100%);
-            --font-primary: 'Inter', sans-serif;
-            --font-display: 'Space Grotesk', sans-serif;
-        }
-
-        [data-theme="light"] {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-glass: rgba(255, 255, 255, 0.9);
-            --bg-card-hover: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --border-glass: rgba(0, 0, 0, 0.08);
-            --border-glow: rgba(37, 99, 235, 0.2);
-        }
-
-        [data-theme="light"] body {
-            background-color: #f8fafc;
-            color: #0f172a;
-        }
-
-        [data-theme="light"] .sidebar {
-            background: #ffffff;
-            border-right: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        [data-theme="light"] .sidebar-logo {
-            color: #0f172a;
-        }
-
-        [data-theme="light"] .sidebar-link {
-            color: #475569;
-        }
-
-        [data-theme="light"] .sidebar-link:hover,
-        [data-theme="light"] .sidebar-link.active {
-            background: rgba(37, 99, 235, 0.08);
-            color: #2563eb;
-        }
-
-        [data-theme="light"] .data-card,
-        [data-theme="light"] .stat-card,
-        [data-theme="light"] .login-card {
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        }
-
-        [data-theme="light"] .stat-details p {
-            color: #0f172a;
-        }
-
-        [data-theme="light"] .page-title,
-        [data-theme="light"] .card-title,
-        [data-theme="light"] .modal-title {
-            color: #0f172a !important;
-        }
-
-        [data-theme="light"] .data-table th {
-            color: #475569;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        [data-theme="light"] .data-table td {
-            color: #0f172a;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-        }
-
-        [data-theme="light"] .project-title-cell,
-        [data-theme="light"] .data-table td strong {
-            color: #0f172a !important;
-        }
-
-        [data-theme="light"] .search-input,
-        [data-theme="light"] .form-input,
-        [data-theme="light"] .form-select,
-        [data-theme="light"] .textarea-input {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            color: #0f172a;
-        }
-
-        [data-theme="light"] .search-input:focus,
-        [data-theme="light"] .form-input:focus,
-        [data-theme="light"] .form-select:focus,
-        [data-theme="light"] .textarea-input:focus {
-            background: #ffffff;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-            color: #0f172a;
-        }
-
-        [data-theme="light"] .form-label {
-            color: #1e293b;
-        }
-
-        [data-theme="light"] .modal-content {
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #0f172a;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        [data-theme="light"] .action-btn-edit {
-            background: rgba(37, 99, 235, 0.08);
-            border-color: rgba(37, 99, 235, 0.25);
-            color: #1d4ed8;
-        }
-
-        [data-theme="light"] .action-btn-edit:hover {
-            background: #2563eb;
-            color: #ffffff;
-            border-color: #2563eb;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-        }
-
-        [data-theme="light"] .action-btn-delete {
-            background: rgba(239, 68, 68, 0.08);
-            border-color: rgba(239, 68, 68, 0.25);
-            color: #dc2626;
-        }
-
-        [data-theme="light"] .action-btn-delete:hover {
-            background: #ef4444;
-            color: #ffffff;
-            border-color: #ef4444;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-        }
-
-        [data-theme="light"] .tr-project-row:hover {
-            background: rgba(241, 245, 249, 0.7);
-        }
-
-        [data-theme="light"] .lead-detail-value {
-            background: #f8fafc;
-            border-color: #e2e8f0;
-            color: #0f172a;
-        }
-
-        [data-theme="light"] .toast {
-            background: #ffffff;
-            color: #0f172a;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-primary);
-        }
-
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .background-blobs {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .blob {
-            position: absolute;
-            width: 500px; height: 500px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.15;
-            animation: float 20s infinite alternate;
-        }
-
-        .blob-1 { background: var(--primary); top: -10%; left: -10%; }
-        .blob-2 { background: var(--secondary); bottom: -10%; right: -10%; animation-delay: -5s; }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 50px) scale(1.1); }
-        }
-
-        .login-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 40px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        .login-logo {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-
-        .login-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus, .form-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--bg-glass);
-            color: var(--text-primary);
-            border: 1px solid var(--border-glass);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--text-secondary);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            border-radius: 8px;
-        }
-
-        .dashboard-container {
-            display: none;
-            flex-grow: 1;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 290px;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-glass);
-            display: flex;
-            flex-direction: column;
-            padding: 30px 20px;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            z-index: 10;
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-
-        .sidebar-logo {
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: 1.25rem;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-            flex-grow: 1;
-        }
-
-        .sidebar-item {
-            margin-bottom: 6px;
-        }
-
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 500;
-            transition: all 0.3s;
-            gap: 12px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .sidebar-link:hover, .sidebar-link.active {
-            color: var(--text-primary);
-            background: rgba(255,255,255,0.04);
-        }
-
-        .sidebar-link.active {
-            background: rgba(37, 99, 235, 0.12);
-            border-left: 3px solid var(--primary);
-            border-radius: 0 12px 12px 0;
-        }
-
-        .sidebar-footer {
-            margin-top: auto;
-            border-top: 1px solid var(--border-glass);
-            padding-top: 20px;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 36px;
-        }
-
-        .stat-card {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 22px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-        }
-
-        .stat-icon {
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: rgba(37, 99, 235, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            color: var(--primary);
-            flex-shrink: 0;
-        }
-
-        .stat-details h3 {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 4px;
-        }
-
-        .stat-details p {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .data-card {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 28px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            margin-bottom: 30px;
-        }
-
-        .data-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .search-input {
-            padding: 10px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            min-width: 240px;
-        }
-
-        .data-table-wrapper {
-            overflow-x: auto;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        .data-table th, .data-table td {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border-glass);
-            font-size: 0.9rem;
-        }
-
-        .data-table th {
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .action-btns {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .action-btn-edit, .action-btn-delete {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            user-select: none;
-            backdrop-filter: blur(8px);
-        }
-
-        .action-btn-edit {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12));
-            border-color: rgba(59, 130, 246, 0.3);
-            color: #93c5fd;
-        }
-
-        .action-btn-edit svg {
-            width: 14px;
-            height: 14px;
-            stroke: currentColor;
-            stroke-width: 2;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .action-btn-edit:hover {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.28), rgba(139, 92, 246, 0.28));
-            border-color: rgba(96, 165, 250, 0.7);
-            color: #ffffff;
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
-        }
-
-        .action-btn-edit:hover svg {
-            transform: rotate(-18deg) scale(1.15);
-        }
-
-        .action-btn-edit:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .action-btn-delete {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(244, 63, 94, 0.12));
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-        }
-
-        .action-btn-delete svg {
-            width: 14px;
-            height: 14px;
-            stroke: currentColor;
-            stroke-width: 2;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .action-btn-delete:hover {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(244, 63, 94, 0.28));
-            border-color: rgba(248, 113, 113, 0.7);
-            color: #ffffff;
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
-        }
-
-        .action-btn-delete:hover svg {
-            transform: translateY(-2px) rotate(12deg) scale(1.15);
-        }
-
-        .action-btn-delete:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        /* Animated row transitions */
-        .tr-project-row {
-            transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .tr-project-row:hover {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        .tr-row-deleting {
-            animation: trRowDelete 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-        }
-
-        @keyframes trRowDelete {
-            0% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-                background: rgba(239, 68, 68, 0.15);
-            }
-            50% {
-                opacity: 0.5;
-                transform: translateX(20px) scale(0.98);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50px) scale(0.9);
-                height: 0;
-                padding-top: 0;
-                padding-bottom: 0;
-                visibility: hidden;
-            }
-        }
-
-        .tr-row-highlight {
-            animation: trRowHighlight 1.5s ease-out;
-        }
-
-        @keyframes trRowHighlight {
-            0% {
-                background: rgba(59, 130, 246, 0.35);
-                box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.5);
-            }
-            100% {
-                background: transparent;
-                box-shadow: none;
-            }
-        }
-
-        @keyframes pulseWarning {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(239,68,68,0.3); }
-            50% { transform: scale(1.06); box-shadow: 0 0 30px rgba(239,68,68,0.5); }
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 100px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-        }
-
-        .tag-blue { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.3); }
-        .tag-purple { background: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.3); }
-        .tag-cyan { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
-        .tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 100px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-        .modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 20px;
-        }
-
-        .modal.open { display: flex; }
-
-        .modal-content {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 650px;
-            padding: 32px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: modalScale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes modalScale {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .modal-title {
-            font-family: var(--font-display);
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .form-full { grid-column: 1 / -1; }
-
-        .textarea-input {
-            width: 100%;
-            height: 100px;
-            resize: vertical;
-        }
-
-        .lead-detail-field { margin-bottom: 14px; }
-        .lead-detail-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
-        .lead-detail-value { font-size: 0.95rem; color: var(--text-primary); line-height: 1.5; background: rgba(255, 255, 255, 0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); }
-
-        .toast {
-            position: fixed;
-            bottom: 24px; right: 24px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 14px 22px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast-icon { font-size: 1.25rem; }
-
-        @media (max-width: 900px) {
-            .dashboard-container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; padding: 20px; }
-            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 6px; }
-            .sidebar-link { padding: 8px 12px; font-size: 0.8rem; }
-            .main-content { padding: 20px; }
-            .form-grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
-
-    <!-- ===== LOGIN INTERFACE ===== -->
-    <div class="login-wrapper" id="loginWrapper">
-        <div class="login-card">
-            <h1 class="login-logo">SHAIVIKA</h1>
-            <p class="login-subtitle">Administrator Portal Login</p>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label" for="username">Username</label>
-                    <input class="form-input" type="text" id="username" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input class="form-input" type="password" id="password" required autocomplete="current-password">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== MAIN DASHBOARD ===== -->
-    <div class="dashboard-container" id="dashboardContainer">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <span class="sidebar-logo">SHAIVIKA ADMIN</span>
-                <button class="theme-toggle-btn action-btn" aria-label="Toggle Theme" id="themeToggleBtn">🌙</button>
-            </div>
-            <ul class="sidebar-nav">
-                <li class="sidebar-item">
-                    <span class="sidebar-link active" data-tab="dashboard-summary">📊 Dashboard Summary</span>
-                </li>
-                <li class="sidebar-item">
-                    <span class="sidebar-link" data-tab="portfolio-manager-tab">💼 Portfolio Projects</span>
-                </li>
-                <li class="sidebar-item">
-                    <span class="sidebar-link" data-tab="category-manager-tab">🏷️ Categories</span>
-                </li>
-                <li class="sidebar-item">
-                    <span class="sidebar-link" data-tab="leads-manager-tab">✉️ Form Submissions</span>
-                </li>
-                <li class="sidebar-item">
-                    <span class="sidebar-link" data-tab="jobs-manager-tab">👔 Job Openings</span>
-                </li>
-                <li class="sidebar-item">
-                    <span class="sidebar-link" data-tab="applications-manager-tab" style="display:flex;align-items:center;justify-content:space-between;">
-                        <span>📄 Job Applications</span>
-                        <span id="pendingAppsBadge" class="status-badge badge-warning" style="display:none;font-size:0.7rem;padding:2px 7px;">0</span>
-                    </span>
-                </li>
-<li class="sidebar-item">
-                    <span class="sidebar-link" data-tab="settings-tab">⚙️ Settings & Backup</span>
-                </li>
-            </ul>
-            <div class="sidebar-footer">
-                <span class="sidebar-link" id="logoutBtn" style="color: var(--danger);">🚪 Sign Out</span>
-            </div>
-        </aside>
-
-        <!-- Main Workspace -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="content-header">
-                <h2 class="page-title" id="contentTitle">Dashboard Summary</h2>
-                <div style="font-size: 0.9rem; color: var(--text-secondary);" id="currentTime"></div>
-            </header>
-
-            <!-- TAB 1: SUMMARY -->
-            <section class="tab-content active" id="dashboard-summary">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">💼</div>
-                        <div class="stat-details">
-                            <h3>Total Projects</h3>
-                            <p id="statTotalProjects">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🏷️</div>
-                        <div class="stat-details">
-                            <h3>Categories</h3>
-                            <p id="statTotalCategories">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✉️</div>
-                        <div class="stat-details">
-                            <h3>Form Leads</h3>
-                            <p id="statTotalSubmissions">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">👔</div>
-                        <div class="stat-details">
-                            <h3>Active Jobs</h3>
-                            <p id="statTotalJobs">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📄</div>
-                        <div class="stat-details">
-                            <h3>Applications</h3>
-                            <p id="statTotalApplications">0</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="data-card">
-                    <div class="data-card-header">
-                        <h3 class="modal-title">Recent Submissions (Leads)</h3>
-                        <button class="btn btn-secondary btn-sm" id="viewAllLeadsBtn">View All</button>
-                    </div>
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Subject</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentLeadsBody">
-                                <!-- Dynamic rows -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 2: PORTFOLIO -->
-            <section class="tab-content" id="portfolio-manager-tab">
-                <div class="data-card">
-                    <div class="data-card-header">
-                        <input type="text" class="search-input" id="searchProjects" placeholder="Search projects by title, desc...">
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-secondary btn-sm" id="syncGoogleSheetBtn" title="Pull latest projects from Google Sheet">🔄 Sync Google Sheet</button>
-                            <button class="btn btn-primary btn-sm" id="addNewProjectBtn">➕ Add Project</button>
-                        </div>
-                    </div>
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Thumb</th>
-                                    <th>Title</th>
-                                    <th>Categories</th>
-                                    <th>URL / Target</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="projectsTableBody">
-                                <!-- Dynamic rows -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 3: CATEGORIES -->
-            <section class="tab-content" id="category-manager-tab">
-                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;" id="catGridContainer">
-                    <div class="data-card" style="height: fit-content;">
-                        <h3 class="modal-title" style="margin-bottom: 20px;" id="catFormTitle">Add New Category</h3>
-                        <form id="categoryForm">
-                            <input type="hidden" id="editCatIndex" value="-1">
-                            <div class="form-group">
-                                <label class="form-label">Category Name</label>
-                                <input type="text" class="form-input" id="catName" required placeholder="e.g. Mobile Apps">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Slug ID</label>
-                                <input type="text" class="form-input" id="catId" required placeholder="e.g. mobile-apps" pattern="[a-z0-9\-]+">
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Save Category</button>
-                        </form>
-                    </div>
-                    <div class="data-card">
-                        <h3 class="modal-title" style="margin-bottom: 20px;">Existing Categories</h3>
-                        <div class="data-table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Slug ID</th>
-                                        <th>Name</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="categoriesTableBody">
-                                    <!-- Dynamic rows -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 4: LEADS -->
-            <section class="tab-content" id="leads-manager-tab">
-                <div class="data-card">
-                    <div class="data-card-header">
-                        <input type="text" class="search-input" id="searchLeads" placeholder="Search leads by name, email, msg...">
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-secondary btn-sm" id="exportLeadsCsv">Export CSV</button>
-                            <button class="btn btn-secondary btn-sm" id="exportLeadsJson">Export JSON</button>
-                        </div>
-                    </div>
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Subject</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leadsTableBody">
-                                <!-- Dynamic rows -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 5: JOB OPENINGS -->
-            <section class="tab-content" id="jobs-manager-tab">
-                <div class="data-card">
-                    <div class="data-card-header">
-                        <input type="text" class="search-input" id="searchJobs" placeholder="Search job postings...">
-                        <button class="btn btn-primary btn-sm" id="addNewJobBtn">➕ Post New Job</button>
-                    </div>
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Icon</th>
-                                    <th>Job Title</th>
-                                    <th>Department</th>
-                                    <th>Location</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="jobsTableBody">
-                                <!-- Dynamic job rows -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 6: JOB APPLICATIONS -->
-            <section class="tab-content" id="applications-manager-tab">
-                <div class="data-card">
-                    <div class="data-card-header">
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-                            <input type="text" class="search-input" id="searchApplications" placeholder="Search candidate by name, email, skills...">
-                            <select class="form-select" id="filterAppStatus" style="width:auto;padding:8px 12px;">
-                                <option value="all">All Application Statuses</option>
-                                <option value="pending">Pending Review</option>
-                                <option value="shortlisted">Shortlisted</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <button class="btn btn-secondary btn-sm" id="exportAppsCsv">📥 Export Candidates CSV</button>
-                            <button class="btn btn-primary btn-sm" id="refreshApplicationsBtn" title="Reload applications from latest data">🔄 Refresh</button>
-                        </div>
-                    </div>
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Applied Date</th>
-                                    <th>Candidate Name</th>
-                                    <th>Target Position</th>
-                                    <th>Contact Info</th>
-                                    <th>Status / Exp</th>
-                                    <th>Resume</th>
-                                    <th>App Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="applicationsTableBody">
-                                <!-- Dynamic application rows -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 7: SETTINGS -->
-            <section class="tab-content" id="settings-tab">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
-                    
-                    <!-- GOOGLE SHEET INTEGRATION CARD -->
-                    <div class="data-card" style="grid-column: 1 / -1;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                            <h3 class="modal-title" style="margin-bottom:0;">📊 Google Sheet Portfolio & CMS Integration</h3>
-                            <span class="tag tag-cyan" id="gasSyncBadge">Not Connected</span>
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
-                            Connect your Google Apps Script Web App URL to automatically synchronize Portfolio projects between this Admin Dashboard, your Google Spreadsheet, and the live Website in real-time.
-                        </p>
-                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end;">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label">Google Apps Script Web App URL</label>
-                                <input type="url" class="form-input" id="gasPortfolioUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
-                            </div>
-                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                                <button class="btn btn-primary" id="btnSaveGasUrl">💾 Save & Test</button>
-                                <button class="btn btn-secondary" id="btnPushAllToGas" title="Sync all current projects to Google Sheet">📤 Push All Projects</button>
-                                <button class="btn btn-secondary" id="btnPullAllFromGas" title="Fetch projects from Google Sheet">📥 Pull From Sheet</button>
-                            </div>
-                        </div>
-                        <div id="gasStatusOutput" style="margin-top: 14px; font-size: 0.85rem; padding: 10px 14px; border-radius: 8px; display: none;"></div>
-                    </div>
-
-                    <div class="data-card">
-                        <h3 class="modal-title" style="margin-bottom: 24px;">Change Admin Password</h3>
-                        <form id="changePasswordForm">
-                            <div class="form-group">
-                                <label class="form-label">Current Password</label>
-                                <input type="password" class="form-input" id="currentPass" required autocomplete="current-password">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">New Password</label>
-                                <input type="password" class="form-input" id="newPass" required autocomplete="new-password">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-input" id="confirmPass" required autocomplete="new-password">
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">Update Password</button>
-                        </form>
-                    </div>
-
-                    <div class="data-card" style="height: fit-content;">
-                        <h3 class="modal-title" style="margin-bottom: 24px;">Database Maintenance</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5;">
-                            Export the full system database (projects, form leads, job postings, and applicant resumes) as a JSON backup.
-                        </p>
-                        <div style="display: flex; flex-direction: column; gap: 14px;">
-                            <button class="btn btn-secondary" id="btnExportDb" style="width: 100%;">📥 Export Full DB Backup</button>
-                            <label class="btn btn-secondary" style="width: 100%; cursor: pointer;">
-                                📤 Import Database Restore
-                                <input type="file" id="btnImportDbFile" accept=".json" style="display: none;">
-                            </label>
-                            <button class="btn btn-danger btn-sm" id="btnResetDb" style="width: 100%; margin-top: 15px;">⚠️ Reset to Default Baseline</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-                                <!-- TAB 8: INVOICE SYSTEM -->
-</main>
-    </div>
-
-    <!-- PROJECT MODAL -->
-    <div class="modal" id="projectModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="projectModalTitle">Add Portfolio Project</h3>
-                <button class="modal-close" id="closeProjectModal">✕</button>
-            </div>
-            <form id="projectForm">
-                <input type="hidden" id="editProjectIndex" value="-1">
-                <div class="form-grid">
-                    <div class="form-group form-full">
-                        <label class="form-label">Project Title</label>
-                        <input type="text" class="form-input" id="projectTitle" required placeholder="e.g. Modern Mobile App">
-                    </div>
-                    <div class="form-group form-full">
-                        <label class="form-label">Project Description</label>
-                        <textarea class="form-input textarea-input" id="projectDesc" required placeholder="Brief detail about what the project does..."></textarea>
-                    </div>
-                    <div class="form-group form-full">
-                        <label class="form-label">Categories</label>
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;" id="projectCategoriesSelect"></div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Live Link / Target URL</label>
-                        <input type="text" class="form-input" id="projectLink" placeholder="https://example.com or contact.html">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fallback Emoji</label>
-                        <input type="text" class="form-input" id="projectEmoji" placeholder="e.g. 📱 or 🏥" maxlength="4">
-                    </div>
-                    <div class="form-group form-full">
-                        <label class="form-label">Project Thumbnail / Image URL (Optional)</label>
-                        <input type="text" class="form-input" id="projectImage" placeholder="https://example.com/image.jpg or img/portfolio/app.png">
-                    </div>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
-                    <button type="button" class="btn btn-secondary" id="cancelProjectModal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Project</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- CUSTOM ANIMATED DELETE CONFIRMATION MODAL -->
-    <div class="modal" id="deleteConfirmModal">
-        <div class="modal-content" style="max-width: 440px; text-align: center; padding: 36px 28px;">
-            <div style="width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(244,63,94,0.1)); border: 2px solid rgba(239,68,68,0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(239,68,68,0.35); animation: pulseWarning 2s infinite;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 6h18"/>
-                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                    <line x1="10" y1="11" x2="10" y2="17"/>
-                    <line x1="14" y1="11" x2="14" y2="17"/>
-                </svg>
-            </div>
-            <h3 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; color: #ffffff;">Delete Portfolio Project?</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
-                Are you sure you want to delete <strong id="deleteProjectTargetTitle" style="color: #f87171;"></strong>? This action will remove it from the dashboard and sync to Google Sheets.
-            </p>
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <button type="button" class="btn btn-secondary" id="cancelDeleteModalBtn" style="padding: 10px 20px; border-radius: 12px;">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteModalBtn" style="padding: 10px 24px; border-radius: 12px; background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 15px rgba(239,68,68,0.4); display: flex; align-items: center; gap: 8px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                    <span>Yes, Delete</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JOB POSTING MODAL -->
-    <div class="modal" id="jobModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="jobModalTitle">Post New Job Opening</h3>
-                <button class="modal-close" id="closeJobModal">✕</button>
-            </div>
-            <form id="jobForm">
-                <input type="hidden" id="editJobIndex" value="-1">
-                <div class="form-grid">
-                    <div class="form-group form-full">
-                        <label class="form-label">Job Title *</label>
-                        <input type="text" class="form-input" id="jobTitle" required placeholder="e.g. Full-Stack Web Developer">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Department *</label>
-                        <select class="form-select" id="jobDepartment" required>
-                            <option value="sales">Sales & BD</option>
-                            <option value="engineering">Engineering</option>
-                            <option value="ai">AI & Data</option>
-                            <option value="design">Design</option>
-                            <option value="general">General / Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Emoji Icon</label>
-                        <input type="text" class="form-input" id="jobEmoji" placeholder="e.g. 💻, 💼, 🤖" maxlength="4">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Location *</label>
-                        <input type="text" class="form-input" id="jobLocation" required placeholder="e.g. Remote (India) / Kadapa">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Employment Type *</label>
-                        <select class="form-select" id="jobType" required>
-                            <option value="Full-Time">Full-Time</option>
-                            <option value="Part-Time">Part-Time</option>
-                            <option value="Commission / Partnership">Commission / Partnership</option>
-                            <option value="Internship">Internship</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Experience Required *</label>
-                        <input type="text" class="form-input" id="jobExperience" required placeholder="e.g. 0-2 Years / Freshers">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Salary / Incentive Package</label>
-                        <input type="text" class="form-input" id="jobSalary" placeholder="e.g. Competitive + Incentives">
-                    </div>
-                    <div class="form-group form-full">
-                        <label class="form-label">Position Overview *</label>
-                        <textarea class="form-input textarea-input" id="jobOverview" required placeholder="Describe the role overview and goals..."></textarea>
-                    </div>
-                    <div class="form-group form-full">
-                        <label class="form-label">Key Responsibilities (One per line) *</label>
-                        <textarea class="form-input textarea-input" id="jobResponsibilities" required placeholder="Build responsive web apps&#10;Integrate APIs and databases"></textarea>
-                    </div>
-                    <div class="form-group form-full">
-                        <label class="form-label">Required Skills (Comma separated) *</label>
-                        <input type="text" class="form-input" id="jobSkills" required placeholder="React, Node.js, Python, B2B Sales">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select class="form-select" id="jobStatus">
-                            <option value="active">Active (Visible on Site)</option>
-                            <option value="inactive">Inactive (Hidden)</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                    <button type="button" class="btn btn-secondary" id="cancelJobModal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Job Posting</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- CANDIDATE APPLICATION DETAIL MODAL -->
-    <div class="modal" id="applicationDetailModal">
-        <div class="modal-content" style="max-width: 650px;">
-            <div class="modal-header">
-                <h3 class="modal-title">Candidate Profile & Application</h3>
-                <button class="modal-close" id="closeAppModal">✕</button>
-            </div>
-            <div id="appModalBody">
-                <!-- Dynamic details -->
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; pt-16; border-top:1px solid var(--border-glass);">
-                <div id="appStatusActionBtns" style="display:flex;gap:8px;">
-                    <!-- Action buttons -->
-                </div>
-                <button class="btn btn-primary btn-sm" id="closeAppModalBtn">Close Profile</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- LEAD DETAILS MODAL -->
-    <div class="premium-modal" id="leadModal">
-        <div class="premium-modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h3 class="modal-title">Form Submission Details</h3>
-                <button class="modal-close" id="closeLeadModal">✕</button>
-            </div>
-            <div id="leadModalBody"></div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
-                <button class="btn btn-primary btn-sm" id="closeLeadModalBtn">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- DELETE CONFIRMATION MODAL -->
-    <div class="premium-modal" id="leadDeleteConfirmModal">
-        <div class="premium-modal-content" style="max-width: 400px;">
-            <div class="warning-icon-wrapper">
-                <div class="warning-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                </div>
-            </div>
-            <div class="premium-modal-title">Delete Submission?</div>
-            <div class="premium-modal-text">This action cannot be undone. This will permanently delete the form submission data.</div>
-            <div class="premium-modal-actions">
-                <button class="premium-modal-btn premium-btn-cancel" id="cancelDeleteBtn">Cancel</button>
-                <button class="premium-modal-btn premium-btn-confirm" id="confirmDeleteActionBtn">Confirm Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- EDIT PANEL -->
-    <div class="edit-slide-panel" id="editLeadPanel">
-        <div class="edit-panel-header">
-            <h3 class="modal-title">Edit Submission</h3>
-            <button class="edit-panel-close" id="closeEditPanelBtn">✕</button>
-        </div>
-        <div id="editLeadBody">
-            <input type="hidden" id="editLeadId">
-            <div style="margin-bottom: 16px;">
-                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Name</label>
-                <input type="text" id="editLeadName" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
-            </div>
-            <div style="margin-bottom: 16px;">
-                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Email</label>
-                <input type="email" id="editLeadEmail" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
-            </div>
-            <div style="margin-bottom: 16px;">
-                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Subject</label>
-                <input type="text" id="editLeadSubject" class="form-control" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
-            </div>
-            <div style="margin-bottom: 16px;">
-                <label style="display:block; margin-bottom:8px; color:var(--text-secondary); font-size: 0.85rem;">Message</label>
-                <textarea id="editLeadMessage" class="form-control" rows="5" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;"></textarea>
-            </div>
-            <div style="margin-top: 24px; text-align: right;">
-                <button class="btn btn-primary" id="saveEditLeadBtn" style="width: 100%; padding: 12px; border-radius: 8px;">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast System -->
-    <div class="toast" id="toastBox">
-        <span class="toast-icon" id="toastIcon">✅</span>
-        <span id="toastMsg">Action complete.</span>
-    </div>
-
-    <!-- ADMIN JAVASCRIPT -->
-    <script>
-        let database = {
+let database = {
             categories: [],
             projects: [],
             submissions: [],
@@ -1570,38 +142,38 @@
 
                 // Submissions
                 try {
-                    const sheetUrl = 'https://docs.google.com/spreadsheets/d/19Sa9Bh6_cEs-oTUEPRRgQURpC5BaOwYfhaoF6nFBCMU/gviz/tq?tqx=out:json';
-                    const response = await fetch(sheetUrl);
-                    const text = await response.text();
-                    const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-                    const data = JSON.parse(jsonString);
-                    const rows = data.table.rows;
-                    
-                    database.submissions = rows.map((row, index) => {
-                        return {
-                            id: 'gs-' + index,
-                            timestamp: row.c[0] ? (row.c[0].f || row.c[0].v) : new Date().toISOString(),
-                            name: row.c[1] ? row.c[1].v : 'Unknown',
-                            email: row.c[2] ? row.c[2].v : 'No Email',
-                            subject: row.c[5] ? row.c[5].v : 'No Service', // Service Interested In
-                            message: row.c[6] ? row.c[6].v : 'No Message',
-                            type: row.c[7] ? (row.c[7].v.includes('Newsletter') ? 'Newsletter' : 'Contact') : 'Contact'
-                        };
-                    }).reverse(); // Newest first
-                    localStorage.setItem('shaivika_submissions', JSON.stringify(database.submissions));
-                } catch(e) {
-                    console.error("Failed to fetch from Google Sheets", e);
                     let subs = localStorage.getItem('shaivika_submissions');
                     database.submissions = subs ? JSON.parse(subs) : [];
+                    // Ensure newest first
+                    database.submissions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                } catch(e) {
+                    console.error("Failed to load submissions", e);
+                    database.submissions = [];
                 }
 
                 // Jobs
                 let jbs = localStorage.getItem('shaivika_job_postings');
                 database.jobs = jbs ? JSON.parse(jbs) : [];
 
-                // Applications
-                let apps = localStorage.getItem('shaivika_job_applications');
-                database.applications = apps ? JSON.parse(apps) : [];
+                // Applications (Fetch from Google Apps Script)
+                const appsGasUrl = 'https://script.google.com/macros/s/AKfycbzmRvImPbmXCG_Y0jKWkq6LZP1JyPWN3tfQlSl6br0-70fr0JTH93ro9JMD46xPSzZ2/exec';
+                try {
+                    const response = await fetch(appsGasUrl);
+                    if (response.ok) {
+                        const gasApps = await response.json();
+                        database.applications = Array.isArray(gasApps) ? gasApps : [];
+                        // Ensure newest first (Google sheets appends at the bottom)
+                        database.applications.reverse();
+                    } else {
+                        // Fallback to local
+                        let apps = localStorage.getItem('shaivika_job_applications');
+                        database.applications = apps ? JSON.parse(apps) : [];
+                    }
+                } catch(e) {
+                    console.error("Failed to fetch applications from Google Sheets", e);
+                    let apps = localStorage.getItem('shaivika_job_applications');
+                    database.applications = apps ? JSON.parse(apps) : [];
+                }
 
                 updateDashboardStats();
                 renderDashboardRecentSubmissions();
@@ -1775,25 +347,36 @@
         // CATEGORIES TABLE
         const renderCategoriesTable = () => {
             const tbody = document.getElementById('categoriesTableBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
             if (database.categories.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No categories created.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No categories created.</td></tr>';
                 return;
             }
             database.categories.forEach((cat, idx) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><code style="color:var(--cyan);">${cat.id}</code></td>
+                    <td><input type="checkbox" class="custom-checkbox category-checkbox" data-index="${idx}"></td>
+                    <td><code style="color:var(--primary);">${cat.id}</code></td>
                     <td style="font-weight:600;">${cat.name}</td>
                     <td>
-                        <div class="action-btns">
-                            <button class="action-btn" onclick="openEditCategory(${idx})">✏️</button>
-                            <button class="action-btn delete" onclick="deleteCategory(${idx})">🗑️</button>
+                        <div class="premium-actions">
+                            <div class="tooltip-wrap" data-tooltip="Edit Category">
+                                <button class="premium-btn edit-btn" onclick="openEditCategory(${idx})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit
+                                </button>
+                            </div>
+                            <div class="tooltip-wrap" data-tooltip="Delete Category">
+                                <button class="premium-btn delete-btn" onclick="deleteCategory(${idx})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Delete
+                                </button>
+                            </div>
                         </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+            if (typeof updateBulkToolbar === 'function') updateBulkToolbar();
         };
 
         // LEADS TABLE
@@ -1806,7 +389,7 @@
                 filtered = filtered.filter(l => l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q));
             }
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No form submissions.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No form submissions.</td></tr>';
                 return;
             }
             filtered.forEach(sub => {
@@ -1814,6 +397,7 @@
                 const date = new Date(sub.timestamp).toLocaleString();
                 const typeTag = sub.type === 'Newsletter' ? 'tag-purple' : 'tag-blue';
                 tr.innerHTML = `
+                    <td><input type="checkbox" class="custom-checkbox lead-checkbox" data-id="${sub.id}"></td>
                     <td>${date}</td>
                     <td><span class="tag ${typeTag}">${sub.type}</span></td>
                     <td>${sub.name}</td>
@@ -1823,17 +407,17 @@
                         <div class="premium-actions">
                             <div class="tooltip-wrap" data-tooltip="View Submission">
                                 <button class="premium-btn view-btn" onclick="viewLeadDetails('${sub.id}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View
                                 </button>
                             </div>
                             <div class="tooltip-wrap" data-tooltip="Edit Submission">
                                 <button class="premium-btn edit-btn" onclick="editLeadDetails('${sub.id}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit
                                 </button>
                             </div>
                             <div class="tooltip-wrap" data-tooltip="Delete Submission">
                                 <button class="premium-btn delete-btn" onclick="confirmDeleteLead('${sub.id}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Delete
                                 </button>
                             </div>
                         </div>
@@ -1841,6 +425,7 @@
                 `;
                 tbody.appendChild(tr);
             });
+            if (typeof updateBulkToolbar === 'function') updateBulkToolbar();
         };
 
         document.getElementById('searchLeads').addEventListener('input', (e) => {
@@ -2458,8 +1043,10 @@
         // ==========================================
         // CATEGORY FORM & CRUD HANDLERS
         // ==========================================
-        document.getElementById('categoryForm').addEventListener('submit', (e) => {
-            e.preventDefault();
+        const catForm = document.getElementById('categoryForm');
+        if (catForm) {
+            catForm.addEventListener('submit', (e) => {
+                e.preventDefault();
             const editIdx = parseInt(document.getElementById('editCatIndex').value);
             const name = document.getElementById('catName').value.trim();
             const id = document.getElementById('catId').value.trim().toLowerCase().replace(/\s+/g, '-');
@@ -2859,14 +1446,213 @@
                 pullProjectsFromGoogleSheet();
             }
         }, 300);
-    </script>
 
-    <!-- INVOICE SYSTEM DEPENDENCIES -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="../js/invoice-db.js"></script>
-    <script src="../js/invoice-manager.js"></script>
-    <script src="../js/invoice-pdf.js"></script>
+        // ==========================================
+        // BULK ACTIONS & ADVANCED EXPORT LOGIC
+        // ==========================================
+        let currentActiveTabForBulk = null; 
 
-</body>
-</html>
+        const updateBulkToolbar = () => {
+            const leadsSelected = document.querySelectorAll('.lead-checkbox:checked').length;
+            const categoriesSelected = document.querySelectorAll('.category-checkbox:checked').length;
+            const bulkToolbar = document.getElementById('bulkActionsToolbar');
+            const bulkCount = document.getElementById('bulkCountDisplay');
+            
+            let totalSelected = 0;
+            if (document.getElementById('leads-manager-tab')?.classList.contains('active')) {
+                totalSelected = leadsSelected;
+                currentActiveTabForBulk = 'leads';
+            } else if (document.getElementById('category-manager-tab')?.classList.contains('active')) {
+                totalSelected = categoriesSelected;
+                currentActiveTabForBulk = 'categories';
+            }
+
+            if (totalSelected > 0) {
+                bulkCount.textContent = `${totalSelected} Selected`;
+                bulkToolbar.classList.add('visible');
+            } else {
+                bulkToolbar.classList.remove('visible');
+            }
+        };
+
+        // Tab click observer for bulk toolbar
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => {
+                setTimeout(updateBulkToolbar, 100);
+            });
+        });
+
+        // Select All Logic - Leads
+        const selectAllLeads = document.getElementById('selectAllLeads');
+        if(selectAllLeads) {
+            selectAllLeads.addEventListener('change', (e) => {
+                document.querySelectorAll('.lead-checkbox').forEach(cb => cb.checked = e.target.checked);
+                updateBulkToolbar();
+            });
+        }
+
+        // Select All Logic - Categories
+        const selectAllCategories = document.getElementById('selectAllCategories');
+        if(selectAllCategories) {
+            selectAllCategories.addEventListener('change', (e) => {
+                document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = e.target.checked);
+                updateBulkToolbar();
+            });
+        }
+
+        // Event delegation for individual checkboxes
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('lead-checkbox') || e.target.classList.contains('category-checkbox')) {
+                updateBulkToolbar();
+            }
+        });
+
+        // Bulk Delete Action
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        if(bulkDeleteBtn) {
+            bulkDeleteBtn.addEventListener('click', () => {
+                console.log('bulkDeleteBtn clicked. currentActiveTabForBulk:', currentActiveTabForBulk);
+                if (currentActiveTabForBulk === 'leads') {
+                    const selectedIds = Array.from(document.querySelectorAll('.lead-checkbox:checked')).map(cb => cb.getAttribute('data-id'));
+                    if (confirm(`Are you sure you want to delete ${selectedIds.length} leads?`)) {
+                        database.submissions = database.submissions.filter(s => !selectedIds.includes(String(s.id)));
+                        saveData();
+                        renderLeadsTable();
+                        if (typeof renderDashboardRecentSubmissions === 'function') renderDashboardRecentSubmissions();
+                        showToast(`${selectedIds.length} leads deleted successfully.`, 'success');
+                    }
+                } else if (currentActiveTabForBulk === 'categories') {
+                    const selectedIndexes = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => parseInt(cb.getAttribute('data-index'))).sort((a,b)=>b-a);
+                    if (confirm(`Are you sure you want to delete ${selectedIndexes.length} categories?`)) {
+                        selectedIndexes.forEach(idx => database.categories.splice(idx, 1));
+                        saveData();
+                        renderCategoriesTable();
+                        showToast(`${selectedIndexes.length} categories deleted successfully.`, 'success');
+                    }
+                }
+                updateBulkToolbar();
+            });
+        }
+
+        // Export Dropdown Logic
+        const exportMenuBtn = document.getElementById('exportMenuBtn');
+        const exportDropdownContent = document.getElementById('exportDropdownContent');
+        
+        if (exportMenuBtn && exportDropdownContent) {
+            exportMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exportDropdownContent.classList.toggle('show');
+            });
+
+            document.addEventListener('click', () => {
+                exportDropdownContent.classList.remove('show');
+            });
+        }
+
+        // Helper: Get selected leads or all if none selected
+        const getLeadsForExport = () => {
+            const selectedIds = Array.from(document.querySelectorAll('.lead-checkbox:checked')).map(cb => cb.getAttribute('data-id'));
+            if (selectedIds.length > 0) {
+                return database.submissions.filter(s => selectedIds.includes(s.id));
+            }
+            return database.submissions; // fallback to all
+        };
+
+        // Export Leads - Excel (.xlsx) using SheetJS
+        document.getElementById('exportLeadsExcel')?.addEventListener('click', () => {
+            const leads = getLeadsForExport();
+            if (leads.length === 0) return showToast('No data to export.', 'error');
+            
+            const ws = XLSX.utils.json_to_sheet(leads);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Leads");
+            XLSX.writeFile(wb, `leads_export_${Date.now()}.xlsx`);
+            showToast('Excel file generated successfully.', 'success');
+        });
+
+        // Export Leads - CSV
+        document.getElementById('exportLeadsCsv')?.addEventListener('click', () => {
+            const leads = getLeadsForExport();
+            if (leads.length === 0) return showToast('No data to export.', 'error');
+            
+            const headers = ['id', 'timestamp', 'name', 'email', 'phone', 'company', 'subject', 'message', 'type'];
+            const csvRows = [headers.join(',')];
+            
+            leads.forEach(lead => {
+                const values = headers.map(header => {
+                    const val = lead[header] ? String(lead[header]).replace(/"/g, '""') : '';
+                    return `"${val}"`;
+                });
+                csvRows.push(values.join(','));
+            });
+            
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `leads_export_${Date.now()}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('CSV downloaded successfully.', 'success');
+        });
+
+        // Export Leads - JSON
+        document.getElementById('exportLeadsJson')?.addEventListener('click', () => {
+            const leads = getLeadsForExport();
+            if (leads.length === 0) return showToast('No data to export.', 'error');
+            
+            const blob = new Blob([JSON.stringify(leads, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `leads_export_${Date.now()}.json`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('JSON downloaded successfully.', 'success');
+        });
+
+        // Export Leads - Google Sheets (Downloads as CSV for Sheets)
+        document.getElementById('exportLeadsGoogleSheets')?.addEventListener('click', () => {
+            const leads = getLeadsForExport();
+            if (leads.length === 0) return showToast('No data to export.', 'error');
+            
+            if (exportMenuBtn) exportMenuBtn.innerText = 'Syncing...';
+            setTimeout(() => {
+                const headers = ['id', 'timestamp', 'name', 'email', 'phone', 'company', 'subject', 'message', 'type'];
+                const csvRows = [headers.join(',')];
+                
+                leads.forEach(lead => {
+                    const values = headers.map(header => {
+                        const val = lead[header] ? String(lead[header]).replace(/"/g, '""') : '';
+                        return `"${val}"`;
+                    });
+                    csvRows.push(values.join(','));
+                });
+                
+                const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('href', url);
+                a.setAttribute('download', `leads_googlesheets_format_${Date.now()}.csv`);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                showToast(`✅ Downloaded ${leads.length} rows for Google Sheets.`, 'success');
+                if (exportMenuBtn) exportMenuBtn.innerText = 'Export ▼';
+            }, 800);
+        });
+
+        // Bulk Export Action (redirects to Excel)
+        const bulkExportBtn = document.getElementById('bulkExportBtn');
+        if(bulkExportBtn) {
+            bulkExportBtn.addEventListener('click', () => {
+                if (currentActiveTabForBulk === 'leads') {
+                    document.getElementById('exportLeadsExcel')?.click();
+                } else {
+                    showToast('Bulk export for categories not supported yet.', 'error');
+                }
+            });
+        }
