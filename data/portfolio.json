@@ -15,7 +15,19 @@
       "link": "https://mansparshcare.xyz/",
       "image": "",
       "emoji": "🏥",
-      "modalId": "#modal-manspharsh"
+      "modalId": "#modal-manspharsh",
+      "status": "active"
+    },
+    {
+      "id": "p2",
+      "title": "Siddartha Hostel Management",
+      "description": "Smart hostel management with room allocation, fee automation, and WhatsApp notification integration.",
+      "categories": ["webapp", "enterprise"],
+      "link": "https://siddarthainstitutions-boys-hostel.netlify.app/",
+      "image": "",
+      "emoji": "🏠",
+      "modalId": "#modal-hostel",
+      "status": "active"
     },
     {
       "id": "p3",

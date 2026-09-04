@@ -64,6 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
       submissions.push(newSubmission);
       localStorage.setItem('shaivika_submissions', JSON.stringify(submissions));
       console.log('Submission saved successfully:', newSubmission);
+
+      // Send to Google Sheet if Web App URL is configured
+      const sheetUrl = window.GOOGLE_SHEET_WEB_APP_URL || localStorage.getItem('shaivika_google_sheet_url') || 'https://script.google.com/macros/s/AKfycbysQyEjXqm-Dyl85Wt3TE-AaEGp56XExz-EZV7sGKmUqbiOVzDruo9QSG-7KrkIiQvW/exec';
+      if (sheetUrl) {
+        fetch(sheetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            sheetName: 'Form Submissions',
+            ...newSubmission
+          })
+        }).then(() => {
+          console.log('Form submission sent to Google Sheet');
+        }).catch(err => {
+          console.error('Google Sheet post error:', err);
+        });
+      }
     } catch (e) {
       console.error('Error saving submission to localStorage:', e);
     }

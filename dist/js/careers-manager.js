@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Prev Button
     const prevBtn = document.createElement('button');
     prevBtn.className = 'page-btn';
-    prevBtn.innerHTML = '‹ Prev';
+    prevBtn.innerHTML = '‹';
     prevBtn.disabled = currentPage === 1;
     prevBtn.onclick = () => {
       if (currentPage > 1) {
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Next Button
     const nextBtn = document.createElement('button');
     nextBtn.className = 'page-btn';
-    nextBtn.innerHTML = 'Next ›';
+    nextBtn.innerHTML = '›';
     nextBtn.disabled = currentPage === totalPages;
     nextBtn.onclick = () => {
       if (currentPage < totalPages) {
@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Application Form Submission
     const jobAppForm = document.getElementById('jobApplicationForm');
     if (jobAppForm) {
-      jobAppForm.addEventListener('submit', (e) => {
+      jobAppForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const name = document.getElementById('applicantName').value.trim();
@@ -471,6 +471,46 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        // ==========================================
+        // CLOUDINARY UPLOAD CONFIGURATION
+        // ==========================================
+        // IMPORTANT: Replace these with your actual Cloudinary details
+        const CLOUDINARY_CLOUD_NAME = 'dzfntkzce'; 
+        const CLOUDINARY_UPLOAD_PRESET = 'shaivika_social_uploads'; 
+        
+        let uploadedResumeUrl = '';
+        
+        if (resumeBase64 && CLOUDINARY_CLOUD_NAME !== 'YOUR_CLOUD_NAME_HERE') {
+            try {
+                // Show uploading state on button
+                const submitBtn = jobAppForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = 'Uploading Resume...';
+                submitBtn.disabled = true;
+
+                const formData = new FormData();
+                formData.append('file', resumeBase64);
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                
+                const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const cloudinaryData = await cloudinaryRes.json();
+                if (cloudinaryData.secure_url) {
+                    uploadedResumeUrl = cloudinaryData.secure_url;
+                } else {
+                    console.error("Cloudinary error:", cloudinaryData);
+                }
+                
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            } catch (err) {
+                console.error("Cloudinary upload error:", err);
+            }
+        }
+
         const applicationData = {
           id: 'app_' + Date.now(),
           jobId: selectedJob ? selectedJob.id : 'general',
@@ -485,15 +525,75 @@ document.addEventListener('DOMContentLoaded', () => {
           message,
           resumeFileName: resumeFileName || 'No resume uploaded',
           resumeBase64: resumeBase64 || '',
+          resumeUrl: uploadedResumeUrl || '', // The Cloudinary link
           submittedAt: new Date().toISOString(),
           appStatus: 'pending' // pending, shortlisted, rejected, hired
         };
 
         try {
+          // 1. Save to Local Storage (Admin Panel Database)
           const cachedApps = localStorage.getItem('shaivika_job_applications');
           let apps = cachedApps ? JSON.parse(cachedApps) : [];
           apps.unshift(applicationData);
           localStorage.setItem('shaivika_job_applications', JSON.stringify(apps));
+
+          // 2. Send to Google Apps Script via hidden form (bypasses CORS + redirect issues)
+          const gasUrl = 'https://script.google.com/macros/s/AKfycbzmRvImPbmXCG_Y0jKWkq6LZP1JyPWN3tfQlSl6br0-70fr0JTH93ro9JMD46xPSzZ2/exec';
+          if (gasUrl) {
+            try {
+              const { resumeBase64: _b64, ...dataToSync } = applicationData;
+
+              // Use an invisible iframe as form target so no page navigation occurs
+              let gasIframe = document.getElementById('_gasIframe');
+              if (!gasIframe) {
+                gasIframe = document.createElement('iframe');
+                gasIframe.name = '_gasIframe';
+                gasIframe.id   = '_gasIframe';
+                gasIframe.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;';
+                document.body.appendChild(gasIframe);
+              }
+
+              const hiddenForm = document.createElement('form');
+              hiddenForm.method  = 'POST';
+              hiddenForm.action  = gasUrl;
+              hiddenForm.target  = '_gasIframe';
+              hiddenForm.style.cssText = 'display:none;';
+              hiddenForm.enctype = 'application/x-www-form-urlencoded';
+
+              // Attach payload as a single field called 'data'
+              const input = document.createElement('input');
+              input.type  = 'hidden';
+              input.name  = 'data';
+              input.value = JSON.stringify(dataToSync);
+              hiddenForm.appendChild(input);
+
+              document.body.appendChild(hiddenForm);
+              hiddenForm.submit();
+              document.body.removeChild(hiddenForm);
+            } catch(gasErr) {
+              console.error('GAS form submit error:', gasErr);
+            }
+
+            // Dual mode: direct JSON fetch to Google Sheet
+            fetch(gasUrl, {
+              method: 'POST',
+              body: JSON.stringify({
+                jobId:          applicationData.jobId,
+                jobTitle:       applicationData.jobTitle,
+                name:           applicationData.name,
+                email:          applicationData.email,
+                phone:          applicationData.phone,
+                status:         applicationData.status,
+                experience:     applicationData.experience,
+                skills:         applicationData.skills,
+                portfolio:      applicationData.portfolio,
+                message:        applicationData.message,
+                resumeFileName: applicationData.resumeFileName,
+                resumeUrl:      applicationData.resumeUrl,
+                submittedAt:    applicationData.submittedAt
+              })
+            }).catch(err => console.log('Dual-mode GAS fetch notice:', err));
+          }
 
           // Toast feedback
           showSubmitSuccessToast(name, selectedJob ? selectedJob.title : 'Position');
