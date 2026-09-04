@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterBar = document.querySelector('.careers-filter-bar');
   const jobDetailModal = document.getElementById('jobDetailModal');
   const applyModal = document.getElementById('applyModal');
+  const paginationContainer = document.querySelector('.pagination');
 
   if (!jobsGrid) return; // Only run on careers page
 
@@ -16,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedJob = null;
   let resumeBase64 = '';
   let resumeFileName = '';
+  let currentPage = 1;
+  const itemsPerPage = 6;
 
   const DEFAULT_JOBS = [
     {
@@ -129,20 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function initCareers() {
     try {
       const cached = localStorage.getItem('shaivika_job_postings');
+
       if (cached) {
         activeJobs = JSON.parse(cached);
-        // Ensure default jobs exist if array is empty or partial
-        if (activeJobs.length < DEFAULT_JOBS.length) {
-          const ids = new Set(activeJobs.map(j => j.id));
-          DEFAULT_JOBS.forEach(dj => {
-            if (!ids.has(dj.id)) activeJobs.push(dj);
-          });
-          localStorage.setItem('shaivika_job_postings', JSON.stringify(activeJobs));
-        }
       } else {
         activeJobs = DEFAULT_JOBS;
         localStorage.setItem('shaivika_job_postings', JSON.stringify(activeJobs));
       }
+      localStorage.setItem('shaivika_careers_initialized', 'true');
     } catch (e) {
       console.warn('Error reading job postings, using default list:', e);
       activeJobs = DEFAULT_JOBS;
@@ -174,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentCategory = cat.id;
+        currentPage = 1; // Reset to page 1 on filter change
         renderJobs();
       };
       filterBar.appendChild(btn);
@@ -197,10 +195,26 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Send your resume to <a href="mailto:shaivikagroups@gmail.com" style="color:var(--primary);font-weight:600;">shaivikagroups@gmail.com</a> for future opportunities.</p>
         </div>
       `;
+      if (paginationContainer) {
+        paginationContainer.style.display = 'none';
+      }
       return;
     }
 
-    filtered.forEach(job => {
+    // Pagination calculations
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // Clamp currentPage
+    if (currentPage > totalPages && totalPages > 0) {
+      currentPage = totalPages;
+    }
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageItems = filtered.slice(startIndex, endIndex);
+
+    pageItems.forEach(job => {
       const card = document.createElement('div');
       card.className = 'job-card glass-card';
       card.style.animation = 'fadeInUp 0.4s ease forwards';
@@ -242,6 +256,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
       jobsGrid.appendChild(card);
     });
+
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(totalPages) {
+    if (!paginationContainer) return;
+
+    if (totalPages <= 1) {
+      paginationContainer.style.display = 'none';
+      return;
+    }
+
+    paginationContainer.style.display = 'flex';
+    paginationContainer.innerHTML = '';
+
+    // Prev Button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'page-btn';
+    prevBtn.innerHTML = '‹';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderJobs();
+        scrollToGrid();
+      }
+    };
+    paginationContainer.appendChild(prevBtn);
+
+    // Number Buttons
+    for (let i = 1; i <= totalPages; i++) {
+      const pageBtn = document.createElement('button');
+      pageBtn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
+      pageBtn.textContent = i;
+      pageBtn.onclick = () => {
+        currentPage = i;
+        renderJobs();
+        scrollToGrid();
+      };
+      paginationContainer.appendChild(pageBtn);
+    }
+
+    // Next Button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'page-btn';
+    nextBtn.innerHTML = '›';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderJobs();
+        scrollToGrid();
+      }
+    };
+    paginationContainer.appendChild(nextBtn);
+  }
+
+  function scrollToGrid() {
+    const rect = jobsGrid.getBoundingClientRect();
+    const top = rect.top + window.scrollY - 120;
+    window.scrollTo({ top, behavior: 'smooth' });
   }
 
   function openJobDetailModal(job) {
@@ -498,6 +573,26 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(gasErr) {
               console.error('GAS form submit error:', gasErr);
             }
+
+            // Dual mode: direct JSON fetch to Google Sheet
+            fetch(gasUrl, {
+              method: 'POST',
+              body: JSON.stringify({
+                jobId:          applicationData.jobId,
+                jobTitle:       applicationData.jobTitle,
+                name:           applicationData.name,
+                email:          applicationData.email,
+                phone:          applicationData.phone,
+                status:         applicationData.status,
+                experience:     applicationData.experience,
+                skills:         applicationData.skills,
+                portfolio:      applicationData.portfolio,
+                message:        applicationData.message,
+                resumeFileName: applicationData.resumeFileName,
+                resumeUrl:      applicationData.resumeUrl,
+                submittedAt:    applicationData.submittedAt
+              })
+            }).catch(err => console.log('Dual-mode GAS fetch notice:', err));
           }
 
           // Toast feedback

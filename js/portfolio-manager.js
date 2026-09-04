@@ -1,4 +1,10 @@
 /**
+<<<<<<< HEAD
+ * SHAIVIKA IT TECHNOLOGIES - Dynamic Portfolio Manager
+ * ALWAYS fetches fresh data from data/portfolio.json (server source of truth).
+ * Falls back to localStorage cache only when fetch fails (offline/file:// protocol).
+ * Admin changes to data/portfolio.json are immediately reflected for all visitors.
+=======
  * SHAIVIKA IT TECHNOLOGIES - Dynamic Portfolio Manager (Production Grade)
  * 
  * Features:
@@ -9,6 +15,7 @@
  * - Multi-Tab, Same-Window, & Tab-Switch (Visibility) Event Sync
  * - Dynamic Modal Drawer for Custom Projects
  * - Responsive Pagination & Smooth Scroll
+>>>>>>> upstream/main
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -79,6 +86,150 @@ document.addEventListener('DOMContentLoaded', () => {
       modalId: "#modal-hostel",
       status: "active",
       created_at: "2025-01-12 11:00:00"
+    },
+    {
+      id: "p3",
+      title: "AI Lead Automation CRM",
+      description: "Intelligent lead scoring, WhatsApp follow-ups, pipeline management and conversion analytics.",
+      categories: ["ai", "saas"],
+      link: "contact.html",
+      image: "",
+      emoji: "🤖"
+    },
+    {
+      id: "p4",
+      title: "Business Analytics Dashboard",
+      description: "Real-time data visualization platform with Google Sheets integration, KPI tracking, and automated reports.",
+      categories: ["saas", "enterprise"],
+      link: "contact.html",
+      image: "",
+      emoji: "📊"
+    },
+    {
+      id: "p5",
+      title: "Real Estate WhatsApp Bot",
+      description: "Intelligent WhatsApp bot that qualifies property leads, shares listings, and schedules site visits automatically.",
+      categories: ["ai", "webapp"],
+      link: "contact.html",
+      image: "",
+      emoji: "💬"
+    },
+    {
+      id: "p6",
+      title: "EdTech Learning Platform",
+      description: "Dark-themed e-learning platform with video courses, progress tracking, gamification, and certificate generation.",
+      categories: ["ui", "webapp"],
+      link: "contact.html",
+      image: "",
+      emoji: "🎓"
+    },
+    {
+      id: "p7",
+      title: "Smart Clinic AI Triage & Slotting",
+      description: "AI-driven triage assistant for medical clinics automating slot booking, patient queries, and lab status updates.",
+      categories: ["ai", "webapp"],
+      link: "contact.html",
+      image: "",
+      emoji: "🩺"
+    },
+    {
+      id: "p8",
+      title: "Cloud Fleet Telematics & GPS Portal",
+      description: "Real-time fleet tracking, live GPS map streaming, driver safety analytics, and automated fuel reporting.",
+      categories: ["enterprise", "saas"],
+      link: "contact.html",
+      image: "",
+      emoji: "🚚"
+    },
+    {
+      id: "p9",
+      title: "E-Commerce Multi-Vendor Marketplace",
+      description: "High-speed multi-vendor shopping engine with UPI instant checkout, vendor dashboard, and order sync.",
+      categories: ["webapp", "ui"],
+      link: "contact.html",
+      image: "",
+      emoji: "🛍️"
+    },
+    {
+      id: "p10",
+      title: "FinTech Investment & Crypto Tracker",
+      description: "Next-gen wealth management app with stock API integration, crypto portfolio rebalancing, and tax reporting.",
+      categories: ["saas", "ui"],
+      link: "contact.html",
+      image: "",
+      emoji: "📈"
+    },
+    {
+      id: "p11",
+      title: "Hospital Bed & Pharmacy ERP",
+      description: "Enterprise resource planning system for regional hospitals covering ICU beds, emergency queuing, and pharmacy stock.",
+      categories: ["enterprise", "webapp"],
+      link: "contact.html",
+      image: "",
+      emoji: "🏥"
+    },
+    {
+      id: "p12",
+      title: "AI Document OCR & Extraction Engine",
+      description: "Automated document intelligence tool reading invoices, receipts, and government IDs with 99.4% precision.",
+      categories: ["ai", "saas"],
+      link: "contact.html",
+      image: "",
+      emoji: "📄"
+    },
+    {
+      id: "p13",
+      title: "Smart City IoT Traffic Console",
+      description: "Real-time urban telemetry processing live camera feeds, signal optimization, and emergency vehicle priority.",
+      categories: ["enterprise", "ai"],
+      link: "contact.html",
+      image: "",
+      emoji: "🚦"
+    },
+    {
+      id: "p14",
+      title: "Restaurant Digital POS & QR Ordering",
+      description: "Touchless QR table ordering, kitchen display system (KDS), cloud inventory, and WhatsApp receipt delivery.",
+      categories: ["webapp", "ui"],
+      link: "contact.html",
+      image: "",
+      emoji: "🍔"
+    },
+    {
+      id: "p15",
+      title: "SaaS Subscription & Invoicing Engine",
+      description: "Automated recurring billing gateway handling multi-currency invoices, dunning recovery, and Stripe tax logic.",
+      categories: ["saas", "enterprise"],
+      link: "contact.html",
+      image: "",
+      emoji: "💳"
+    },
+    {
+      id: "p16",
+      title: "AI Conversational Support Voice Bot",
+      description: "Voice-enabled AI customer representative handling inbound support, call routing, and CRM ticket creation.",
+      categories: ["ai", "enterprise"],
+      link: "contact.html",
+      image: "",
+      emoji: "🎙️"
+    },
+    {
+      id: "p17",
+      title: "Neobank Mobile Banking Interface",
+      description: "Glassmorphism design system for modern banking apps with biometric login, card lock controls, and visual budget analytics.",
+      categories: ["ui", "webapp"],
+      link: "contact.html",
+      image: "",
+      emoji: "📱"
+    },
+    {
+      id: "p18",
+      title: "Supply Chain & Warehouse Manager",
+      description: "Industrial warehouse tracking with barcode integration, automated reorder thresholds, and dispatch manifests.",
+      categories: ["enterprise", "saas"],
+      link: "contact.html",
+      image: "",
+      emoji: "📦"
     }
   ];
 
@@ -576,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Prev Button
     const prevBtn = document.createElement('button');
     prevBtn.className = 'page-btn';
-    prevBtn.innerHTML = '‹ Prev';
+    prevBtn.innerHTML = '‹';
     prevBtn.disabled = currentPage === 1;
     prevBtn.onclick = () => {
       if (currentPage > 1) {
@@ -603,7 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Next Button
     const nextBtn = document.createElement('button');
     nextBtn.className = 'page-btn';
-    nextBtn.innerHTML = 'Next ›';
+    nextBtn.innerHTML = '›';
     nextBtn.disabled = currentPage === totalPages;
     nextBtn.onclick = () => {
       if (currentPage < totalPages) {

@@ -15,7 +15,8 @@
       "link": "https://mansparshcare.xyz/",
       "image": "",
       "emoji": "🏥",
-      "modalId": "#modal-manspharsh"
+      "modalId": "#modal-manspharsh",
+      "status": "active"
     },
     {
       "id": "p2",
@@ -25,7 +26,8 @@
       "link": "https://siddarthainstitutions-boys-hostel.netlify.app/",
       "image": "",
       "emoji": "🏠",
-      "modalId": "#modal-hostel"
+      "modalId": "#modal-hostel",
+      "status": "active"
     },
     {
       "id": "p3",

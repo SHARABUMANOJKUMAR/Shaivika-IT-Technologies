@@ -1,4 +1,10 @@
 /**
+<<<<<<< HEAD
+ * SHAIVIKA IT TECHNOLOGIES - Dynamic Portfolio Manager
+ * ALWAYS fetches fresh data from data/portfolio.json (server source of truth).
+ * Falls back to localStorage cache only when fetch fails (offline/file:// protocol).
+ * Admin changes to data/portfolio.json are immediately reflected for all visitors.
+=======
  * SHAIVIKA IT TECHNOLOGIES - Dynamic Portfolio Manager (Production Grade)
  * 
  * Features:
@@ -9,6 +15,7 @@
  * - Multi-Tab, Same-Window, & Tab-Switch (Visibility) Event Sync
  * - Dynamic Modal Drawer for Custom Projects
  * - Responsive Pagination & Smooth Scroll
+>>>>>>> upstream/main
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: "enterprise", name: "Enterprise" }
   ];
 
-  // Base Showcase 18 Projects
+  // Base Verified Projects
   const DEFAULT_PROJECTS = [
     {
       id: "p1",
@@ -87,9 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["ai", "saas"],
       link: "contact.html",
       image: "",
-      emoji: "🤖",
-      status: "active",
-      created_at: "2025-01-15 12:00:00"
+      emoji: "🤖"
     },
     {
       id: "p4",
@@ -98,9 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["saas", "enterprise"],
       link: "contact.html",
       image: "",
-      emoji: "📊",
-      status: "active",
-      created_at: "2025-01-18 14:00:00"
+      emoji: "📊"
     },
     {
       id: "p5",
@@ -109,9 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["ai", "webapp"],
       link: "contact.html",
       image: "",
-      emoji: "💬",
-      status: "active",
-      created_at: "2025-01-20 15:00:00"
+      emoji: "💬"
     },
     {
       id: "p6",
@@ -120,9 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["ui", "webapp"],
       link: "contact.html",
       image: "",
-      emoji: "🎓",
-      status: "active",
-      created_at: "2025-01-22 16:00:00"
+      emoji: "🎓"
     },
     {
       id: "p7",
@@ -131,9 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["ai", "webapp"],
       link: "contact.html",
       image: "",
-      emoji: "🩺",
-      status: "active",
-      created_at: "2025-01-25 17:00:00"
+      emoji: "🩺"
     },
     {
       id: "p8",
@@ -142,9 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["enterprise", "saas"],
       link: "contact.html",
       image: "",
-      emoji: "🚚",
-      status: "active",
-      created_at: "2025-01-28 18:00:00"
+      emoji: "🚚"
     },
     {
       id: "p9",
@@ -153,9 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["webapp", "ui"],
       link: "contact.html",
       image: "",
-      emoji: "🛍️",
-      status: "active",
-      created_at: "2025-02-01 19:00:00"
+      emoji: "🛍️"
     },
     {
       id: "p10",
@@ -164,9 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["saas", "ui"],
       link: "contact.html",
       image: "",
-      emoji: "📈",
-      status: "active",
-      created_at: "2025-02-03 20:00:00"
+      emoji: "📈"
     },
     {
       id: "p11",
@@ -175,9 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["enterprise", "webapp"],
       link: "contact.html",
       image: "",
-      emoji: "🏥",
-      status: "active",
-      created_at: "2025-02-05 21:00:00"
+      emoji: "🏥"
     },
     {
       id: "p12",
@@ -186,9 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["ai", "saas"],
       link: "contact.html",
       image: "",
-      emoji: "📄",
-      status: "active",
-      created_at: "2025-02-08 22:00:00"
+      emoji: "📄"
     },
     {
       id: "p13",
@@ -197,9 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["enterprise", "ai"],
       link: "contact.html",
       image: "",
-      emoji: "🚦",
-      status: "active",
-      created_at: "2025-02-10 23:00:00"
+      emoji: "🚦"
     },
     {
       id: "p14",
@@ -208,9 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["webapp", "ui"],
       link: "contact.html",
       image: "",
-      emoji: "🍔",
-      status: "active",
-      created_at: "2025-02-12 09:00:00"
+      emoji: "🍔"
     },
     {
       id: "p15",
@@ -219,9 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["saas", "enterprise"],
       link: "contact.html",
       image: "",
-      emoji: "💳",
-      status: "active",
-      created_at: "2025-02-15 10:00:00"
+      emoji: "💳"
     },
     {
       id: "p16",
@@ -230,9 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["ai", "enterprise"],
       link: "contact.html",
       image: "",
-      emoji: "🎙️",
-      status: "active",
-      created_at: "2025-02-18 11:00:00"
+      emoji: "🎙️"
     },
     {
       id: "p17",
@@ -241,9 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["ui", "webapp"],
       link: "contact.html",
       image: "",
-      emoji: "📱",
-      status: "active",
-      created_at: "2025-02-20 12:00:00"
+      emoji: "📱"
     },
     {
       id: "p18",
@@ -252,9 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ["enterprise", "saas"],
       link: "contact.html",
       image: "",
-      emoji: "📦",
-      status: "active",
-      created_at: "2025-02-22 13:00:00"
+      emoji: "📦"
     }
   ];
 
@@ -433,42 +408,76 @@ document.addEventListener('DOMContentLoaded', () => {
       render();
 
       // ==========================================================
-      // LIVE GOOGLE SHEET BACKGROUND SYNC (Bi-directional Merge)
+      // LIVE GOOGLE SHEET RESILIENT SYNC (Fetch + JSONP Fallback)
       // ==========================================================
       const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
       const gasUrl = localStorage.getItem('shaivika_gas_portfolio_url') || DEFAULT_GAS_URL;
 
-      if (gasUrl) {
+      async function fetchGasProjects(url) {
+        if (!url) return null;
+        const getUrl = url.includes('?') ? `${url}&action=getProjects` : `${url}?action=getProjects`;
+
+        // 1. Try standard fetch with 7s timeout
         try {
-          const getUrl = gasUrl.includes('?') ? `${gasUrl}&action=getProjects` : `${gasUrl}?action=getProjects`;
-          const gasRes = await fetch(getUrl, { cache: 'no-store' });
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 7000);
+          const gasRes = await fetch(getUrl, { cache: 'no-store', signal: controller.signal });
+          clearTimeout(timer);
           if (gasRes.ok) {
             const gasData = await gasRes.json();
             if (gasData && gasData.status === 'success' && Array.isArray(gasData.projects)) {
-              // Intelligent Non-destructive Merge:
-              // Keep all existing local projects and merge/update from Google Sheet
-              const liveMap = new Map();
-              
-              // 1. Start with currently loaded projects (preserves any instant local additions)
-              projects.forEach(p => liveMap.set(p.id, p));
-
-              // 2. Merge Google Sheet projects
-              gasData.projects.forEach(p => {
-                const norm = normalizeProject(p);
-                liveMap.set(norm.id, norm);
-              });
-
-              projects = sortProjects(Array.from(liveMap.values()));
-              categories = resolveCategories(categories, projects);
-
-              localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
-              localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
-              render();
+              return gasData.projects;
             }
           }
-        } catch (gasErr) {
-          console.info('Google Sheet live sync background notice (using active cache):', gasErr.message);
+        } catch (fetchErr) {
+          console.info('Fetch notice, trying JSONP channel:', fetchErr.message);
         }
+
+        // 2. Cross-origin JSONP script fallback
+        return new Promise((resolve) => {
+          const callbackName = 'shaivika_main_gas_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+          const script = document.createElement('script');
+          const timeout = setTimeout(() => {
+            cleanup();
+            resolve(null);
+          }, 8000);
+
+          function cleanup() {
+            clearTimeout(timeout);
+            delete window[callbackName];
+            if (script.parentNode) script.parentNode.removeChild(script);
+          }
+
+          window[callbackName] = function (resp) {
+            cleanup();
+            if (resp && resp.status === 'success' && Array.isArray(resp.projects)) {
+              resolve(resp.projects);
+            } else {
+              resolve(null);
+            }
+          };
+
+          script.src = `${getUrl}&callback=${callbackName}&_t=${Date.now()}`;
+          script.onerror = function () {
+            cleanup();
+            resolve(null);
+          };
+          document.head.appendChild(script);
+        });
+      }
+
+      if (gasUrl) {
+        fetchGasProjects(gasUrl).then(gasProjects => {
+          if (Array.isArray(gasProjects) && gasProjects.length > 0) {
+            projects = sortProjects(gasProjects.map(normalizeProject));
+            categories = resolveCategories(categories, projects);
+
+            localStorage.setItem('shaivika_portfolio_projects', JSON.stringify(projects));
+            localStorage.setItem('shaivika_portfolio_categories', JSON.stringify(categories));
+            render();
+            console.log(`✅ Synced ${projects.length} portfolio projects from Google Sheet.`);
+          }
+        });
       }
     } catch (e) {
       console.error('Error initializing portfolio:', e);
@@ -482,9 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderFilterBar() {
     if (!filterBar) return;
-    
+
     filterBar.innerHTML = '';
-    
+
     // 1. "All Projects" Tab
     const allBtn = document.createElement('button');
     allBtn.className = `filter-btn ${currentFilter === 'all' ? 'active' : ''}`;
@@ -527,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pagination calculations
     const totalItems = filteredProjects.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-    
+
     if (currentPage > totalPages) {
       currentPage = totalPages;
     }
@@ -550,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'project-card';
         card.style.animation = 'fadeInUp 0.4s ease forwards';
-        
+
         // Thumbnail Construction
         let thumbHTML = '';
         if (proj.image && proj.image.trim() !== '') {
@@ -620,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
         `;
-        
+
         // Card Click Handler
         card.style.cursor = 'pointer';
         card.onclick = () => {
@@ -696,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = 'hidden';
   }
 
-  window.closeDynamicProjectModal = function() {
+  window.closeDynamicProjectModal = function () {
     const modal = document.getElementById('dynamicProjectModal');
     if (modal) {
       modal.classList.remove('open');
@@ -718,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Prev Button
     const prevBtn = document.createElement('button');
     prevBtn.className = 'page-btn';
-    prevBtn.innerHTML = '‹ Prev';
+    prevBtn.innerHTML = '‹';
     prevBtn.disabled = currentPage === 1;
     prevBtn.onclick = () => {
       if (currentPage > 1) {
@@ -745,7 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Next Button
     const nextBtn = document.createElement('button');
     nextBtn.className = 'page-btn';
-    nextBtn.innerHTML = 'Next ›';
+    nextBtn.innerHTML = '›';
     nextBtn.disabled = currentPage === totalPages;
     nextBtn.onclick = () => {
       if (currentPage < totalPages) {
