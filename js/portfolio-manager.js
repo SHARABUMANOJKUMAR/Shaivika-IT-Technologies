@@ -75,8 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
       status: "active",
       created_at: "2025-01-10 10:00:00"
     },
-<<<<<<< HEAD
-
+    {
+      id: "p2",
+      title: "Siddartha Hostel Management",
+      description: "Smart hostel management with room allocation, fee automation, and WhatsApp notification integration.",
+      categories: ["webapp", "enterprise"],
+      link: "https://siddarthainstitutions-boys-hostel.netlify.app/",
+      image: "",
+      emoji: "🏠",
+      modalId: "#modal-hostel",
+      status: "active",
+      created_at: "2025-01-12 11:00:00"
+    },
     {
       id: "p3",
       title: "AI Lead Automation CRM",
@@ -220,19 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
       link: "contact.html",
       image: "",
       emoji: "📦"
-=======
-    {
-      id: "p2",
-      title: "Siddartha Hostel Management",
-      description: "Smart hostel management with room allocation, fee automation, and WhatsApp notification integration.",
-      categories: ["webapp", "enterprise"],
-      link: "https://siddarthainstitutions-boys-hostel.netlify.app/",
-      image: "",
-      emoji: "🏠",
-      modalId: "#modal-hostel",
-      status: "active",
-      created_at: "2025-01-12 11:00:00"
->>>>>>> upstream/main
     }
   ];
 
