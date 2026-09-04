@@ -820,6 +820,7 @@
             .sidebar-link { padding: 8px 12px; font-size: 0.8rem; }
             .main-content { padding: 20px; }
             .form-grid { grid-template-columns: 1fr; }
+            #catGridContainer { grid-template-columns: 1fr !important; }
         }
     </style>
 </head>
@@ -975,7 +976,6 @@
                             <button class="btn btn-primary btn-sm" id="addNewProjectBtn">➕ Add Project</button>
                             <button class="btn btn-secondary btn-sm" id="exportPortfolioBtn" onclick="exportPortfolioJSON()">⬇️ Export JSON</button>
                             <button class="btn btn-danger btn-sm" id="btnResetDb" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);color:#ef4444;" title="Reset database to default baseline">🔄 Reset DB</button>
-                        </div>
                         </div>
                     </div>
                     <div class="data-table-wrapper">
@@ -1209,7 +1209,7 @@
                                 📤 Import Database Restore
                                 <input type="file" id="btnImportDbFile" accept=".json" style="display: none;">
                             </label>
-                            <button class="btn btn-danger btn-sm" id="btnResetDb" style="width: 100%; margin-top: 15px;">⚠️ Reset to Default Baseline</button>
+                            <button class="btn btn-danger btn-sm" id="btnResetDbSettings" style="width: 100%; margin-top: 15px;">⚠️ Reset to Default Baseline</button>
                         </div>
                     </div>
                 </div>
@@ -1461,6 +1461,7 @@
                                 </div>
                                 
                                 <input type="hidden" id="inv-form-uuid" value="">
+                                <input type="hidden" id="inv-form-id" value="">
                                 
                                 <!-- Customer Details (Flat) -->
                                 <h4 style="margin: 0 0 15px 0; font-size: 14px; color: #1e3a8a;"><i class="fa fa-user"></i> Customer Details</h4>
@@ -2154,6 +2155,18 @@
             if (window._toastTimeout) clearTimeout(window._toastTimeout);
             window._toastTimeout = setTimeout(() => toastBox.classList.remove('show'), 3500);
         };
+        window.showToast = showToast;
+
+        const escapeHTML = (str) => {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        };
+        window.escapeHTML = escapeHTML;
 
         const DEFAULT_FALLBACK_PROJECTS = [
             { id: "p1", title: "Manspharshcare Platform", description: "Comprehensive healthcare web platform built for Manspharshcare.xyz — featuring patient portal, appointment booking, and telemedicine.", categories: ["webapp", "ui"], link: "https://mansparshcare.xyz/", emoji: "🏥" },
@@ -2342,11 +2355,11 @@
                 const date = new Date(sub.timestamp).toLocaleDateString();
                 const typeTag = sub.type === 'Newsletter' ? 'tag-purple' : 'tag-blue';
                 tr.innerHTML = `
-                    <td>${date}</td>
-                    <td><span class="tag ${typeTag}">${sub.type}</span></td>
-                    <td>${sub.name}</td>
-                    <td>${sub.email}</td>
-                    <td>${sub.subject}</td>
+                    <td>${escapeHTML(date)}</td>
+                    <td><span class="tag ${typeTag}">${escapeHTML(sub.type)}</span></td>
+                    <td>${escapeHTML(sub.name)}</td>
+                    <td>${escapeHTML(sub.email)}</td>
+                    <td>${escapeHTML(sub.subject)}</td>
                     <td>
                         <div class="premium-actions">
                             <div class="tooltip-wrap" data-tooltip="View Submission">
@@ -2395,17 +2408,16 @@
             }
 
             filtered.forEach((proj) => {
+                const idx = database.projects.indexOf(proj);
                 const tr = document.createElement('tr');
                 tr.className = `tr-project-row ${highlightIndex === idx ? 'tr-row-highlight' : ''}`;
-                tr.id = `proj-row-${idx}`;
+                tr.id = 'proj-row-' + proj.id;
                 
                 let thumbHTML = proj.image ? `<img src="${proj.image}" style="width:50px; height:35px; object-fit:cover; border-radius:6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">` : `<span style="font-size: 1.35rem;">${proj.emoji || '💻'}</span>`;
                 const cats = Array.isArray(proj.categories) ? proj.categories : (typeof proj.categories === 'string' ? proj.categories.split(',').map(s => s.trim()) : []);
                 const tags = cats.map(cId => `<span class="tag tag-cyan" style="font-size:0.68rem; margin-right:4px;">${cId}</span>`).join('');
                 const linkDisplay = proj.link ? `<a href="${proj.link}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:500; display:inline-flex; align-items:center; gap:4px;" title="${proj.link}"><span>${proj.link.length > 28 ? proj.link.substring(0,25) + '...' : proj.link}</span> <span style="font-size:0.75rem;">↗</span></a>` : '<span style="color:var(--text-muted);">None</span>';
 
-
-                tr.id = 'proj-row-' + proj.id;
                 tr.innerHTML = `
                     <td style="text-align:center;">${thumbHTML}</td>
                     <td class="project-title-cell" style="font-weight:600; color: var(--text-primary); font-size:0.95rem;">${proj.title}</td>
@@ -2496,11 +2508,11 @@
                 const date = new Date(sub.timestamp).toLocaleString();
                 const typeTag = sub.type === 'Newsletter' ? 'tag-purple' : 'tag-blue';
                 tr.innerHTML = `
-                    <td>${date}</td>
-                    <td><span class="tag ${typeTag}">${sub.type}</span></td>
-                    <td>${sub.name}</td>
-                    <td>${sub.email}</td>
-                    <td>${sub.subject}</td>
+                    <td>${escapeHTML(date)}</td>
+                    <td><span class="tag ${typeTag}">${escapeHTML(sub.type)}</span></td>
+                    <td>${escapeHTML(sub.name)}</td>
+                    <td>${escapeHTML(sub.email)}</td>
+                    <td>${escapeHTML(sub.subject)}</td>
                     <td>
                         <div class="premium-actions">
                             <div class="tooltip-wrap" data-tooltip="View Submission">
@@ -2545,7 +2557,8 @@
                 return;
             }
 
-            filtered.forEach((job, idx) => {
+            filtered.forEach((job) => {
+                const idx = database.jobs.indexOf(job);
                 const tr = document.createElement('tr');
                 const statusBadge = job.status === 'inactive' ? '<span class="status-badge badge-danger">Inactive</span>' : '<span class="status-badge badge-success">Active</span>';
 
@@ -2607,7 +2620,7 @@
                 if (app.appStatus === 'shortlisted') statusBadge = '<span class="status-badge badge-success">Shortlisted</span>';
                 if (app.appStatus === 'rejected') statusBadge = '<span class="status-badge badge-danger">Rejected</span>';
 
-                const hasResume = app.resumeBase64 ? `<span style="color:var(--success);font-weight:600;">📎 ${app.resumeFileName}</span>` : '<span style="color:var(--text-muted);">No file</span>';
+                const hasResume = (app.resumeBase64 || app.resumeUrl) ? `<span style="color:var(--success);font-weight:600;">📎 ${app.resumeFileName || 'Resume Attached'}</span>` : '<span style="color:var(--text-muted);">No file</span>';
 
                 tr.innerHTML = `
                     <td>${dateStr}</td>
@@ -2818,14 +2831,18 @@
             const actionContainer = document.getElementById('appStatusActionBtns');
 
             let resumeSectionHTML = '';
-            if (app.resumeBase64) {
+            if (app.resumeBase64 || app.resumeUrl) {
+                const downloadBtn = app.resumeBase64 ? `<a href="${app.resumeBase64}" download="${app.resumeFileName || 'resume.pdf'}" class="btn btn-success btn-sm">📥 Download Resume</a>` : '';
+                const previewBtn = app.resumeBase64 ? `<button onclick="window.open('${app.resumeBase64}')" class="btn btn-secondary btn-sm">👁️ Open Resume Preview</button>` : '';
+                const cloudBtn = app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="btn btn-primary btn-sm">☁️ View Resume (Cloud)</a>` : '';
                 resumeSectionHTML = `
                     <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.3);padding:16px;border-radius:12px;margin-top:16px;">
                         <div style="font-weight:700;font-size:14px;color:var(--success);margin-bottom:8px;">📄 Resume File Attached</div>
-                        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Filename: <strong>${app.resumeFileName}</strong></div>
+                        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Filename: <strong>${app.resumeFileName || 'Candidate Resume'}</strong></div>
                         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                            <a href="${app.resumeBase64}" download="${app.resumeFileName}" class="btn btn-success btn-sm">📥 Download Resume</a>
-                            <button onclick="window.open('${app.resumeBase64}')" class="btn btn-secondary btn-sm">👁️ Open Resume Preview</button>
+                            ${downloadBtn}
+                            ${previewBtn}
+                            ${cloudBtn}
                         </div>
                     </div>
                 `;
@@ -3207,8 +3224,6 @@
                 database.categories.push({ id, name });
                 showToast('Category added.', 'success');
             }
-                showToast('New category added.', 'success');
-            }
 
             saveData();
             renderCategoriesTable();
@@ -3222,8 +3237,6 @@
 
         window.openEditCategory = (idx) => {
             const cat = database.categories[idx];
-        window.openEditCategory = (idx) => {
-            const cat = database.categories[idx];
             if (!cat) return;
             document.getElementById('editCatIndex').value = idx;
             const catTitle = document.getElementById('catFormTitle');
@@ -3232,10 +3245,7 @@
             document.getElementById('catId').value = cat.id;
             document.getElementById('catName').focus();
         };
-        };
 
-        window.deleteCategory = (idx) => {
-            const cat = database.categories[idx];
         window.deleteCategory = (idx) => {
             const cat = database.categories[idx];
             if (!cat) return;
@@ -3254,14 +3264,6 @@
                 document.getElementById('editCatIndex').value = '-1';
                 const catTitle = document.getElementById('catFormTitle');
                 if (catTitle) catTitle.textContent = 'Add New Category';
-                showToast('Category deleted.', 'success');
-            }
-        };
-                database.categories.splice(idx, 1);
-                saveData();
-                renderCategoriesTable();
-                populateCategoryCheckboxes();
-
                 showToast('Category deleted.', 'success');
             }
         };
@@ -3290,7 +3292,7 @@
         });
 
         // RESET TO DEFAULT BASELINE handler
-        document.getElementById('btnResetDb')?.addEventListener('click', () => {
+        const handleResetDb = () => {
             if (confirm('Are you sure you want to reset the database to default baseline? This will clear all custom projects, categories, job applications, job postings, and submissions.')) {
                 localStorage.removeItem('shaivika_portfolio_categories');
                 localStorage.removeItem('shaivika_portfolio_projects');
@@ -3300,7 +3302,9 @@
                 showToast('Database reset to defaults.', 'success');
                 loadData();
             }
-        });
+        };
+        document.getElementById('btnResetDb')?.addEventListener('click', handleResetDb);
+        document.getElementById('btnResetDbSettings')?.addEventListener('click', handleResetDb);
 
         // ==========================================
         // GOOGLE APPS SCRIPT SYNC LOGIC
@@ -3575,15 +3579,49 @@
             }
             showToast(`Synced ${count} records to Google Sheet!`, 'success');
         });
+
+        // Google Sheet Integration URL Handlers
+        const googleSheetInput = document.getElementById('googleSheetUrlInput');
+        if (googleSheetInput) {
+            googleSheetInput.value = localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_ACTIVE_GAS_URL;
+        }
+
+        document.getElementById('googleSheetForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const urlVal = document.getElementById('googleSheetUrlInput').value.trim();
+            if (!urlVal) {
+                showToast('Please enter a valid Google Apps Script Web App URL.', 'error');
+                return;
+            }
+            localStorage.setItem('shaivika_google_sheet_url', urlVal);
+            showToast('Google Sheet Web App URL saved successfully!', 'success');
+        });
+
+        document.getElementById('btnTestGoogleSheet')?.addEventListener('click', async () => {
+            const urlVal = (document.getElementById('googleSheetUrlInput')?.value.trim()) || localStorage.getItem('shaivika_google_sheet_url') || DEFAULT_ACTIVE_GAS_URL;
+            showToast('Testing Google Sheet connection...', 'info');
+            try {
+                await fetch(urlVal, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: 'ping', timestamp: new Date().toISOString() })
+                });
+                showToast('Google Sheet test ping sent successfully!', 'success');
+            } catch (err) {
+                showToast('Test ping error: ' + err.message, 'error');
+            }
+        });
+
         const leadModal = document.getElementById('leadModal');
         window.viewLeadDetails = (id) => {
             const sub = database.submissions.find(s => s.id === id);
             if (!sub) return;
             document.getElementById('leadModalBody').innerHTML = `
-                <div class="lead-detail-field"><div class="lead-detail-label">Name</div><div class="lead-detail-value">${sub.name}</div></div>
-                <div class="lead-detail-field"><div class="lead-detail-label">Email</div><div class="lead-detail-value">${sub.email}</div></div>
-                <div class="lead-detail-field"><div class="lead-detail-label">Subject</div><div class="lead-detail-value">${sub.subject}</div></div>
-                <div class="lead-detail-field"><div class="lead-detail-label">Message</div><div class="lead-detail-value" style="white-space:pre-wrap;">${sub.message}</div></div>
+                <div class="lead-detail-field"><div class="lead-detail-label">Name</div><div class="lead-detail-value">${escapeHTML(sub.name)}</div></div>
+                <div class="lead-detail-field"><div class="lead-detail-label">Email</div><div class="lead-detail-value">${escapeHTML(sub.email)}</div></div>
+                <div class="lead-detail-field"><div class="lead-detail-label">Subject</div><div class="lead-detail-value">${escapeHTML(sub.subject)}</div></div>
+                <div class="lead-detail-field"><div class="lead-detail-label">Message</div><div class="lead-detail-value" style="white-space:pre-wrap;">${escapeHTML(sub.message)}</div></div>
             `;
             leadModal.classList.add('open');
             document.body.style.overflow = 'hidden';

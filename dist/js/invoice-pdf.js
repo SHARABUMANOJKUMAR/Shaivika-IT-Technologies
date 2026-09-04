@@ -1,0 +1,344 @@
+/**
+ * SHAIVIKA IT TECHNOLOGIES - Invoice PDF & Preview Generator
+ * Uses html2pdf.js and qrcode.js to generate professional A4 PDFs and live previews.
+ */
+
+const InvoicePDF = {
+    
+    // Amount to Words Converter (Indian Numbering System)
+    numberToWords: function(num) {
+        const a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+        const b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
+
+        if ((num = num.toString()).length > 9) return 'overflow';
+        let n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+        if (!n) return; let str = '';
+        str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+        str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+        str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+        str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+        str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'Only' : 'Only';
+        return str;
+    },
+
+    // Generates a QR Code as a Data URI
+    generateQR: async function(text) {
+        if (!text) return '';
+        return new Promise((resolve) => {
+            const tempDiv = document.createElement('div');
+            new QRCode(tempDiv, {
+                text: text,
+                width: 150,
+                height: 150,
+                colorDark : "#1e3a8a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.M
+            });
+            setTimeout(() => {
+                const img = tempDiv.querySelector('img');
+                const canvas = tempDiv.querySelector('canvas');
+                if (img && img.src) resolve(img.src);
+                else if (canvas) resolve(canvas.toDataURL("image/png"));
+                else resolve('');
+            }, 50);
+        });
+    },
+
+    // Generates the core HTML template used by both Preview and PDF export
+    getInvoiceHTML: async function(inv, settings, customer) {
+        const isInterState = inv.state_code && inv.state_code !== 'AP';
+        const verifyUrl = window.location.origin + '/verify.html?id=' + (inv.verification_id || '');
+        const verifyQrData = await this.generateQR(verifyUrl);
+
+        let itemsHtml = '';
+        (inv.items || []).forEach(item => {
+            const amt = item.qty * item.rate;
+            let taxColumn = '';
+            if (isInterState) {
+                taxColumn = `
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
+                        ${item.taxRate}%<br><span style="color:#64748b">₹${item.taxAmount.toFixed(2)}</span>
+                    </td>
+                `;
+            } else {
+                const halfRate = item.taxRate / 2;
+                const halfAmt = item.taxAmount / 2;
+                taxColumn = `
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
+                        ${halfRate}%<br><span style="color:#64748b">₹${halfAmt.toFixed(2)}</span>
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
+                        ${halfRate}%<br><span style="color:#64748b">₹${halfAmt.toFixed(2)}</span>
+                    </td>
+                `;
+            }
+
+            itemsHtml += `
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-size: 12px;">
+                        <strong>${item.description}</strong>
+                        ${item.hsn ? `<div style="font-size:10px; color:#64748b;">HSN: ${item.hsn}</div>` : ''}
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 12px; font-weight: 600;">${item.qty}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">₹${Number(item.rate).toFixed(2)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">₹${amt.toFixed(2)}</td>
+                    ${taxColumn}
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #4f46e5; font-weight: 700; font-size: 13px;">₹${item.total.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        let taxHeaders = isInterState ? 
+            `<th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">IGST</th>` : 
+            `<th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">CGST</th>
+             <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">SGST</th>`;
+
+        const words = this.numberToWords(Math.round(inv.total_amount));
+
+        return `
+            <style>
+                /* Force light mode styling for the invoice preview so dark-mode CSS doesn't ruin it */
+                #invoice-preview-sheet * { color-scheme: light !important; }
+                .invoice-print-wrapper { background: #ffffff !important; color: #1e293b !important; }
+                .invoice-print-wrapper table { border-collapse: collapse !important; }
+                .invoice-print-wrapper td, .invoice-print-wrapper th { background-color: transparent; }
+            </style>
+            <div class="invoice-print-wrapper" style="font-family: 'Inter', Helvetica, sans-serif; color: #1e293b; background: #ffffff; width: 100%; height: 100%; position: relative; box-sizing: border-box; overflow: hidden;">
+                <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(236, 72, 153, 0.1)); z-index: 0;"></div>
+                <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(56, 189, 248, 0.1)); z-index: 0;"></div>
+
+                <div style="position: relative; z-index: 1; background: #ffffff;">
+                    <div style="background: linear-gradient(135deg, #2563eb, #7c3aed, #ec4899); padding: 30px; margin: -20px -20px 20px -20px; border-radius: 0 0 16px 16px; color: white;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="vertical-align: middle; width: 50%;">
+                                    <div style="background: white; display: inline-block; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px;">
+                                        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1786872082/Shaivika_IT_Technologies_Logo_p3p7iw.png" style="height: 55px; max-width: 250px; object-fit: contain;">
+                                    </div>
+                                    <div style="font-size: 12px; color: rgba(255,255,255,0.9); line-height: 1.6;">
+                                        <strong style="font-size: 14px; color: white;">${settings.companyName}</strong><br>
+                                        ${settings.companyAddress.replace(/\n/g, '<br>')}<br>
+                                        ${settings.companyEmail} | ${settings.companyPhone}<br>
+                                        ${settings.gstin ? 'GSTIN: <strong>' + settings.gstin + '</strong>' : ''}
+                                    </div>
+                                </td>
+                                <td style="vertical-align: middle; text-align: right; width: 50%;">
+                                    <h1 style="margin: 0 0 8px 0; font-size: 38px; color: #ffffff; letter-spacing: 2px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">TAX INVOICE</h1>
+                                    <div style="font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 15px; display: inline-block; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px;">
+                                        # ${inv.invoice_number}
+                                    </div>
+                                    <table style="font-size: 12px; float: right; text-align: right; border-collapse: collapse; color: white;">
+                                        <tr>
+                                            <td style="padding-right: 12px; padding-bottom: 6px; opacity: 0.8;">Invoice Date:</td>
+                                            <td style="font-weight: 600;">${new Date(inv.invoice_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding-right: 12px; opacity: 0.8;">Due Date:</td>
+                                            <td style="font-weight: 600;">${new Date(inv.due_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <table style="width: 100%; margin-bottom: 30px; border-collapse: collapse; padding: 0 10px;">
+                        <tr>
+                            <td style="padding: 20px; background: #ffffff; border: 1px solid #e2e8f0; width: 48%; vertical-align: top; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); display: inline-block; text-align: center; line-height: 32px; margin-right: 10px; color: #3b82f6; font-weight: bold; font-size: 14px;">B</div>
+                                    <h3 style="margin: 0; font-size: 12px; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Billed To</h3>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">${customer.company || customer.name || 'Client Name'}</div>
+                                <div style="font-size: 12px; color: #475569; line-height: 1.6;">
+                                    ${customer.name && customer.company ? 'Attn: ' + customer.name + '<br>' : ''}
+                                    ${customer.address ? customer.address.replace(/\n/g, '<br>') + '<br>' : ''}
+                                    ${customer.phone ? 'Phone: ' + customer.phone + '<br>' : ''}
+                                    ${customer.email ? 'Email: ' + customer.email + '<br>' : ''}
+                                    ${customer.gstin ? 'GSTIN: <strong style="color: #0f172a;">' + customer.gstin + '</strong>' : ''}
+                                </div>
+                            </td>
+                            <td style="width: 4%;"></td>
+                            <td style="padding: 20px; background: #ffffff; border: 1px solid #e2e8f0; width: 48%; vertical-align: top; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); display: inline-block; text-align: center; line-height: 32px; margin-right: 10px; color: #10b981; font-weight: bold; font-size: 14px;">P</div>
+                                    <h3 style="margin: 0; font-size: 12px; color: #10b981; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Payment Method</h3>
+                                </div>
+                                <table style="font-size: 12px; color: #475569; line-height: 1.6; border-collapse: collapse; width: 100%;">
+                                    <tr><td style="padding-bottom: 4px; width: 60px;"><strong>Method:</strong></td><td style="padding-bottom: 4px;">${inv.payment_method || 'Online / Bank Transfer'}</td></tr>
+                                    <tr><td style="padding-bottom: 4px;"><strong>Status:</strong></td><td style="padding-bottom: 4px; color: ${inv.status === 'PAID' ? '#10b981' : (inv.status === 'DRAFT' ? '#475569' : '#f59e0b')}; font-weight: 600;">${inv.status || 'PENDING'}</td></tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: linear-gradient(90deg, #1e293b, #334155);">
+                                    <th style="color: #ffffff; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Description</th>
+                                    <th style="color: #ffffff; padding: 12px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 50px;">Qty</th>
+                                    <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 80px;">Rate</th>
+                                    <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 80px;">Amount</th>
+                                    ${taxHeaders}
+                                    <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 90px;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background: #ffffff;">
+                                ${itemsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                        <tr>
+                            <td style="width: 50%; vertical-align: bottom; padding-right: 20px;">
+                                <div style="background: #f8fafc; border-left: 4px solid #8b5cf6; padding: 15px; border-radius: 0 8px 8px 0;">
+                                    <div style="font-size: 11px; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Amount in Words</strong></div>
+                                    <div style="font-size: 13px; font-weight: 500; color: #1e293b;">Rupees ${words}</div>
+                                </div>
+                            </td>
+                            <td style="width: 50%;">
+                                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #475569;">Subtotal</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${inv.subtotal.toFixed(2)}</td>
+                                        </tr>
+                                        ${inv.discount_amount > 0 ? `
+                                        <tr>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #ef4444;">Discount</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #ef4444; font-weight: 600; text-align: right;">- ₹${inv.discount_amount.toFixed(2)}</td>
+                                        </tr>` : ''}
+                                        <tr>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #475569;">Tax Amount</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${inv.tax_amount.toFixed(2)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0;"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px 0; font-size: 16px; color: #1e3a8a; font-weight: 800;">Grand Total</td>
+                                            <td style="padding: 12px 0; font-size: 18px; color: #1e3a8a; font-weight: 800; text-align: right;">₹${inv.total_amount.toFixed(2)}</td>
+                                        </tr>
+                                        ${inv.amount_paid > 0 ? `
+                                        <tr>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #10b981;">Amount Paid</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #10b981; font-weight: 600; text-align: right;">- ₹${inv.amount_paid.toFixed(2)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px 0; font-size: 15px; color: #ef4444; font-weight: 700;">Balance Due</td>
+                                            <td style="padding: 12px 0; font-size: 16px; color: #ef4444; font-weight: 800; text-align: right;">₹${inv.balance_due.toFixed(2)}</td>
+                                        </tr>` : ''}
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border-top: 2px solid #f1f5f9; padding-top: 25px;">
+                        <tr>
+                            <td style="vertical-align: top; width: 70%; padding-top: 20px;">
+                                <div style="font-size: 11px; color: #64748b; line-height: 1.6; margin-bottom: 20px;">
+                                    ${inv.notes ? `<strong style="color: #334155; font-size: 12px;">Summary:</strong><br>${inv.notes.replace(/\n/g, '<br>')}<br><br>` : ''}
+                                    ${settings.defaultTerms ? `<strong style="color: #334155; font-size: 12px;">Terms & Conditions:</strong><br>${settings.defaultTerms.replace(/\n/g, '<br>')}` : ''}
+                                </div>
+                                <div style="font-size: 10px; color: #94a3b8; background: #f8fafc; padding: 10px 15px; border-radius: 8px; display: inline-block;">
+                                    <span style="color: #10b981; font-size: 14px; margin-right: 6px;">✓</span> Verification ID: <strong style="color: #475569;">${inv.verification_id}</strong><br>
+                                    <span style="margin-left: 22px;">This is a computer generated invoice and does not require a physical signature.</span>
+                                </div>
+                            </td>
+                            <td style="vertical-align: middle; text-align: right; width: 30%; padding-top: 20px;">
+                                <div style="display: inline-block; text-align: center; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                                    <img src="${verifyQrData}" style="width: 80px; height: 80px;"><br>
+                                    <div style="font-size: 10px; color: #4f46e5; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Verify</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        `;
+    },
+
+    renderLivePreview: async function(invoiceData) {
+        const previewElement = document.getElementById('invoice-preview-sheet');
+        if (!previewElement) return;
+        
+        const settings = window.InvoiceDB ? window.InvoiceDB.getSettings() : InvoiceDB.defaultSettings;
+        let customer = {
+            name: invoiceData.customer_name || 'Client Name',
+            phone: invoiceData.customer_phone || '',
+            email: invoiceData.customer_email || ''
+        };
+        if (window.InvoiceDB && invoiceData.customer_id) {
+            const dbCust = window.InvoiceDB.getCustomerById(invoiceData.customer_id);
+            if (dbCust) customer = Object.assign(customer, dbCust);
+        }
+
+        const html = await this.getInvoiceHTML(invoiceData, settings, customer);
+        previewElement.innerHTML = html;
+        
+        // Scale logic for preview based on parent container width
+        const container = document.querySelector('.a4-container');
+        if (container) {
+            const containerWidth = container.clientWidth - 40; // 40px padding
+            const a4Width = 794; // approx px width of A4 at 96dpi
+            if (containerWidth < a4Width) {
+                const scale = containerWidth / a4Width;
+                previewElement.style.transform = `scale(${scale})`;
+                container.style.height = `${(1123 * scale) + 40}px`; // 1123px is A4 height
+            } else {
+                previewElement.style.transform = `scale(1)`;
+                container.style.height = `1163px`;
+            }
+        }
+    },
+
+    generate: async function(uuid) {
+        let container;
+        try {
+            const inv = InvoiceDB.getInvoiceById(uuid);
+            if (!inv) {
+                alert('Invoice not found!');
+                return;
+            }
+
+            const settings = InvoiceDB.getSettings();
+            const customer = InvoiceDB.getCustomerById(inv.customer_id) || {};
+            const html = await this.getInvoiceHTML(inv, settings, customer);
+
+            container = document.createElement('div');
+            container.innerHTML = html;
+            container.style.width = '800px';
+            container.style.minHeight = '1131px';
+            container.style.padding = '0';
+            container.style.backgroundColor = '#ffffff';
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            document.body.appendChild(container);
+
+            const filename = `${inv.invoice_number}_${(customer.company || customer.name || 'Invoice').replace(/[^a-z0-9]/gi, '_')}.pdf`;
+            const opt = {
+                margin: 0,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, windowWidth: 800, scrollY: 0, scrollX: 0 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            if(window.showToast) window.showToast('Generating high-quality PDF...', 'info');
+            // Passing the unattached container directly avoids viewport/scrolling bugs (like blank pages)
+            await html2pdf().set(opt).from(container).save();
+            if(window.showToast) window.showToast('PDF Downloaded successfully!', 'success');
+        } catch(e) {
+            console.error('PDF Generation Error:', e);
+            alert('Failed to generate PDF. Check console.');
+        } finally {
+            if (container && container.parentNode) container.parentNode.removeChild(container);
+        }
+    }
+};
+
+window.InvoicePDF = InvoicePDF;
