@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Admin Dashboard - Shaivika IT Technologies</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2098,16 +2100,35 @@
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            // Brute-force rate limiting and lockout protection
+            const lockoutUntil = parseInt(sessionStorage.getItem('shaivika_admin_lockout') || '0', 10);
+            const now = Date.now();
+            if (lockoutUntil > now) {
+                const remaining = Math.ceil((lockoutUntil - now) / 1000);
+                showToast(`Too many failed attempts. Locked for ${remaining}s.`, 'error');
+                return;
+            }
+
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value.trim();
             const storedPass = localStorage.getItem('shaivika_admin_password');
 
             if ((user === 'shaivika' || user === 'admin') && (pass === storedPass || pass === 'googlemanoj' || pass === 'adminpassword123')) {
+                sessionStorage.removeItem('shaivika_admin_failed_attempts');
+                sessionStorage.removeItem('shaivika_admin_lockout');
                 localStorage.setItem('shaivika_admin_logged_in', 'true');
                 showToast('Login successful!', 'success');
                 checkAuth();
             } else {
-                showToast('Invalid credentials.', 'error');
+                let attempts = parseInt(sessionStorage.getItem('shaivika_admin_failed_attempts') || '0', 10) + 1;
+                sessionStorage.setItem('shaivika_admin_failed_attempts', attempts.toString());
+                if (attempts >= 5) {
+                    sessionStorage.setItem('shaivika_admin_lockout', (Date.now() + 30000).toString());
+                    showToast('Security lockout: 5 failed attempts. Locked for 30 seconds.', 'error');
+                } else {
+                    showToast(`Invalid credentials. (${5 - attempts} attempts remaining)`, 'error');
+                }
             }
         });
 
@@ -2167,6 +2188,16 @@
                 .replace(/'/g, '&#039;');
         };
         window.escapeHTML = escapeHTML;
+
+        const sanitizeUrl = (url) => {
+            if (!url) return '';
+            const trimmed = String(url).trim();
+            if (/^(https?:\/\/|\/|\.\/|\.\.\/|mailto:|tel:)/i.test(trimmed)) {
+                return trimmed;
+            }
+            return '';
+        };
+        window.sanitizeUrl = sanitizeUrl;
 
         const DEFAULT_FALLBACK_PROJECTS = [
             { id: "p1", title: "Manspharshcare Platform", description: "Comprehensive healthcare web platform built for Manspharshcare.xyz — featuring patient portal, appointment booking, and telemedicine.", categories: ["webapp", "ui"], link: "https://mansparshcare.xyz/", emoji: "🏥" },
@@ -2620,23 +2651,24 @@
                 if (app.appStatus === 'shortlisted') statusBadge = '<span class="status-badge badge-success">Shortlisted</span>';
                 if (app.appStatus === 'rejected') statusBadge = '<span class="status-badge badge-danger">Rejected</span>';
 
-                const hasResume = (app.resumeBase64 || app.resumeUrl) ? `<span style="color:var(--success);font-weight:600;">📎 ${app.resumeFileName || 'Resume Attached'}</span>` : '<span style="color:var(--text-muted);">No file</span>';
+                const safeResumeName = escapeHTML(app.resumeFileName || 'Resume Attached');
+                const hasResume = (app.resumeBase64 || app.resumeUrl) ? `<span style="color:var(--success);font-weight:600;">📎 ${safeResumeName}</span>` : '<span style="color:var(--text-muted);">No file</span>';
 
                 tr.innerHTML = `
-                    <td>${dateStr}</td>
-                    <td style="font-weight:700;">${app.name}</td>
-                    <td><span class="tag tag-cyan">${app.jobTitle}</span></td>
+                    <td>${escapeHTML(dateStr)}</td>
+                    <td style="font-weight:700;">${escapeHTML(app.name)}</td>
+                    <td><span class="tag tag-cyan">${escapeHTML(app.jobTitle)}</span></td>
                     <td>
-                        <div style="font-size:0.85rem;">📧 ${app.email}</div>
-                        <div style="font-size:0.8rem;color:var(--text-secondary);">📱 ${app.phone}</div>
+                        <div style="font-size:0.85rem;">📧 ${escapeHTML(app.email)}</div>
+                        <div style="font-size:0.8rem;color:var(--text-secondary);">📱 ${escapeHTML(app.phone)}</div>
                     </td>
-                    <td>${app.status || 'N/A'} <br><small style="color:var(--text-muted);">${app.experience || ''}</small></td>
+                    <td>${escapeHTML(app.status || 'N/A')} <br><small style="color:var(--text-muted);">${escapeHTML(app.experience || '')}</small></td>
                     <td>${hasResume}</td>
                     <td>${statusBadge}</td>
                     <td>
                         <div class="action-btns">
-                            <button class="action-btn" onclick="viewApplicationDetails('${app.id}')" title="View Full Candidate Profile & Resume">👁️ Profile</button>
-                            <button class="action-btn delete" onclick="deleteApplication('${app.id}')" title="Delete Application">🗑️</button>
+                            <button class="action-btn" onclick="viewApplicationDetails('${escapeHTML(app.id)}')" title="View Full Candidate Profile & Resume">👁️ Profile</button>
+                            <button class="action-btn delete" onclick="deleteApplication('${escapeHTML(app.id)}')" title="Delete Application">🗑️</button>
                         </div>
                     </td>
                 `;
@@ -2830,15 +2862,20 @@
             const modalBody = document.getElementById('appModalBody');
             const actionContainer = document.getElementById('appStatusActionBtns');
 
+            const cleanPhone = (app.phone || '').replace(/[^0-9]/g,'');
+            const safePortfolio = sanitizeUrl(app.portfolio);
+            const safeResumeUrl = sanitizeUrl(app.resumeUrl);
+            const safeResumeBase64 = (app.resumeBase64 && app.resumeBase64.startsWith('data:')) ? app.resumeBase64 : '';
+
             let resumeSectionHTML = '';
-            if (app.resumeBase64 || app.resumeUrl) {
-                const downloadBtn = app.resumeBase64 ? `<a href="${app.resumeBase64}" download="${app.resumeFileName || 'resume.pdf'}" class="btn btn-success btn-sm">📥 Download Resume</a>` : '';
-                const previewBtn = app.resumeBase64 ? `<button onclick="window.open('${app.resumeBase64}')" class="btn btn-secondary btn-sm">👁️ Open Resume Preview</button>` : '';
-                const cloudBtn = app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="btn btn-primary btn-sm">☁️ View Resume (Cloud)</a>` : '';
+            if (safeResumeBase64 || safeResumeUrl) {
+                const downloadBtn = safeResumeBase64 ? `<a href="${safeResumeBase64}" download="${escapeHTML(app.resumeFileName || 'resume.pdf')}" class="btn btn-success btn-sm">📥 Download Resume</a>` : '';
+                const previewBtn = safeResumeBase64 ? `<button onclick="window.open('${safeResumeBase64}')" class="btn btn-secondary btn-sm">👁️ Open Resume Preview</button>` : '';
+                const cloudBtn = safeResumeUrl ? `<a href="${safeResumeUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">☁️ View Resume (Cloud)</a>` : '';
                 resumeSectionHTML = `
                     <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.3);padding:16px;border-radius:12px;margin-top:16px;">
                         <div style="font-weight:700;font-size:14px;color:var(--success);margin-bottom:8px;">📄 Resume File Attached</div>
-                        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Filename: <strong>${app.resumeFileName || 'Candidate Resume'}</strong></div>
+                        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Filename: <strong>${escapeHTML(app.resumeFileName || 'Candidate Resume')}</strong></div>
                         <div style="display:flex;gap:10px;flex-wrap:wrap;">
                             ${downloadBtn}
                             ${previewBtn}
@@ -2857,45 +2894,45 @@
             modalBody.innerHTML = `
                 <div class="lead-detail-field">
                     <div class="lead-detail-label">Candidate Name</div>
-                    <div class="lead-detail-value" style="font-size:1.1rem;font-weight:800;color:var(--primary);">${app.name}</div>
+                    <div class="lead-detail-value" style="font-size:1.1rem;font-weight:800;color:var(--primary);">${escapeHTML(app.name)}</div>
                 </div>
                 <div class="lead-detail-field">
                     <div class="lead-detail-label">Applied Position</div>
-                    <div class="lead-detail-value"><span class="tag tag-cyan">${app.jobTitle}</span></div>
+                    <div class="lead-detail-value"><span class="tag tag-cyan">${escapeHTML(app.jobTitle)}</span></div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="lead-detail-field">
                         <div class="lead-detail-label">Email Address</div>
-                        <div class="lead-detail-value"><a href="mailto:${app.email}" style="color:var(--accent);">${app.email}</a></div>
+                        <div class="lead-detail-value"><a href="mailto:${escapeHTML(app.email)}" style="color:var(--accent);">${escapeHTML(app.email)}</a></div>
                     </div>
                     <div class="lead-detail-field">
                         <div class="lead-detail-label">Mobile (WhatsApp)</div>
-                        <div class="lead-detail-value"><a href="https://wa.me/${app.phone.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--success);">📱 ${app.phone} (Chat)</a></div>
+                        <div class="lead-detail-value"><a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" style="color:var(--success);">📱 ${escapeHTML(app.phone)} (Chat)</a></div>
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="lead-detail-field">
                         <div class="lead-detail-label">Current Status</div>
-                        <div class="lead-detail-value">${app.status || 'N/A'}</div>
+                        <div class="lead-detail-value">${escapeHTML(app.status || 'N/A')}</div>
                     </div>
                     <div class="lead-detail-field">
                         <div class="lead-detail-label">Passout / Experience</div>
-                        <div class="lead-detail-value">${app.experience || 'N/A'}</div>
+                        <div class="lead-detail-value">${escapeHTML(app.experience || 'N/A')}</div>
                     </div>
                 </div>
                 <div class="lead-detail-field">
                     <div class="lead-detail-label">Primary Skills</div>
-                    <div class="lead-detail-value">${app.skills || 'N/A'}</div>
+                    <div class="lead-detail-value">${escapeHTML(app.skills || 'N/A')}</div>
                 </div>
-                ${app.portfolio ? `
+                ${safePortfolio ? `
                 <div class="lead-detail-field">
                     <div class="lead-detail-label">Portfolio / LinkedIn</div>
-                    <div class="lead-detail-value"><a href="${app.portfolio}" target="_blank" style="color:var(--accent);">${app.portfolio}</a></div>
+                    <div class="lead-detail-value"><a href="${safePortfolio}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">${escapeHTML(app.portfolio)}</a></div>
                 </div>` : ''}
                 ${app.message ? `
                 <div class="lead-detail-field">
                     <div class="lead-detail-label">Cover Statement / Note</div>
-                    <div class="lead-detail-value" style="white-space:pre-wrap;">${app.message}</div>
+                    <div class="lead-detail-value" style="white-space:pre-wrap;">${escapeHTML(app.message)}</div>
                 </div>` : ''}
                 ${resumeSectionHTML}
             `;
@@ -3278,6 +3315,11 @@
 
             if (currentPass !== storedPass && currentPass !== 'adminpassword123' && currentPass !== 'googlemanoj') {
                 showToast('Current password is incorrect.', 'error');
+                return;
+            }
+
+            if (!newPass || newPass.length < 8) {
+                showToast('New password must be at least 8 characters long.', 'error');
                 return;
             }
 

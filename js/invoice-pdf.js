@@ -5,6 +5,17 @@
 
 const InvoicePDF = {
     
+    // HTML Escaper for Security & XSS Mitigation
+    escapeHTML: function(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    },
+
     // Amount to Words Converter (Indian Numbering System)
     numberToWords: function(num) {
         const a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
@@ -46,23 +57,32 @@ const InvoicePDF = {
 
     // Generates the core HTML template used by both Preview and PDF export
     getInvoiceHTML: async function(inv, settings, customer) {
+        const esc = this.escapeHTML;
         const isInterState = inv.state_code && inv.state_code !== 'AP';
-        const verifyUrl = window.location.origin + '/verify.html?id=' + (inv.verification_id || '');
+        const verifyUrl = window.location.origin + '/verify.html?id=' + encodeURIComponent(inv.verification_id || '');
         const verifyQrData = await this.generateQR(verifyUrl);
 
         let itemsHtml = '';
         (inv.items || []).forEach(item => {
-            const amt = item.qty * item.rate;
+            const qty = Number(item.qty || 1);
+            const rate = Number(item.rate || 0);
+            const amt = qty * rate;
+            const taxRate = Number(item.taxRate || 0);
+            const taxAmount = Number(item.taxAmount || 0);
+            const total = Number(item.total || (amt + taxAmount));
+            const safeDesc = esc(item.description || 'Service Item');
+            const safeHsn = esc(item.hsn || '');
+
             let taxColumn = '';
             if (isInterState) {
                 taxColumn = `
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
-                        ${item.taxRate}%<br><span style="color:#64748b">₹${item.taxAmount.toFixed(2)}</span>
+                        ${taxRate}%<br><span style="color:#64748b">₹${taxAmount.toFixed(2)}</span>
                     </td>
                 `;
             } else {
-                const halfRate = item.taxRate / 2;
-                const halfAmt = item.taxAmount / 2;
+                const halfRate = taxRate / 2;
+                const halfAmt = taxAmount / 2;
                 taxColumn = `
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
                         ${halfRate}%<br><span style="color:#64748b">₹${halfAmt.toFixed(2)}</span>
@@ -76,14 +96,14 @@ const InvoicePDF = {
             itemsHtml += `
                 <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-size: 12px;">
-                        <strong>${item.description}</strong>
-                        ${item.hsn ? `<div style="font-size:10px; color:#64748b;">HSN: ${item.hsn}</div>` : ''}
+                        <strong>${safeDesc}</strong>
+                        ${safeHsn ? `<div style="font-size:10px; color:#64748b;">HSN: ${safeHsn}</div>` : ''}
                     </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 12px; font-weight: 600;">${item.qty}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">₹${Number(item.rate).toFixed(2)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 12px; font-weight: 600;">${qty}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">₹${rate.toFixed(2)}</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">₹${amt.toFixed(2)}</td>
                     ${taxColumn}
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #4f46e5; font-weight: 700; font-size: 13px;">₹${item.total.toFixed(2)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #4f46e5; font-weight: 700; font-size: 13px;">₹${total.toFixed(2)}</td>
                 </tr>
             `;
         });
@@ -93,7 +113,38 @@ const InvoicePDF = {
             `<th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">CGST</th>
              <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">SGST</th>`;
 
-        const words = this.numberToWords(Math.round(inv.total_amount));
+        const totalAmt = Number(inv.total_amount || 0);
+        const words = this.numberToWords(Math.round(totalAmt));
+
+        const safeCompanyName = esc(settings.companyName || 'Shaivika IT Technologies');
+        const safeCompanyAddress = esc(settings.companyAddress || '').replace(/\n/g, '<br>');
+        const safeCompanyEmail = esc(settings.companyEmail || '');
+        const safeCompanyPhone = esc(settings.companyPhone || '');
+        const safeCompanyGstin = esc(settings.gstin || '');
+
+        const safeInvNumber = esc(inv.invoice_number || 'INV-001');
+        const safeInvDate = inv.invoice_date ? new Date(inv.invoice_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) : 'N/A';
+        const safeDueDate = inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) : 'N/A';
+
+        const safeClientName = esc(customer.company || customer.name || 'Client Name');
+        const safeAttn = (customer.name && customer.company) ? 'Attn: ' + esc(customer.name) + '<br>' : '';
+        const safeCustAddress = customer.address ? esc(customer.address).replace(/\n/g, '<br>') + '<br>' : '';
+        const safeCustPhone = customer.phone ? 'Phone: ' + esc(customer.phone) + '<br>' : '';
+        const safeCustEmail = customer.email ? 'Email: ' + esc(customer.email) + '<br>' : '';
+        const safeCustGstin = customer.gstin ? 'GSTIN: <strong style="color: #0f172a;">' + esc(customer.gstin) + '</strong>' : '';
+
+        const safePaymentMethod = esc(inv.payment_method || 'Online / Bank Transfer');
+        const safeStatus = esc(inv.status || 'PENDING');
+        const safeVerificationId = esc(inv.verification_id || '');
+
+        const safeNotes = inv.notes ? `<strong style="color: #334155; font-size: 12px;">Summary:</strong><br>${esc(inv.notes).replace(/\n/g, '<br>')}<br><br>` : '';
+        const safeTerms = settings.defaultTerms ? `<strong style="color: #334155; font-size: 12px;">Terms & Conditions:</strong><br>${esc(settings.defaultTerms).replace(/\n/g, '<br>')}` : '';
+
+        const subtotal = Number(inv.subtotal || 0);
+        const discountAmt = Number(inv.discount_amount || 0);
+        const taxTotal = Number(inv.tax_amount || 0);
+        const amtPaid = Number(inv.amount_paid || 0);
+        const balanceDue = Number(inv.balance_due || 0);
 
         return `
             <style>
@@ -116,25 +167,25 @@ const InvoicePDF = {
                                         <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1786872082/Shaivika_IT_Technologies_Logo_p3p7iw.png" style="height: 55px; max-width: 250px; object-fit: contain;">
                                     </div>
                                     <div style="font-size: 12px; color: rgba(255,255,255,0.9); line-height: 1.6;">
-                                        <strong style="font-size: 14px; color: white;">${settings.companyName}</strong><br>
-                                        ${settings.companyAddress.replace(/\n/g, '<br>')}<br>
-                                        ${settings.companyEmail} | ${settings.companyPhone}<br>
-                                        ${settings.gstin ? 'GSTIN: <strong>' + settings.gstin + '</strong>' : ''}
+                                        <strong style="font-size: 14px; color: white;">${safeCompanyName}</strong><br>
+                                        ${safeCompanyAddress}<br>
+                                        ${safeCompanyEmail} | ${safeCompanyPhone}<br>
+                                        ${safeCompanyGstin ? 'GSTIN: <strong>' + safeCompanyGstin + '</strong>' : ''}
                                     </div>
                                 </td>
                                 <td style="vertical-align: middle; text-align: right; width: 50%;">
                                     <h1 style="margin: 0 0 8px 0; font-size: 38px; color: #ffffff; letter-spacing: 2px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">TAX INVOICE</h1>
                                     <div style="font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 15px; display: inline-block; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px;">
-                                        # ${inv.invoice_number}
+                                        # ${safeInvNumber}
                                     </div>
                                     <table style="font-size: 12px; float: right; text-align: right; border-collapse: collapse; color: white;">
                                         <tr>
-                                            <td style="padding-right: 12px; padding-bottom: 6px; opacity: 0.8;">Invoice Date:</td>
-                                            <td style="font-weight: 600;">${new Date(inv.invoice_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}</td>
+                                             <td style="padding-right: 12px; padding-bottom: 6px; opacity: 0.8;">Invoice Date:</td>
+                                            <td style="font-weight: 600;">${safeInvDate}</td>
                                         </tr>
                                         <tr>
                                             <td style="padding-right: 12px; opacity: 0.8;">Due Date:</td>
-                                            <td style="font-weight: 600;">${new Date(inv.due_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}</td>
+                                            <td style="font-weight: 600;">${safeDueDate}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -149,13 +200,13 @@ const InvoicePDF = {
                                     <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); display: inline-block; text-align: center; line-height: 32px; margin-right: 10px; color: #3b82f6; font-weight: bold; font-size: 14px;">B</div>
                                     <h3 style="margin: 0; font-size: 12px; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Billed To</h3>
                                 </div>
-                                <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">${customer.company || customer.name || 'Client Name'}</div>
+                                <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">${safeClientName}</div>
                                 <div style="font-size: 12px; color: #475569; line-height: 1.6;">
-                                    ${customer.name && customer.company ? 'Attn: ' + customer.name + '<br>' : ''}
-                                    ${customer.address ? customer.address.replace(/\n/g, '<br>') + '<br>' : ''}
-                                    ${customer.phone ? 'Phone: ' + customer.phone + '<br>' : ''}
-                                    ${customer.email ? 'Email: ' + customer.email + '<br>' : ''}
-                                    ${customer.gstin ? 'GSTIN: <strong style="color: #0f172a;">' + customer.gstin + '</strong>' : ''}
+                                    ${safeAttn}
+                                    ${safeCustAddress}
+                                    ${safeCustPhone}
+                                    ${safeCustEmail}
+                                    ${safeCustGstin}
                                 </div>
                             </td>
                             <td style="width: 4%;"></td>
@@ -165,8 +216,8 @@ const InvoicePDF = {
                                     <h3 style="margin: 0; font-size: 12px; color: #10b981; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Payment Method</h3>
                                 </div>
                                 <table style="font-size: 12px; color: #475569; line-height: 1.6; border-collapse: collapse; width: 100%;">
-                                    <tr><td style="padding-bottom: 4px; width: 60px;"><strong>Method:</strong></td><td style="padding-bottom: 4px;">${inv.payment_method || 'Online / Bank Transfer'}</td></tr>
-                                    <tr><td style="padding-bottom: 4px;"><strong>Status:</strong></td><td style="padding-bottom: 4px; color: ${inv.status === 'PAID' ? '#10b981' : (inv.status === 'DRAFT' ? '#475569' : '#f59e0b')}; font-weight: 600;">${inv.status || 'PENDING'}</td></tr>
+                                    <tr><td style="padding-bottom: 4px; width: 60px;"><strong>Method:</strong></td><td style="padding-bottom: 4px;">${safePaymentMethod}</td></tr>
+                                    <tr><td style="padding-bottom: 4px;"><strong>Status:</strong></td><td style="padding-bottom: 4px; color: ${inv.status === 'PAID' ? '#10b981' : (inv.status === 'DRAFT' ? '#475569' : '#f59e0b')}; font-weight: 600;">${safeStatus}</td></tr>
                                 </table>
                             </td>
                         </tr>
@@ -202,33 +253,33 @@ const InvoicePDF = {
                                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
                                     <table style="width: 100%; border-collapse: collapse;">
                                         <tr>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #475569;">Subtotal</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${inv.subtotal.toFixed(2)}</td>
+                                             <td style="padding: 8px 0; font-size: 13px; color: #475569;">Subtotal</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${subtotal.toFixed(2)}</td>
                                         </tr>
-                                        ${inv.discount_amount > 0 ? `
+                                        ${discountAmt > 0 ? `
                                         <tr>
                                             <td style="padding: 8px 0; font-size: 13px; color: #ef4444;">Discount</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #ef4444; font-weight: 600; text-align: right;">- ₹${inv.discount_amount.toFixed(2)}</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #ef4444; font-weight: 600; text-align: right;">- ₹${discountAmt.toFixed(2)}</td>
                                         </tr>` : ''}
                                         <tr>
                                             <td style="padding: 8px 0; font-size: 13px; color: #475569;">Tax Amount</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${inv.tax_amount.toFixed(2)}</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${taxTotal.toFixed(2)}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2"><hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0;"></td>
                                         </tr>
                                         <tr>
                                             <td style="padding: 12px 0; font-size: 16px; color: #1e3a8a; font-weight: 800;">Grand Total</td>
-                                            <td style="padding: 12px 0; font-size: 18px; color: #1e3a8a; font-weight: 800; text-align: right;">₹${inv.total_amount.toFixed(2)}</td>
+                                            <td style="padding: 12px 0; font-size: 18px; color: #1e3a8a; font-weight: 800; text-align: right;">₹${totalAmt.toFixed(2)}</td>
                                         </tr>
-                                        ${inv.amount_paid > 0 ? `
+                                        ${amtPaid > 0 ? `
                                         <tr>
                                             <td style="padding: 8px 0; font-size: 13px; color: #10b981;">Amount Paid</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #10b981; font-weight: 600; text-align: right;">- ₹${inv.amount_paid.toFixed(2)}</td>
+                                            <td style="padding: 8px 0; font-size: 13px; color: #10b981; font-weight: 600; text-align: right;">- ₹${amtPaid.toFixed(2)}</td>
                                         </tr>
                                         <tr>
                                             <td style="padding: 12px 0; font-size: 15px; color: #ef4444; font-weight: 700;">Balance Due</td>
-                                            <td style="padding: 12px 0; font-size: 16px; color: #ef4444; font-weight: 800; text-align: right;">₹${inv.balance_due.toFixed(2)}</td>
+                                            <td style="padding: 12px 0; font-size: 16px; color: #ef4444; font-weight: 800; text-align: right;">₹${balanceDue.toFixed(2)}</td>
                                         </tr>` : ''}
                                     </table>
                                 </div>
@@ -240,11 +291,11 @@ const InvoicePDF = {
                         <tr>
                             <td style="vertical-align: top; width: 70%; padding-top: 20px;">
                                 <div style="font-size: 11px; color: #64748b; line-height: 1.6; margin-bottom: 20px;">
-                                    ${inv.notes ? `<strong style="color: #334155; font-size: 12px;">Summary:</strong><br>${inv.notes.replace(/\n/g, '<br>')}<br><br>` : ''}
-                                    ${settings.defaultTerms ? `<strong style="color: #334155; font-size: 12px;">Terms & Conditions:</strong><br>${settings.defaultTerms.replace(/\n/g, '<br>')}` : ''}
+                                    ${safeNotes}
+                                    ${safeTerms}
                                 </div>
                                 <div style="font-size: 10px; color: #94a3b8; background: #f8fafc; padding: 10px 15px; border-radius: 8px; display: inline-block;">
-                                    <span style="color: #10b981; font-size: 14px; margin-right: 6px;">✓</span> Verification ID: <strong style="color: #475569;">${inv.verification_id}</strong><br>
+                                    <span style="color: #10b981; font-size: 14px; margin-right: 6px;">✓</span> Verification ID: <strong style="color: #475569;">${safeVerificationId}</strong><br>
                                     <span style="margin-left: 22px;">This is a computer generated invoice and does not require a physical signature.</span>
                                 </div>
                             </td>

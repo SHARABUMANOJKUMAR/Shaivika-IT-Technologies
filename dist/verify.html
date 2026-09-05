@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Document Verification - Shaivika IT Technologies</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -208,8 +210,19 @@
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
-        const verifyId = urlParams.get('id');
+        const rawVerifyId = urlParams.get('id') || '';
+        const verifyId = rawVerifyId.trim();
 
         setTimeout(() => {
             const loadingState = document.getElementById('loading-state');
@@ -235,7 +248,7 @@
                         showSuccess(invoice);
                     }
                 } else {
-                    showError("Document Not Found", `The document with Verification ID <strong>${verifyId}</strong> could not be authenticated. It may have been forged or deleted.`);
+                    showError("Document Not Found", `The document with Verification ID <strong>${escapeHTML(verifyId)}</strong> could not be authenticated. It may have been forged or deleted.`);
                 }
             } catch (e) {
                 showError("System Error", "Unable to connect to the verification database.");
@@ -246,18 +259,25 @@
         function showSuccess(invoice) {
             let statusTag = '';
             if (invoice.status === 'PAID') statusTag = '<span class="tag tag-success">Paid in Full</span>';
-            else if (invoice.balance_due > 0) statusTag = `<span class="tag tag-danger">Balance: ₹${invoice.balance_due.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>`;
-            else statusTag = `<span class="tag tag-primary">${invoice.status}</span>`;
+            else if (invoice.balance_due > 0) statusTag = `<span class="tag tag-danger">Balance: ₹${Number(invoice.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</span>`;
+            else statusTag = `<span class="tag tag-primary">${escapeHTML(invoice.status || 'ACTIVE')}</span>`;
 
             let itemsHtml = '';
             (invoice.items || []).forEach(item => {
+                const desc = escapeHTML(item.description || 'Service Item');
+                const qty = Number(item.qty || 1);
+                const rate = Number(item.rate || 0);
+                const total = Number(item.total || (qty * rate));
                 itemsHtml += `
                     <tr>
-                        <td><strong style="color:var(--text-primary); font-size: 15px;">${item.description}</strong><br><span style="color:var(--text-secondary); font-size:12px;">Qty: ${item.qty} × ₹${item.rate.toLocaleString('en-IN')}</span></td>
-                        <td style="text-align:right; font-weight: 700; color:var(--text-primary);">₹${item.total.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                        <td><strong style="color:var(--text-primary); font-size: 15px;">${desc}</strong><br><span style="color:var(--text-secondary); font-size:12px;">Qty: ${qty} × ₹${rate.toLocaleString('en-IN')}</span></td>
+                        <td style="text-align:right; font-weight: 700; color:var(--text-primary);">₹${total.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     </tr>
                 `;
             });
+
+            const totalAmount = Number(invoice.total_amount || 0);
+            const invoiceDate = invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
 
             const html = `
                 <div class="status-icon status-success">✓</div>
@@ -267,19 +287,19 @@
                 <div class="details-box">
                     <div class="detail-row">
                         <span class="detail-label">Verification ID</span>
-                        <span class="detail-value" style="font-family:monospace; color:var(--primary); background: rgba(59,130,246,0.1); padding: 4px 8px; border-radius: 6px;">${invoice.verification_id}</span>
+                        <span class="detail-value" style="font-family:monospace; color:var(--primary); background: rgba(59,130,246,0.1); padding: 4px 8px; border-radius: 6px;">${escapeHTML(invoice.verification_id)}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Invoice Number</span>
-                        <span class="detail-value">${invoice.invoice_number}</span>
+                        <span class="detail-value">${escapeHTML(invoice.invoice_number)}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Issue Date</span>
-                        <span class="detail-value">${new Date(invoice.invoice_date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                        <span class="detail-value">${escapeHTML(invoiceDate)}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Billed To</span>
-                        <span class="detail-value">${invoice.customer_name}</span>
+                        <span class="detail-value">${escapeHTML(invoice.customer_name)}</span>
                     </div>
                     
                     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border);">
@@ -291,7 +311,7 @@
 
                     <div class="detail-row" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
                         <span class="detail-label">Total Amount</span>
-                        <span class="detail-value" style="color:var(--success); font-size:22px; font-weight: 800; text-shadow: 0 0 15px rgba(16,185,129,0.3);">₹${invoice.total_amount.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>
+                        <span class="detail-value" style="color:var(--success); font-size:22px; font-weight: 800; text-shadow: 0 0 15px rgba(16,185,129,0.3);">₹${totalAmount.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Status</span>
@@ -305,7 +325,7 @@
         function showError(title, message) {
             const html = `
                 <div class="status-icon status-error">✕</div>
-                <h1 style="color:var(--danger)">${title}</h1>
+                <h1 style="color:var(--danger)">${escapeHTML(title)}</h1>
                 <p>${message}</p>
                 <div style="margin-top: 25px; padding: 20px; background: rgba(239,68,68,0.1); border-radius: 12px; border: 1px solid rgba(239,68,68,0.2); font-size: 14px; text-align: left; line-height: 1.6;">
                     <strong style="color:var(--danger); display:block; margin-bottom:8px; font-size: 15px;">Security Warning:</strong> If you received a physical document claiming to match this ID, it is likely fraudulent. Please contact Shaivika IT Technologies immediately.

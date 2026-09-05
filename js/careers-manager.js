@@ -4,6 +4,17 @@
  * and comprehensive job application submission with resume file upload.
  */
 document.addEventListener('DOMContentLoaded', () => {
+  // Security Sanitization Utility
+  function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   const jobsGrid = document.querySelector('.jobs-grid');
   const filterBar = document.querySelector('.careers-filter-bar');
   const jobDetailModal = document.getElementById('jobDetailModal');
@@ -219,28 +230,35 @@ document.addEventListener('DOMContentLoaded', () => {
       card.className = 'job-card glass-card';
       card.style.animation = 'fadeInUp 0.4s ease forwards';
 
-      const skillsHTML = (job.skills || []).slice(0, 3).map(s => `<span class="tag tag-blue">${s}</span>`).join('');
+      const skillsHTML = (job.skills || []).slice(0, 3).map(s => `<span class="tag tag-blue">${escapeHTML(s)}</span>`).join('');
+      const safeEmoji = escapeHTML(job.emoji || '💼');
+      const safeDept = escapeHTML(job.departmentName || 'General');
+      const safeTitle = escapeHTML(job.title || 'Career Opportunity');
+      const safeOverview = escapeHTML(job.overview ? job.overview.substring(0, 130) + '...' : '');
+      const safeLocation = escapeHTML(job.location || 'Remote');
+      const safeType = escapeHTML(job.type || 'Full-Time');
+      const safeExp = escapeHTML(job.experience || 'Entry Level');
 
       card.innerHTML = `
         <div class="job-card-header">
-          <div class="job-icon">${job.emoji || '💼'}</div>
+          <div class="job-icon">${safeEmoji}</div>
           <div>
-            <span class="job-department-tag">${job.departmentName || 'General'}</span>
-            <h3 class="job-title">${job.title}</h3>
+            <span class="job-department-tag">${safeDept}</span>
+            <h3 class="job-title">${safeTitle}</h3>
           </div>
         </div>
-        <p class="job-desc">${job.overview ? job.overview.substring(0, 130) + '...' : ''}</p>
+        <p class="job-desc">${safeOverview}</p>
         <div class="job-meta">
-          <span>📍 ${job.location || 'Remote'}</span>
-          <span>⏰ ${job.type || 'Full-Time'}</span>
-          <span>🎓 ${job.experience || 'Entry Level'}</span>
+          <span>📍 ${safeLocation}</span>
+          <span>⏰ ${safeType}</span>
+          <span>🎓 ${safeExp}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
           ${skillsHTML}
         </div>
         <div class="job-actions">
-          <button class="btn btn-ghost btn-sm btn-view-details" data-job-id="${job.id}">Position Overview →</button>
-          <button class="btn btn-primary btn-sm btn-apply-now" data-job-id="${job.id}">Apply Now 🚀</button>
+          <button class="btn btn-ghost btn-sm btn-view-details" data-job-id="${escapeHTML(job.id)}">Position Overview →</button>
+          <button class="btn btn-primary btn-sm btn-apply-now" data-job-id="${escapeHTML(job.id)}">Apply Now 🚀</button>
         </div>
       `;
 
@@ -325,37 +343,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const modalBody = jobDetailModal.querySelector('.modal-body-content');
     if (modalBody) {
-      const respHTML = (job.responsibilities || []).map(r => `<li>${r}</li>`).join('');
-      const skillsHTML = (job.skills || []).map(s => `<span class="tag tag-purple">${s}</span>`).join('');
+      const respHTML = (job.responsibilities || []).map(r => `<li>${escapeHTML(r)}</li>`).join('');
+      const skillsHTML = (job.skills || []).map(s => `<span class="tag tag-purple">${escapeHTML(s)}</span>`).join('');
+      const safeEmoji = escapeHTML(job.emoji || '💼');
+      const safeDept = escapeHTML(job.departmentName || 'General');
+      const safeTitle = escapeHTML(job.title || 'Career Position');
+      const safeLocation = escapeHTML(job.location || 'Remote');
+      const safeType = escapeHTML(job.type || 'Full-Time');
+      const safeExp = escapeHTML(job.experience || 'Entry Level');
+      const safeOverview = escapeHTML(job.overview || '');
 
       modalBody.innerHTML = `
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
           <div style="font-size:3rem;background:var(--gradient-card);width:70px;height:70px;border-radius:16px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-glass);">
-            ${job.emoji || '💼'}
+            ${safeEmoji}
           </div>
           <div>
-            <span class="tag tag-cyan" style="margin-bottom:6px;display:inline-block;">${job.departmentName || 'General'}</span>
-            <h2 style="font-size:1.6rem;font-weight:800;color:var(--text-primary);">${job.title}</h2>
+            <span class="tag tag-cyan" style="margin-bottom:6px;display:inline-block;">${safeDept}</span>
+            <h2 style="font-size:1.6rem;font-weight:800;color:var(--text-primary);">${safeTitle}</h2>
           </div>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:12px;margin-bottom:24px;background:var(--bg-glass);padding:16px;border-radius:12px;border:1px solid var(--border-glass);">
           <div>
             <div style="font-size:11px;color:var(--text-muted);">Location</div>
-            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">📍 ${job.location}</div>
+            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">📍 ${safeLocation}</div>
           </div>
           <div>
             <div style="font-size:11px;color:var(--text-muted);">Employment Type</div>
-            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">⏰ ${job.type}</div>
+            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">⏰ ${safeType}</div>
           </div>
           <div>
             <div style="font-size:11px;color:var(--text-muted);">Experience Needed</div>
-            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">🎓 ${job.experience}</div>
+            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">🎓 ${safeExp}</div>
           </div>
         </div>
 
         <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;color:var(--accent);">Position Overview</h3>
-        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">${job.overview}</p>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">${safeOverview}</p>
 
         <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:10px;color:var(--accent);">Key Responsibilities</h3>
         <ul class="results-list" style="margin-bottom:24px;">
@@ -401,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resumeBase64 = '';
     resumeFileName = '';
     const fileLabel = applyModal.querySelector('#resumeFileStatus');
-    if (fileLabel) fileLabel.textContent = 'No file selected (PDF, DOCX, JPG, PNG)';
+    if (fileLabel) fileLabel.textContent = 'No file selected (PDF, DOC, DOCX, TXT)';
 
     applyModal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -423,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Resume file input change listener
+    // Resume file input change listener with strict validation
     const resumeInput = document.getElementById('applicantResume');
     const fileStatusLabel = document.getElementById('resumeFileStatus');
 
@@ -431,6 +456,15 @@ document.addEventListener('DOMContentLoaded', () => {
       resumeInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        // Strict extension whitelist
+        const allowedExtRegex = /\.(pdf|docx?|rtf|txt)$/i;
+        if (!allowedExtRegex.test(file.name)) {
+          alert('Invalid file format. Please upload a valid resume document (.pdf, .doc, .docx, .rtf, or .txt).');
+          resumeInput.value = '';
+          if (fileStatusLabel) fileStatusLabel.textContent = 'Invalid file type. Allowed: PDF, DOC, DOCX, RTF, TXT';
+          return;
+        }
 
         if (file.size > 5 * 1024 * 1024) {
           alert('File size exceeds 5MB limit. Please choose a smaller resume file.');
@@ -444,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = (evt) => {
           resumeBase64 = evt.target.result;
           if (fileStatusLabel) {
-            fileStatusLabel.innerHTML = `✓ Selected: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
+            fileStatusLabel.innerHTML = `✓ Selected: <strong>${escapeHTML(file.name)}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
           }
         };
         reader.readAsDataURL(file);
@@ -614,12 +648,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function showSubmitSuccessToast(candidateName, jobTitle) {
     const toast = document.createElement('div');
     toast.className = 'custom-toast-notification';
+    const safeName = escapeHTML(candidateName);
+    const safeTitle = escapeHTML(jobTitle);
     toast.innerHTML = `
       <div style="display:flex;align-items:center;gap:12px;">
         <span style="font-size:1.8rem;">🎉</span>
         <div>
           <strong style="display:block;font-size:15px;color:#fff;">Application Submitted!</strong>
-          <span style="font-size:13px;color:rgba(255,255,255,0.85);">Thank you ${candidateName}. We have received your application for <strong>${jobTitle}</strong>.</span>
+          <span style="font-size:13px;color:rgba(255,255,255,0.85);">Thank you ${safeName}. We have received your application for <strong>${safeTitle}</strong>.</span>
         </div>
       </div>
     `;

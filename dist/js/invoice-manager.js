@@ -3,6 +3,16 @@
  * Handles UI rendering, reactive data binding, and interactions.
  */
 
+function escapeHTML(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 function initializeInvoiceManager() {
     const invoiceTab = document.getElementById('invoice-generator-tab');
     if (!invoiceTab || !window.InvoiceDB) {
@@ -83,12 +93,12 @@ function initializeInvoiceManager() {
         recent.forEach(inv => {
             recentBody.innerHTML += `
                 <tr>
-                    <td><strong>${inv.invoice_number}</strong></td>
-                    <td>${inv.customer_name || 'N/A'}</td>
+                    <td><strong>${escapeHTML(inv.invoice_number)}</strong></td>
+                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${getStatusColor(inv.status)}">${inv.status}</span></td>
+                    <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-ghost" onclick="window.viewInvoicePDF('${inv.invoice_uuid}')">PDF</button>
+                        <button class="btn btn-sm btn-ghost" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">PDF</button>
                     </td>
                 </tr>
             `;
@@ -116,19 +126,19 @@ function initializeInvoiceManager() {
         filtered.forEach(inv => {
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${inv.invoice_number}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
-                    <td>${inv.customer_name || 'N/A'}</td>
+                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
+                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${getStatusColor(inv.status)}">${inv.status}</span></td>
+                    <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
                         <div style="display:flex; gap:6px;">
-                            <button class="btn btn-sm btn-ghost" title="PDF" onclick="window.viewInvoicePDF('${inv.invoice_uuid}')">📄</button>
-                            <button class="btn btn-sm btn-ghost" title="Edit" onclick="switchInvoiceView('create', '${inv.invoice_uuid}')">✏️</button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button class="btn btn-sm btn-ghost" title="Record Payment" onclick="window.openPaymentModal('${inv.invoice_number}')">💳</button>` : ''}
-                            <button class="btn btn-sm btn-ghost" title="Audit Log" onclick="window.openAuditModal('${inv.invoice_number}')">📜</button>
-                            ${inv.status === 'DRAFT' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Delete" onclick="window.deleteInvoice('${inv.invoice_uuid}')">🗑️</button>` : ''}
-                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Cancel" onclick="window.cancelInvoice('${inv.invoice_uuid}')">🚫</button>` : ''}
+                            <button class="btn btn-sm btn-ghost" title="PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">📄</button>
+                            <button class="btn btn-sm btn-ghost" title="Edit" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')">✏️</button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button class="btn btn-sm btn-ghost" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')">💳</button>` : ''}
+                            <button class="btn btn-sm btn-ghost" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')">📜</button>
+                            ${inv.status === 'DRAFT' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Delete" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')">🗑️</button>` : ''}
+                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Cancel" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')">🚫</button>` : ''}
                         </div>
                     </td>
                 </tr>
@@ -454,11 +464,11 @@ function initializeInvoiceManager() {
         filtered.forEach(c => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${c.customer_id}</span></td>
-                    <td><strong>${c.name}</strong></td>
-                    <td>${c.company || '-'}</td>
-                    <td>${c.email || '-'}</td>
-                    <td><button class="btn btn-sm btn-ghost" onclick="window.editCustomer('${c.customer_id}')">Edit</button></td>
+                    <td><span class="tag tag-cyan">${escapeHTML(c.customer_id)}</span></td>
+                    <td><strong>${escapeHTML(c.name)}</strong></td>
+                    <td>${escapeHTML(c.company || '-')}</td>
+                    <td>${escapeHTML(c.email || '-')}</td>
+                    <td><button class="btn btn-sm btn-ghost" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')">Edit</button></td>
                 </tr>
             `;
         });
@@ -540,11 +550,11 @@ function initializeInvoiceManager() {
         filtered.forEach(s => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${s.service_id}</span></td>
-                    <td><strong>${s.name}</strong></td>
-                    <td>${s.hsn || '-'}</td>
+                    <td><span class="tag tag-cyan">${escapeHTML(s.service_id)}</span></td>
+                    <td><strong>${escapeHTML(s.name)}</strong></td>
+                    <td>${escapeHTML(s.hsn || '-')}</td>
                     <td>₹${Number(s.price).toLocaleString('en-IN')} (${s.tax_rate}%)</td>
-                    <td><button class="btn btn-sm btn-ghost" onclick="window.editService('${s.service_id}')">Edit</button></td>
+                    <td><button class="btn btn-sm btn-ghost" onclick="window.editService('${escapeHTML(s.service_id)}')">Edit</button></td>
                 </tr>
             `;
         });
@@ -606,9 +616,9 @@ function initializeInvoiceManager() {
             services.forEach(s => {
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${s.name}</strong><br><small>${s.hsn||''}</small></td>
+                        <td><strong>${escapeHTML(s.name)}</strong><br><small>${escapeHTML(s.hsn||'')}</small></td>
                         <td>₹${Number(s.price).toLocaleString('en-IN')}</td>
-                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${s.service_id}')">Add</button></td>
+                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${escapeHTML(s.service_id)}')">Add</button></td>
                     </tr>
                 `;
             });
@@ -716,10 +726,10 @@ function initializeInvoiceManager() {
                 list.innerHTML += `
                     <li>
                         <div>
-                            <strong>${log.action}</strong>
-                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${log.user}</div>
+                            <strong>${escapeHTML(log.action)}</strong>
+                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${escapeHTML(log.user)}</div>
                         </div>
-                        <span class="tag ${getStatusColor(log.status)}">${log.status}</span>
+                        <span class="tag ${getStatusColor(log.status)}">${escapeHTML(log.status)}</span>
                     </li>
                 `;
             });
