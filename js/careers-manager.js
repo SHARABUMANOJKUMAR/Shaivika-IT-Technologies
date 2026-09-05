@@ -415,21 +415,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const jobTitleLabel = applyModal.querySelector('#applyJobTitleDisplay');
     if (jobTitleLabel) {
-      jobTitleLabel.textContent = job.title;
+      jobTitleLabel.textContent = job ? job.title : 'Position';
     }
     const applyJobIdInput = applyModal.querySelector('#applyJobId');
     if (applyJobIdInput) {
-      applyJobIdInput.value = job.id;
+      applyJobIdInput.value = job ? job.id : '';
     }
 
-    // Reset resume variables
-    resumeBase64 = '';
-    resumeFileName = '';
-    const fileLabel = applyModal.querySelector('#resumeFileStatus');
-    if (fileLabel) fileLabel.textContent = 'No file selected (PDF, DOC, DOCX, TXT)';
+    // Clear any previous error styling
+    applyModal.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
 
     applyModal.classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    // Scroll modal to top
+    const modalBox = applyModal.querySelector('.modal-box');
+    if (modalBox) modalBox.scrollTop = 0;
   }
 
   function closeModals() {
@@ -439,223 +440,410 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function attachFormHandlers() {
-    // Close modal triggers
-    document.querySelectorAll('.modal-close, .modal-overlay').forEach(el => {
+    // 1. Close modal triggers (buttons, overlay backgrounds, escape key)
+    document.querySelectorAll('.modal-close, .modal-close-3d, .modal-close-btn').forEach(el => {
+      el.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModals();
+      };
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(el => {
       el.addEventListener('click', (e) => {
-        if (e.target === el || e.target.classList.contains('modal-close')) {
+        if (e.target === el) {
           closeModals();
         }
       });
     });
 
-    // Resume file input change listener with strict validation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModals();
+      }
+    });
+
+    // 2. Resume File Upload & Drag-and-Drop Area
     const resumeInput = document.getElementById('applicantResume');
+    const uploadArea = document.getElementById('resumeUploadArea');
     const fileStatusLabel = document.getElementById('resumeFileStatus');
+    const uploadIcon = document.getElementById('resumeUploadIcon');
+    const uploadTitle = document.getElementById('resumeUploadTitle');
+    const clearBtn = document.getElementById('clearResumeBtn');
 
-    if (resumeInput) {
-      resumeInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Strict extension whitelist
-        const allowedExtRegex = /\.(pdf|docx?|rtf|txt)$/i;
-        if (!allowedExtRegex.test(file.name)) {
-          alert('Invalid file format. Please upload a valid resume document (.pdf, .doc, .docx, .rtf, or .txt).');
-          resumeInput.value = '';
-          if (fileStatusLabel) fileStatusLabel.textContent = 'Invalid file type. Allowed: PDF, DOC, DOCX, RTF, TXT';
-          return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-          alert('File size exceeds 5MB limit. Please choose a smaller resume file.');
-          resumeInput.value = '';
-          if (fileStatusLabel) fileStatusLabel.textContent = 'File too large (>5MB)';
-          return;
-        }
-
-        resumeFileName = file.name;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          resumeBase64 = evt.target.result;
-          if (fileStatusLabel) {
-            fileStatusLabel.innerHTML = `✓ Selected: <strong>${escapeHTML(file.name)}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+    function resetResumeFile() {
+      resumeBase64 = '';
+      resumeFileName = '';
+      if (resumeInput) resumeInput.value = '';
+      if (uploadArea) {
+        uploadArea.classList.remove('dragover');
+        uploadArea.style.borderColor = '';
+      }
+      if (uploadIcon) uploadIcon.textContent = '📄';
+      if (uploadTitle) uploadTitle.textContent = 'Click or drag & drop resume file here';
+      if (fileStatusLabel) fileStatusLabel.textContent = 'Supports PDF, DOC, DOCX, TXT, PNG, JPG (Max 5MB)';
+      if (clearBtn) clearBtn.style.display = 'none';
     }
 
-    // Application Form Submission
+    if (clearBtn) {
+      clearBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        resetResumeFile();
+      };
+    }
+
+    function processResumeFile(file) {
+      if (!file) return;
+
+      // Extensions whitelist
+      const allowedExtRegex = /\.(pdf|docx?|rtf|txt|png|jpe?g)$/i;
+      if (!allowedExtRegex.test(file.name)) {
+        showErrorField(uploadArea, 'Invalid file format. Please upload PDF, DOC, DOCX, TXT, PNG, or JPG.');
+        resetResumeFile();
+        return;
+      }
+
+      // Max size: 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        showErrorField(uploadArea, 'File size exceeds 5MB limit. Please choose a smaller resume file.');
+        resetResumeFile();
+        return;
+      }
+
+      if (uploadArea) {
+        uploadArea.classList.remove('field-error');
+        uploadArea.style.borderColor = '#10b981';
+      }
+
+      resumeFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        resumeBase64 = evt.target.result;
+        if (uploadIcon) uploadIcon.textContent = '✅';
+        if (uploadTitle) uploadTitle.textContent = 'Resume Attached Successfully';
+        if (fileStatusLabel) {
+          fileStatusLabel.innerHTML = `<strong>${escapeHTML(file.name)}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
+        }
+        if (clearBtn) clearBtn.style.display = 'inline-block';
+      };
+      reader.onerror = () => {
+        showErrorField(uploadArea, 'Failed to read file. Please try again.');
+        resetResumeFile();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (uploadArea && resumeInput) {
+      uploadArea.onclick = (e) => {
+        if (e.target === clearBtn) return;
+        resumeInput.click();
+      };
+
+      resumeInput.onchange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+          processResumeFile(e.target.files[0]);
+        }
+      };
+
+      // Drag & Drop
+      ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadArea.classList.add('dragover');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadArea.classList.remove('dragover');
+        }, false);
+      });
+
+      uploadArea.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt ? dt.files : null;
+        if (files && files.length > 0) {
+          processResumeFile(files[0]);
+        }
+      }, false);
+    }
+
+    // 3. Clear errors as user inputs
     const jobAppForm = document.getElementById('jobApplicationForm');
     if (jobAppForm) {
+      jobAppForm.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('input', () => {
+          input.classList.remove('field-error');
+          input.style.borderColor = '';
+        });
+        input.addEventListener('change', () => {
+          input.classList.remove('field-error');
+          input.style.borderColor = '';
+        });
+      });
+
+      // 4. Form Submission
       jobAppForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const name = document.getElementById('applicantName').value.trim();
-        const email = document.getElementById('applicantEmail').value.trim();
-        const phone = document.getElementById('applicantPhone').value.trim();
-        const status = document.getElementById('applicantStatus').value;
-        const experience = document.getElementById('applicantExperience').value.trim();
-        const skills = document.getElementById('applicantSkills').value.trim();
-        const portfolio = document.getElementById('applicantPortfolio').value.trim();
-        const message = document.getElementById('applicantMessage').value.trim();
+        const nameInput = document.getElementById('applicantName');
+        const emailInput = document.getElementById('applicantEmail');
+        const phoneInput = document.getElementById('applicantPhone');
+        const statusSelect = document.getElementById('applicantStatus');
+        const expInput = document.getElementById('applicantExperience');
+        const skillsInput = document.getElementById('applicantSkills');
+        const portfolioInput = document.getElementById('applicantPortfolio');
+        const messageInput = document.getElementById('applicantMessage');
+        const submitBtn = document.getElementById('submitAppBtn') || jobAppForm.querySelector('button[type="submit"]');
 
-        if (!name || !email || !phone) {
-          alert('Please fill in required fields: Name, Email, and Phone number.');
+        const name = nameInput ? nameInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const status = statusSelect ? statusSelect.value : '';
+        const experience = expInput ? expInput.value.trim() : '';
+        const skills = skillsInput ? skillsInput.value.trim() : '';
+        const portfolio = portfolioInput ? portfolioInput.value.trim() : '';
+        const message = messageInput ? messageInput.value.trim() : '';
+
+        // Validation Checks
+        if (!name) {
+          showErrorField(nameInput, 'Please enter your Full Name.');
           return;
         }
 
-        // ==========================================
-        // CLOUDINARY UPLOAD CONFIGURATION
-        // ==========================================
-        // IMPORTANT: Replace these with your actual Cloudinary details
-        const CLOUDINARY_CLOUD_NAME = 'dzfntkzce'; 
-        const CLOUDINARY_UPLOAD_PRESET = 'shaivika_social_uploads'; 
-        
-        let uploadedResumeUrl = '';
-        
-        if (resumeBase64 && CLOUDINARY_CLOUD_NAME !== 'YOUR_CLOUD_NAME_HERE') {
-            try {
-                // Show uploading state on button
-                const submitBtn = jobAppForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = 'Uploading Resume...';
-                submitBtn.disabled = true;
-
-                const formData = new FormData();
-                formData.append('file', resumeBase64);
-                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-                
-                const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const cloudinaryData = await cloudinaryRes.json();
-                if (cloudinaryData.secure_url) {
-                    uploadedResumeUrl = cloudinaryData.secure_url;
-                } else {
-                    console.error("Cloudinary error:", cloudinaryData);
-                }
-                
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            } catch (err) {
-                console.error("Cloudinary upload error:", err);
-            }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+          showErrorField(emailInput, 'Please enter a valid email address (e.g. name@domain.com).');
+          return;
         }
 
-        const applicationData = {
-          id: 'app_' + Date.now(),
-          jobId: selectedJob ? selectedJob.id : 'general',
-          jobTitle: selectedJob ? selectedJob.title : 'General Application',
-          name,
-          email,
-          phone,
-          status,
-          experience,
-          skills,
-          portfolio,
-          message,
-          resumeFileName: resumeFileName || 'No resume uploaded',
-          resumeBase64: resumeBase64 || '',
-          resumeUrl: uploadedResumeUrl || '', // The Cloudinary link
-          submittedAt: new Date().toISOString(),
-          appStatus: 'pending' // pending, shortlisted, rejected, hired
-        };
+        const phoneClean = phone.replace(/[\s\-\(\)\+]/g, '');
+        if (!phone || phoneClean.length < 8) {
+          showErrorField(phoneInput, 'Please enter a valid mobile / WhatsApp contact number.');
+          return;
+        }
+
+        if (!status) {
+          showErrorField(statusSelect, 'Please select your current status.');
+          return;
+        }
+
+        if (!experience) {
+          showErrorField(expInput, 'Please specify your Passout Year or Experience Years.');
+          return;
+        }
+
+        if (!skills) {
+          showErrorField(skillsInput, 'Please list your Primary Skills & Tech Stack.');
+          return;
+        }
+
+        if (!resumeBase64) {
+          showErrorField(uploadArea, 'Please attach your Resume / CV (PDF, DOCX, TXT, PNG, JPG).');
+          return;
+        }
+
+        // Disable submit button & show spinner
+        const originalBtnHTML = submitBtn ? submitBtn.innerHTML : 'Submit Application 🚀';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `
+            <span style="display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;vertical-align:middle;"></span>
+            Submitting Application...
+          `;
+        }
 
         try {
-          // 1. Save to Local Storage (Admin Panel Database)
-          const cachedApps = localStorage.getItem('shaivika_job_applications');
-          let apps = cachedApps ? JSON.parse(cachedApps) : [];
-          apps.unshift(applicationData);
-          localStorage.setItem('shaivika_job_applications', JSON.stringify(apps));
+          // Cloudinary Upload (with 8s timeout safeguard)
+          let uploadedResumeUrl = '';
+          const CLOUDINARY_CLOUD_NAME = 'dzfntkzce';
+          const CLOUDINARY_UPLOAD_PRESET = 'shaivika_social_uploads';
 
-          // 2. Send to Google Apps Script via hidden form (bypasses CORS + redirect issues)
+          if (resumeBase64 && CLOUDINARY_CLOUD_NAME !== 'YOUR_CLOUD_NAME_HERE') {
+            try {
+              const formData = new FormData();
+              formData.append('file', resumeBase64);
+              formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+              const cloudController = new AbortController();
+              const cloudTimeout = setTimeout(() => cloudController.abort(), 8000);
+
+              const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
+                method: 'POST',
+                body: formData,
+                signal: cloudController.signal
+              });
+              clearTimeout(cloudTimeout);
+
+              const cloudinaryData = await cloudinaryRes.json();
+              if (cloudinaryData && cloudinaryData.secure_url) {
+                uploadedResumeUrl = cloudinaryData.secure_url;
+              }
+            } catch (cloudErr) {
+              console.warn('Cloudinary upload warning (using fallback base64):', cloudErr);
+            }
+          }
+
+          const applicationData = {
+            id: 'app_' + Date.now(),
+            jobId: selectedJob ? selectedJob.id : 'general',
+            jobTitle: selectedJob ? selectedJob.title : 'General Application',
+            name,
+            email,
+            phone,
+            status,
+            experience,
+            skills,
+            portfolio,
+            message,
+            resumeFileName: resumeFileName || 'Resume.pdf',
+            resumeBase64: resumeBase64 || '',
+            resumeUrl: uploadedResumeUrl || '',
+            submittedAt: new Date().toISOString(),
+            appStatus: 'pending'
+          };
+
+          // 1. Save to Local Storage (Admin Panel Database)
+          try {
+            const cachedApps = localStorage.getItem('shaivika_job_applications');
+            let apps = cachedApps ? JSON.parse(cachedApps) : [];
+            apps.unshift(applicationData);
+            localStorage.setItem('shaivika_job_applications', JSON.stringify(apps));
+          } catch (storageErr) {
+            console.error('LocalStorage save error:', storageErr);
+          }
+
+          // 2. Google Apps Script Sync
           const gasUrl = 'https://script.google.com/macros/s/AKfycbzmRvImPbmXCG_Y0jKWkq6LZP1JyPWN3tfQlSl6br0-70fr0JTH93ro9JMD46xPSzZ2/exec';
           if (gasUrl) {
             try {
               const { resumeBase64: _b64, ...dataToSync } = applicationData;
-
-              // Use an invisible iframe as form target so no page navigation occurs
               let gasIframe = document.getElementById('_gasIframe');
               if (!gasIframe) {
                 gasIframe = document.createElement('iframe');
                 gasIframe.name = '_gasIframe';
-                gasIframe.id   = '_gasIframe';
+                gasIframe.id = '_gasIframe';
                 gasIframe.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;';
                 document.body.appendChild(gasIframe);
               }
 
               const hiddenForm = document.createElement('form');
-              hiddenForm.method  = 'POST';
-              hiddenForm.action  = gasUrl;
-              hiddenForm.target  = '_gasIframe';
+              hiddenForm.method = 'POST';
+              hiddenForm.action = gasUrl;
+              hiddenForm.target = '_gasIframe';
               hiddenForm.style.cssText = 'display:none;';
               hiddenForm.enctype = 'application/x-www-form-urlencoded';
 
-              // Attach payload as a single field called 'data'
               const input = document.createElement('input');
-              input.type  = 'hidden';
-              input.name  = 'data';
+              input.type = 'hidden';
+              input.name = 'data';
               input.value = JSON.stringify(dataToSync);
               hiddenForm.appendChild(input);
 
               document.body.appendChild(hiddenForm);
               hiddenForm.submit();
-              document.body.removeChild(hiddenForm);
-            } catch(gasErr) {
-              console.error('GAS form submit error:', gasErr);
+              setTimeout(() => hiddenForm.remove(), 1000);
+            } catch (gasErr) {
+              console.warn('GAS form submit warning:', gasErr);
             }
-
-            // Dual mode: direct JSON fetch to Google Sheet
-            fetch(gasUrl, {
-              method: 'POST',
-              body: JSON.stringify({
-                jobId:          applicationData.jobId,
-                jobTitle:       applicationData.jobTitle,
-                name:           applicationData.name,
-                email:          applicationData.email,
-                phone:          applicationData.phone,
-                status:         applicationData.status,
-                experience:     applicationData.experience,
-                skills:         applicationData.skills,
-                portfolio:      applicationData.portfolio,
-                message:        applicationData.message,
-                resumeFileName: applicationData.resumeFileName,
-                resumeUrl:      applicationData.resumeUrl,
-                submittedAt:    applicationData.submittedAt
-              })
-            }).catch(err => console.log('Dual-mode GAS fetch notice:', err));
           }
 
-          // Toast feedback
+          // 3. Show Success Celebration Toast
           showSubmitSuccessToast(name, selectedJob ? selectedJob.title : 'Position');
 
-          // Reset form & close
+          // 4. Reset form & close modal
           jobAppForm.reset();
+          resetResumeFile();
           closeModals();
         } catch (err) {
-          console.error('Error saving application:', err);
-          alert('Application saved! Thank you for applying.');
+          console.error('Error submitting application:', err);
+          showSubmitSuccessToast(name, selectedJob ? selectedJob.title : 'Position');
           jobAppForm.reset();
+          resetResumeFile();
           closeModals();
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHTML;
+          }
         }
       });
     }
   }
 
+  function showErrorField(el, message) {
+    if (!el) return;
+    el.classList.add('field-error');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (typeof el.focus === 'function') {
+      el.focus();
+    }
+    showNotification(message, 'error');
+  }
+
+  function showNotification(message, type = 'info') {
+    const existing = document.querySelector('.custom-form-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'custom-form-toast';
+    const isError = type === 'error';
+    const safeMsg = escapeHTML(message);
+
+    toast.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.2rem;">${isError ? '⚠️' : 'ℹ️'}</span>
+        <span style="font-size:13px;font-weight:600;">${safeMsg}</span>
+      </div>
+    `;
+    toast.style.cssText = `
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      background: ${isError ? '#ef4444' : '#2563eb'};
+      color: white;
+      padding: 12px 22px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      z-index: 10001;
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-primary, sans-serif);
+      pointer-events: none;
+    `;
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      toast.style.opacity = '1';
+    });
+
+    setTimeout(() => {
+      toast.style.transform = 'translateX(-50%) translateY(-30px)';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 400);
+    }, 4000);
+  }
+
   function showSubmitSuccessToast(candidateName, jobTitle) {
+    const existing = document.querySelector('.custom-toast-notification');
+    if (existing) existing.remove();
+
     const toast = document.createElement('div');
     toast.className = 'custom-toast-notification';
     const safeName = escapeHTML(candidateName);
     const safeTitle = escapeHTML(jobTitle);
     toast.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span style="font-size:1.8rem;">🎉</span>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span style="font-size:2rem;">🎉</span>
         <div>
-          <strong style="display:block;font-size:15px;color:#fff;">Application Submitted!</strong>
-          <span style="font-size:13px;color:rgba(255,255,255,0.85);">Thank you ${safeName}. We have received your application for <strong>${safeTitle}</strong>.</span>
+          <strong style="display:block;font-size:15px;color:#fff;margin-bottom:2px;">Application Submitted Successfully!</strong>
+          <span style="font-size:13px;color:rgba(255,255,255,0.9);">Thank you, <strong>${safeName}</strong>. Your application for <strong>${safeTitle}</strong> has been received.</span>
         </div>
       </div>
     `;
@@ -666,22 +854,25 @@ document.addEventListener('DOMContentLoaded', () => {
       transform: translateX(-50%) translateY(100px);
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
-      padding: 16px 24px;
+      padding: 16px 26px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-      z-index: 10000;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 12px 35px rgba(16, 185, 129, 0.45);
+      z-index: 10002;
+      opacity: 0;
+      transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-primary, sans-serif);
     `;
     document.body.appendChild(toast);
 
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       toast.style.transform = 'translateX(-50%) translateY(0)';
-    }, 100);
+      toast.style.opacity = '1';
+    });
 
     setTimeout(() => {
       toast.style.transform = 'translateX(-50%) translateY(100px)';
       toast.style.opacity = '0';
       setTimeout(() => toast.remove(), 500);
-    }, 5000);
+    }, 5500);
   }
 });
