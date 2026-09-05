@@ -76,7 +76,7 @@ const InvoicePDF = {
         const verificationUrl = inv.verification_url || inv.verificationUrl ||
             ((window.location.protocol === 'https:' || !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname))
                 ? `${window.location.origin}/verify.html?id=${encodeURIComponent(invoiceNumber)}`
-                : `https://shaivikagroups.in/verify.html?id=${encodeURIComponent(invoiceNumber)}`);
+                : `https://shaivika-it-technologies.netlify.app/verify.html?id=${encodeURIComponent(invoiceNumber)}`);
         const verifyUrl = verificationUrl;
         const verifyQrData = await this.generateQR(verifyUrl);
 
