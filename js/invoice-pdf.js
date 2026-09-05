@@ -94,7 +94,7 @@ const InvoicePDF = {
             let taxColumn = '';
             if (isInterState) {
                 taxColumn = `
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">
                         ${taxRate}%<br><span style="color:#64748b">₹${taxAmount.toFixed(2)}</span>
                     </td>
                 `;
@@ -102,10 +102,10 @@ const InvoicePDF = {
                 const halfRate = taxRate / 2;
                 const halfAmt = taxAmount / 2;
                 taxColumn = `
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">
                         ${halfRate}%<br><span style="color:#64748b">₹${halfAmt.toFixed(2)}</span>
                     </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px;">
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">
                         ${halfRate}%<br><span style="color:#64748b">₹${halfAmt.toFixed(2)}</span>
                     </td>
                 `;
@@ -113,23 +113,23 @@ const InvoicePDF = {
 
             itemsHtml += `
                 <tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-size: 12px;">
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-size: 13px;">
                         <strong>${safeDesc}</strong>
-                        ${safeHsn ? `<div style="font-size:10px; color:#64748b;">HSN: ${safeHsn}</div>` : ''}
+                        ${safeHsn ? `<div style="font-size:11px; color:#64748b; margin-top: 4px;">HSN: ${safeHsn}</div>` : ''}
                     </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 12px; font-weight: 600;">${qty}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">₹${rate.toFixed(2)}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 12px;">₹${amt.toFixed(2)}</td>
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 13px; font-weight: 600;">${qty}</td>
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 13px;">₹${rate.toFixed(2)}</td>
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 13px;">₹${amt.toFixed(2)}</td>
                     ${taxColumn}
-                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #4f46e5; font-weight: 700; font-size: 13px;">₹${total.toFixed(2)}</td>
+                    <td style="padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #4f46e5; font-weight: 700; font-size: 14px;">₹${total.toFixed(2)}</td>
                 </tr>
             `;
         });
 
         let taxHeaders = isInterState ? 
-            `<th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">IGST</th>` : 
-            `<th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">CGST</th>
-             <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px;">SGST</th>`;
+            `<th style="color: #ffffff; padding: 14px 12px; text-align: right; font-size: 12px;">IGST</th>` : 
+            `<th style="color: #ffffff; padding: 14px 12px; text-align: right; font-size: 12px;">CGST</th>
+             <th style="color: #ffffff; padding: 14px 12px; text-align: right; font-size: 12px;">SGST</th>`;
 
         const totalAmt = Number(inv.total_amount || 0);
         const words = this.numberToWords(Math.round(totalAmt));
@@ -155,8 +155,8 @@ const InvoicePDF = {
         const safeStatus = esc(inv.status || 'PENDING');
         const safeVerificationId = esc(inv.verification_id || inv.verificationId || invoiceNumber);
 
-        const safeNotes = inv.notes ? `<strong style="color: #334155; font-size: 12px;">Summary:</strong><br>${esc(inv.notes).replace(/\n/g, '<br>')}<br><br>` : '';
-        const safeTerms = settings.defaultTerms ? `<strong style="color: #334155; font-size: 12px;">Terms & Conditions:</strong><br>${esc(settings.defaultTerms).replace(/\n/g, '<br>')}` : '';
+        const safeNotes = inv.notes ? `<strong style="color: #334155; font-size: 13px;">Summary:</strong><br>${esc(inv.notes).replace(/\n/g, '<br>')}<br><br>` : '';
+        const safeTerms = settings.defaultTerms ? `<strong style="color: #334155; font-size: 13px;">Terms & Conditions:</strong><br>${esc(settings.defaultTerms).replace(/\n/g, '<br>')}` : '';
 
         const subtotal = Number(inv.subtotal || 0);
         const discountAmt = Number(inv.discount_amount || 0);
@@ -173,57 +173,45 @@ const InvoicePDF = {
                 .invoice-print-wrapper td, .invoice-print-wrapper th { background-color: transparent; }
                 @page { size: A4 portrait; margin: 0; }
                 .invoice-print-wrapper {
-                    padding: 20px 22px 16px !important;
-                    font-size: 12px !important;
+                    padding: 40px 45px 30px !important;
+                    font-size: 13px !important;
                 }
                 .invoice-print-wrapper > div > div:first-child {
-                    padding: 34px !important;
-                    margin: -22px -22px 22px !important;
+                    padding: 40px 45px !important;
+                    margin: -40px -45px 30px !important;
                 }
-                .invoice-print-wrapper h1 { font-size: 40px !important; }
-                .invoice-print-wrapper td,
-                .invoice-print-wrapper th { padding: 13px !important; }
-                .invoice-print-wrapper table[style*="margin-bottom: 30px"] { margin-bottom: 22px !important; }
-                .invoice-print-wrapper table[style*="margin-top: 10px"] { margin-top: 4px !important; }
-                .invoice-print-wrapper table[style*="padding-top: 25px"] { padding-top: 16px !important; }
-                .invoice-print-wrapper [style*="font-size: 11px"] { font-size: 12px !important; }
-                .invoice-print-wrapper [style*="font-size: 10px"] { font-size: 10px !important; }
-                .invoice-print-wrapper [style*="font-size: 9px"] { font-size: 10px !important; }
-                .invoice-print-wrapper img[style*="width: 80px"] { width: 92px !important; height: 92px !important; }
-                .invoice-print-wrapper img[style*="height: 55px"] { height: 60px !important; }
-                .invoice-print-wrapper > div > div:last-child td { padding-top: 12px !important; }
             </style>
             <div class="invoice-print-wrapper" style="font-family: 'Inter', Helvetica, sans-serif; color: #1e293b; background: #ffffff; width: 100%; height: 100%; position: relative; box-sizing: border-box; overflow: hidden;">
                 <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(236, 72, 153, 0.1)); z-index: 0;"></div>
                 <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(56, 189, 248, 0.1)); z-index: 0;"></div>
 
                 <div style="position: relative; z-index: 1; background: #ffffff;">
-                    <div style="background: linear-gradient(135deg, #2563eb, #7c3aed, #ec4899); padding: 30px; margin: -20px -20px 20px -20px; border-radius: 0 0 16px 16px; color: white;">
+                    <div style="background: linear-gradient(135deg, #2563eb, #7c3aed, #ec4899); padding: 40px 45px; margin: -40px -45px 30px -45px; border-radius: 0 0 16px 16px; color: white;">
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
                                 <td style="vertical-align: middle; width: 50%;">
-                                    <div style="background: white; display: inline-block; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px;">
-                                        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1786872082/Shaivika_IT_Technologies_Logo_p3p7iw.png" style="height: 55px; max-width: 250px; object-fit: contain;">
+                                    <div style="background: white; display: inline-block; padding: 12px 18px; border-radius: 8px; margin-bottom: 12px;">
+                                        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1786872082/Shaivika_IT_Technologies_Logo_p3p7iw.png" style="height: 65px; max-width: 280px; object-fit: contain;">
                                     </div>
-                                    <div style="font-size: 12px; color: rgba(255,255,255,0.9); line-height: 1.6;">
-                                        <strong style="font-size: 14px; color: white;">${safeCompanyName}</strong><br>
+                                    <div style="font-size: 13px; color: rgba(255,255,255,0.95); line-height: 1.6;">
+                                        <strong style="font-size: 16px; color: white;">${safeCompanyName}</strong><br>
                                         ${safeCompanyAddress}<br>
                                         ${safeCompanyEmail} | ${safeCompanyPhone}<br>
                                         ${safeCompanyGstin ? 'GSTIN: <strong>' + safeCompanyGstin + '</strong>' : ''}
                                     </div>
                                 </td>
                                 <td style="vertical-align: middle; text-align: right; width: 50%;">
-                                    <h1 style="margin: 0 0 8px 0; font-size: 38px; color: #ffffff; letter-spacing: 2px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">TAX INVOICE</h1>
-                                    <div style="font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 15px; display: inline-block; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px;">
+                                    <h1 style="margin: 0 0 10px 0; font-size: 44px; color: #ffffff; letter-spacing: 2px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">TAX INVOICE</h1>
+                                    <div style="font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.95); margin-bottom: 20px; display: inline-block; background: rgba(0,0,0,0.2); padding: 6px 16px; border-radius: 20px;">
                                         # ${safeInvNumber}
                                     </div>
-                                    <table style="font-size: 12px; float: right; text-align: right; border-collapse: collapse; color: white;">
+                                    <table style="font-size: 13px; float: right; text-align: right; border-collapse: collapse; color: white;">
                                         <tr>
-                                             <td style="padding-right: 12px; padding-bottom: 6px; opacity: 0.8;">Invoice Date:</td>
-                                            <td style="font-weight: 600;">${safeInvDate}</td>
+                                             <td style="padding-right: 14px; padding-bottom: 8px; opacity: 0.9;">Invoice Date:</td>
+                                            <td style="font-weight: 600; padding-bottom: 8px;">${safeInvDate}</td>
                                         </tr>
                                         <tr>
-                                            <td style="padding-right: 12px; opacity: 0.8;">Due Date:</td>
+                                            <td style="padding-right: 14px; opacity: 0.9;">Due Date:</td>
                                             <td style="font-weight: 600;">${safeDueDate}</td>
                                         </tr>
                                     </table>
@@ -232,15 +220,15 @@ const InvoicePDF = {
                         </table>
                     </div>
 
-                    <table style="width: 100%; margin-bottom: 30px; border-collapse: collapse; padding: 0 10px;">
+                    <table style="width: 100%; margin-bottom: 30px; border-collapse: collapse; padding: 0;">
                         <tr>
-                            <td style="padding: 20px; background: #ffffff; border: 1px solid #e2e8f0; width: 48%; vertical-align: top; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                                <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); display: inline-block; text-align: center; line-height: 32px; margin-right: 10px; color: #3b82f6; font-weight: bold; font-size: 14px;">B</div>
-                                    <h3 style="margin: 0; font-size: 12px; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Billed To</h3>
+                            <td style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; width: 48%; vertical-align: top; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <div style="display: flex; align-items: center; margin-bottom: 14px;">
+                                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); display: inline-block; text-align: center; line-height: 36px; margin-right: 12px; color: #3b82f6; font-weight: bold; font-size: 16px;">B</div>
+                                    <h3 style="margin: 0; font-size: 13px; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Billed To</h3>
                                 </div>
-                                <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">${safeClientName}</div>
-                                <div style="font-size: 12px; color: #475569; line-height: 1.6;">
+                                <div style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${safeClientName}</div>
+                                <div style="font-size: 13px; color: #475569; line-height: 1.6;">
                                     ${safeAttn}
                                     ${safeCustAddress}
                                     ${safeCustPhone}
@@ -249,14 +237,14 @@ const InvoicePDF = {
                                 </div>
                             </td>
                             <td style="width: 4%;"></td>
-                            <td style="padding: 20px; background: #ffffff; border: 1px solid #e2e8f0; width: 48%; vertical-align: top; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                                <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); display: inline-block; text-align: center; line-height: 32px; margin-right: 10px; color: #10b981; font-weight: bold; font-size: 14px;">P</div>
-                                    <h3 style="margin: 0; font-size: 12px; color: #10b981; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Payment Method</h3>
+                            <td style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; width: 48%; vertical-align: top; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <div style="display: flex; align-items: center; margin-bottom: 14px;">
+                                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); display: inline-block; text-align: center; line-height: 36px; margin-right: 12px; color: #10b981; font-weight: bold; font-size: 16px;">P</div>
+                                    <h3 style="margin: 0; font-size: 13px; color: #10b981; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">Payment Method</h3>
                                 </div>
-                                <table style="font-size: 12px; color: #475569; line-height: 1.6; border-collapse: collapse; width: 100%;">
-                                    <tr><td style="padding-bottom: 4px; width: 60px;"><strong>Method:</strong></td><td style="padding-bottom: 4px;">${safePaymentMethod}</td></tr>
-                                    <tr><td style="padding-bottom: 4px;"><strong>Status:</strong></td><td style="padding-bottom: 4px; color: ${inv.status === 'PAID' ? '#10b981' : (inv.status === 'DRAFT' ? '#475569' : '#f59e0b')}; font-weight: 600;">${safeStatus}</td></tr>
+                                <table style="font-size: 13px; color: #475569; line-height: 1.6; border-collapse: collapse; width: 100%;">
+                                    <tr><td style="padding-bottom: 6px; width: 70px;"><strong>Method:</strong></td><td style="padding-bottom: 6px;">${safePaymentMethod}</td></tr>
+                                    <tr><td style="padding-bottom: 6px;"><strong>Status:</strong></td><td style="padding-bottom: 6px; color: ${inv.status === 'PAID' ? '#10b981' : (inv.status === 'DRAFT' ? '#475569' : '#f59e0b')}; font-weight: 600;">${safeStatus}</td></tr>
                                 </table>
                             </td>
                         </tr>
@@ -266,12 +254,12 @@ const InvoicePDF = {
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background: linear-gradient(90deg, #1e293b, #334155);">
-                                    <th style="color: #ffffff; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Description</th>
-                                    <th style="color: #ffffff; padding: 12px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 50px;">Qty</th>
-                                    <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 80px;">Rate</th>
-                                    <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 80px;">Amount</th>
+                                    <th style="color: #ffffff; padding: 14px 12px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Description</th>
+                                    <th style="color: #ffffff; padding: 14px 12px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 50px;">Qty</th>
+                                    <th style="color: #ffffff; padding: 14px 12px; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 90px;">Rate</th>
+                                    <th style="color: #ffffff; padding: 14px 12px; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 90px;">Amount</th>
                                     ${taxHeaders}
-                                    <th style="color: #ffffff; padding: 12px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; width: 90px;">Total</th>
+                                    <th style="color: #ffffff; padding: 14px 12px; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; width: 100px;">Total</th>
                                 </tr>
                             </thead>
                             <tbody style="background: #ffffff;">
@@ -280,45 +268,45 @@ const InvoicePDF = {
                         </table>
                     </div>
 
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                         <tr>
                             <td style="width: 50%; vertical-align: bottom; padding-right: 20px;">
-                                <div style="background: #f8fafc; border-left: 4px solid #8b5cf6; padding: 15px; border-radius: 0 8px 8px 0;">
-                                    <div style="font-size: 11px; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Amount in Words</strong></div>
-                                    <div style="font-size: 13px; font-weight: 500; color: #1e293b;">Rupees ${words}</div>
+                                <div style="background: #f8fafc; border-left: 4px solid #8b5cf6; padding: 18px; border-radius: 0 8px 8px 0;">
+                                    <div style="font-size: 12px; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Amount in Words</strong></div>
+                                    <div style="font-size: 14px; font-weight: 500; color: #1e293b; line-height: 1.5;">Rupees ${words}</div>
                                 </div>
                             </td>
                             <td style="width: 50%;">
-                                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
+                                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
                                     <table style="width: 100%; border-collapse: collapse;">
                                         <tr>
-                                             <td style="padding: 8px 0; font-size: 13px; color: #475569;">Subtotal</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${subtotal.toFixed(2)}</td>
+                                             <td style="padding: 10px 0; font-size: 14px; color: #475569;">Subtotal</td>
+                                            <td style="padding: 10px 0; font-size: 14px; color: #0f172a; font-weight: 600; text-align: right;">₹${subtotal.toFixed(2)}</td>
                                         </tr>
                                         ${discountAmt > 0 ? `
                                         <tr>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #ef4444;">Discount</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #ef4444; font-weight: 600; text-align: right;">- ₹${discountAmt.toFixed(2)}</td>
+                                            <td style="padding: 10px 0; font-size: 14px; color: #ef4444;">Discount</td>
+                                            <td style="padding: 10px 0; font-size: 14px; color: #ef4444; font-weight: 600; text-align: right;">- ₹${discountAmt.toFixed(2)}</td>
                                         </tr>` : ''}
                                         <tr>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #475569;">Tax Amount</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #0f172a; font-weight: 600; text-align: right;">₹${taxTotal.toFixed(2)}</td>
+                                            <td style="padding: 10px 0; font-size: 14px; color: #475569;">Tax Amount</td>
+                                            <td style="padding: 10px 0; font-size: 14px; color: #0f172a; font-weight: 600; text-align: right;">₹${taxTotal.toFixed(2)}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="2"><hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0;"></td>
+                                            <td colspan="2"><hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 12px 0;"></td>
                                         </tr>
                                         <tr>
-                                            <td style="padding: 12px 0; font-size: 16px; color: #1e3a8a; font-weight: 800;">Grand Total</td>
-                                            <td style="padding: 12px 0; font-size: 18px; color: #1e3a8a; font-weight: 800; text-align: right;">₹${totalAmt.toFixed(2)}</td>
+                                            <td style="padding: 14px 0 10px; font-size: 18px; color: #1e3a8a; font-weight: 800;">Grand Total</td>
+                                            <td style="padding: 14px 0 10px; font-size: 22px; color: #1e3a8a; font-weight: 800; text-align: right;">₹${totalAmt.toFixed(2)}</td>
                                         </tr>
                                         ${amtPaid > 0 ? `
                                         <tr>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #10b981;">Amount Paid</td>
-                                            <td style="padding: 8px 0; font-size: 13px; color: #10b981; font-weight: 600; text-align: right;">- ₹${amtPaid.toFixed(2)}</td>
+                                            <td style="padding: 10px 0; font-size: 14px; color: #10b981;">Amount Paid</td>
+                                            <td style="padding: 10px 0; font-size: 14px; color: #10b981; font-weight: 600; text-align: right;">- ₹${amtPaid.toFixed(2)}</td>
                                         </tr>
                                         <tr>
-                                            <td style="padding: 12px 0; font-size: 15px; color: #ef4444; font-weight: 700;">Balance Due</td>
-                                            <td style="padding: 12px 0; font-size: 16px; color: #ef4444; font-weight: 800; text-align: right;">₹${balanceDue.toFixed(2)}</td>
+                                            <td style="padding: 12px 0 4px; font-size: 16px; color: #ef4444; font-weight: 700;">Balance Due</td>
+                                            <td style="padding: 12px 0 4px; font-size: 18px; color: #ef4444; font-weight: 800; text-align: right;">₹${balanceDue.toFixed(2)}</td>
                                         </tr>` : ''}
                                     </table>
                                 </div>
@@ -326,28 +314,28 @@ const InvoicePDF = {
                         </tr>
                     </table>
 
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border-top: 2px solid #f1f5f9; padding-top: 25px;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border-top: 2px solid #f1f5f9; padding-top: 20px;">
                         <tr>
                             <td style="vertical-align: top; width: 70%; padding-top: 20px;">
-                                <div style="font-size: 11px; color: #64748b; line-height: 1.6; margin-bottom: 20px;">
+                                <div style="font-size: 12px; color: #64748b; line-height: 1.6; margin-bottom: 24px;">
                                     ${safeNotes}
                                     ${safeTerms}
                                 </div>
-                                <div style="font-size: 10px; color: #94a3b8; background: #f8fafc; padding: 10px 15px; border-radius: 8px; display: inline-block;">
-                                    <span style="color: #10b981; font-size: 14px; margin-right: 6px;">✓</span> Invoice Verification: <strong style="color: #475569;">${safeVerificationId}</strong><br>
-                                    <span style="margin-left: 22px;">Scan to verify this invoice at the Shaivika verification page. This is not a government GST e-invoice.</span>
+                                <div style="font-size: 11px; color: #94a3b8; background: #f8fafc; padding: 12px 18px; border-radius: 8px; display: inline-block;">
+                                    <span style="color: #10b981; font-size: 15px; margin-right: 6px;">✓</span> Invoice Verification: <strong style="color: #475569;">${safeVerificationId}</strong><br>
+                                    <span style="margin-left: 24px;">Scan to verify this invoice at the Shaivika verification page. This is not a government GST e-invoice.</span>
                                 </div>
                             </td>
                             <td style="vertical-align: middle; text-align: right; width: 30%; padding-top: 20px;">
                                 ${verifyQrData ? `
-                                    <div style="display: inline-block; text-align: center; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
-                                        <img src="${verifyQrData}" style="width: 80px; height: 80px;"><br>
-                                        <div style="font-size: 10px; color: #4f46e5; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Verify</div>
+                                    <div style="display: inline-block; text-align: center; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                                        <img src="${verifyQrData}" style="width: 110px; height: 110px;"><br>
+                                        <div style="font-size: 11px; color: #4f46e5; font-weight: 700; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Verify</div>
                                     </div>
                                 ` : `
-                                    <div style="display: inline-block; text-align: center; background: white; padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
-                                        <div style="font-size: 24px; color: #4f46e5; margin-bottom: 4px;">🛡️</div>
-                                        <div style="font-size: 10px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Verified Invoice</div>
+                                    <div style="display: inline-block; text-align: center; background: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                                        <div style="font-size: 28px; color: #4f46e5; margin-bottom: 6px;">🛡️</div>
+                                        <div style="font-size: 11px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Verified Invoice</div>
                                     </div>
                                 `}
                             </td>
