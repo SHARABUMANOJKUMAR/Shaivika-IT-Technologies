@@ -39,10 +39,58 @@ window.InvoiceDB = {
         gasInvoiceUrl: 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec'
     },
 
+    // Default Services catalog matching services.html
+    defaultServices: [
+        { service_id: 'SIT-SRV-WEB', name: 'Web Application Development', description: 'Full-stack responsive web application development (React/Next.js/Node)', price: 20000, default_price: 20000, tax_rate: 18, default_tax_rate: 18, category: 'Development', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-APP', name: 'Mobile Application Development (iOS & Android)', description: 'Cross-platform mobile app development for Android & iOS (Flutter/React Native)', price: 25000, default_price: 25000, tax_rate: 18, default_tax_rate: 18, category: 'Development', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-AI-AUTO', name: 'AI Automations Suite', description: 'End-to-end WhatsApp, Telegram, CRM & Business Pipeline Automations', price: 20000, default_price: 20000, tax_rate: 18, default_tax_rate: 18, category: 'AI & Automation', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-CHATBOT', name: 'AI Chatbot Builders', description: 'Custom LLM-powered support, sales & lead gen bots for Website, WhatsApp & Telegram', price: 15000, default_price: 15000, tax_rate: 18, default_tax_rate: 18, category: 'AI & Automation', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-SEO', name: 'SEO Optimisation & Digital Marketing', description: 'Technical SEO, keyword research, on-page optimization & monthly growth campaigns', price: 12000, default_price: 12000, tax_rate: 18, default_tax_rate: 18, category: 'Marketing', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-DASHBOARD', name: 'Analytical Dashboards & Business Intelligence', description: 'Real-time BI dashboards, KPIs, live data connectors and automated reporting', price: 18000, default_price: 18000, tax_rate: 18, default_tax_rate: 18, category: 'Analytics', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-CRM', name: 'Custom CRM Systems', description: 'Intelligent CRM with automated follow-ups, WhatsApp integration & pipeline analytics', price: 30000, default_price: 30000, tax_rate: 18, default_tax_rate: 18, category: 'Enterprise', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-SAAS', name: 'SaaS Products & Platform Development', description: 'Production-ready scalable SaaS architecture, multi-tenant DB and billing pipelines', price: 45000, default_price: 45000, tax_rate: 18, default_tax_rate: 18, category: 'SaaS', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-UIUX', name: 'UI/UX Design & Product Prototyping', description: 'High-fidelity Figma wireframes, glassmorphic design systems & user research', price: 14000, default_price: 14000, tax_rate: 18, default_tax_rate: 18, category: 'Design', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-LOGO', name: 'Logo Designing & Brand Identity', description: 'Complete brand kits, vector logos, color systems and typography guidelines', price: 8000, default_price: 8000, tax_rate: 18, default_tax_rate: 18, category: 'Design', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-PROMO', name: 'AI Video & Photo Business Promotions', description: 'AI promotional video reels, product photo generation and social media campaigns', price: 10000, default_price: 10000, tax_rate: 18, default_tax_rate: 18, category: 'Creative', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-INVITE', name: 'Virtual Wedding & Digital Invitation Cards', description: 'Interactive digital event invitations with animations, RSVP and WhatsApp sharing', price: 5000, default_price: 5000, tax_rate: 18, default_tax_rate: 18, category: 'Creative', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-PROJECTS', name: 'Final Year Projects & Academic Solutions', description: 'Full-stack B.Tech/MCA/M.Tech projects with complete documentation and deployment', price: 15000, default_price: 15000, tax_rate: 18, default_tax_rate: 18, category: 'Academic', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-COURSE', name: 'Learning Courses & Corporate Training', description: 'Hands-on training in Web Dev, AI Automation, Data Analytics & UI/UX', price: 10000, default_price: 10000, tax_rate: 18, default_tax_rate: 18, category: 'Training', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-CLOUD', name: 'Cloud Services & DevOps Infrastructure', description: 'Cloud deployment, CI/CD pipelines, Docker containerization & server security', price: 22000, default_price: 22000, tax_rate: 18, default_tax_rate: 18, category: 'Cloud', status: 'ACTIVE' },
+        { service_id: 'SIT-SRV-QA', name: 'Software Testing & Quality Assurance', description: 'Automated test suites, end-to-end regression testing, manual QA & API audits', price: 12000, default_price: 12000, tax_rate: 18, default_tax_rate: 18, category: 'QA', status: 'ACTIVE' }
+    ],
+
     init: function() {
         if (!localStorage.getItem(this.K_INVOICES)) localStorage.setItem(this.K_INVOICES, JSON.stringify([]));
         if (!localStorage.getItem(this.K_CUSTOMERS)) localStorage.setItem(this.K_CUSTOMERS, JSON.stringify([]));
-        if (!localStorage.getItem(this.K_SERVICES)) localStorage.setItem(this.K_SERVICES, JSON.stringify([]));
+        
+        // Populate default services if none exist or migrate to updated list
+        let existingServices = JSON.parse(localStorage.getItem(this.K_SERVICES) || '[]');
+        if (!existingServices || existingServices.length === 0) {
+            localStorage.setItem(this.K_SERVICES, JSON.stringify(this.defaultServices));
+        } else {
+            let updated = false;
+            // Update old SIT-SRV-WEB title if it still says (2-in-1)
+            let webSrv = existingServices.find(s => s.service_id === 'SIT-SRV-WEB');
+            if (webSrv && webSrv.name.includes('(2-in-1)')) {
+                webSrv.name = 'Web Application Development';
+                webSrv.price = 20000;
+                webSrv.default_price = 20000;
+                updated = true;
+            }
+            // Insert SIT-SRV-APP if missing
+            if (!existingServices.some(s => s.service_id === 'SIT-SRV-APP')) {
+                existingServices.splice(1, 0, { service_id: 'SIT-SRV-APP', name: 'Mobile Application Development (iOS & Android)', description: 'Cross-platform mobile app development for Android & iOS (Flutter/React Native)', price: 25000, default_price: 25000, tax_rate: 18, default_tax_rate: 18, category: 'Development', status: 'ACTIVE' });
+                updated = true;
+            }
+            existingServices.forEach(s => {
+                if (s.price === undefined && s.default_price !== undefined) { s.price = s.default_price; updated = true; }
+                if (s.default_price === undefined && s.price !== undefined) { s.default_price = s.price; updated = true; }
+                if (s.tax_rate === undefined && s.default_tax_rate !== undefined) { s.tax_rate = s.default_tax_rate; updated = true; }
+                if (s.default_tax_rate === undefined) { s.default_tax_rate = s.tax_rate || 18; updated = true; }
+            });
+            if (updated) localStorage.setItem(this.K_SERVICES, JSON.stringify(existingServices));
+        }
+
         if (!localStorage.getItem(this.K_PAYMENTS)) localStorage.setItem(this.K_PAYMENTS, JSON.stringify([]));
         if (!localStorage.getItem(this.K_AUDIT)) localStorage.setItem(this.K_AUDIT, JSON.stringify([]));
         

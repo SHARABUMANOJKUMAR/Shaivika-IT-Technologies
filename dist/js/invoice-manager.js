@@ -3,7 +3,10 @@
  * Handles UI rendering, reactive data binding, and interactions.
  */
 
-function escapeHTML(str) {
+(function() {
+'use strict';
+
+function invEscapeHTML(str) {
     if (str == null) return '';
     return String(str)
         .replace(/&/g, '&amp;')
@@ -142,19 +145,19 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(inv => {
             recentBody.innerHTML += `
                 <tr>
-                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
-                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
+                    <td><strong>${invEscapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
+                    <td>${invEscapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
+                    <td><span class="tag ${getStatusColor(inv.status)}">${invEscapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -193,19 +196,19 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(inv => {
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
-                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
+                    <td><strong>${invEscapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
+                    <td>${invEscapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
+                    <td><span class="tag ${getStatusColor(inv.status)}">${invEscapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="window.switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="window.switchInvoiceView('create', '${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -260,12 +263,16 @@ window.setInvoiceListFilter = function(filter) {
 
     // --- CREATE / EDIT (BUILDER) ---
     function renderCreateInvoiceForm(uuid = null) {
+        if (!window.InvoiceDB) return;
         const services = InvoiceDB.getServices();
         const srvSelect = document.getElementById('inv-flat-service');
         if (srvSelect) {
-            srvSelect.innerHTML = '<option value="">-- Select Service --</option>';
+            srvSelect.innerHTML = '<option value="">-- Select Service (From Services Page) --</option>';
             services.forEach(s => {
-                srvSelect.innerHTML += `<option value="${s.service_id}" data-price="${s.price}" data-tax="${s.tax_rate}">${s.name}</option>`;
+                const sPrice = s.default_price !== undefined ? s.default_price : (s.price !== undefined ? s.price : 0);
+                const sTax = s.default_tax_rate !== undefined ? s.default_tax_rate : (s.tax_rate !== undefined ? s.tax_rate : 18);
+                const sDesc = invEscapeHTML(s.description || '');
+                srvSelect.innerHTML += `<option value="${s.service_id}" data-price="${sPrice}" data-tax="${sTax}" data-desc="${sDesc}">${invEscapeHTML(s.name)}</option>`;
             });
         }
 
@@ -322,11 +329,11 @@ window.setInvoiceListFilter = function(filter) {
             });
         }
         
-        calculateFormTotals(true);
+        calculateFormTotals(false);
         updateLivePreview();
     }
 
-    function calculateFormTotals(skipPreview = false) {
+    window.calculateFormTotals = function(skipPreview = false) {
         const price = parseFloat(document.getElementById('inv-flat-price')?.value) || 0;
         const gstRate = parseFloat(document.getElementById('inv-flat-gst')?.value) || 0;
         
@@ -334,16 +341,18 @@ window.setInvoiceListFilter = function(filter) {
         const total = price + taxAmount;
 
         const totalEl = document.getElementById('inv-flat-total');
-        if (totalEl) totalEl.value = total.toFixed(2);
+        if (totalEl) {
+            totalEl.value = '₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
         
         if (!skipPreview) {
             updateLivePreview();
         }
         return { subtotal: price, taxTotal: taxAmount, grandTotal: total, discount: 0, balanceDue: total };
-    }
+    };
 
     function getCurrentInvoiceData() {
-        const totals = calculateFormTotals(true);
+        const totals = window.calculateFormTotals(true);
         const uuid = document.getElementById('inv-form-uuid')?.value || '';
         const existingInv = uuid ? InvoiceDB.getInvoiceById(uuid) : null;
         
@@ -352,10 +361,10 @@ window.setInvoiceListFilter = function(filter) {
         const email = document.getElementById('inv-flat-email')?.value || '';
         
         const srvSelect = document.getElementById('inv-flat-service');
-        const serviceName = srvSelect && srvSelect.selectedIndex > 0 ? srvSelect.options[srvSelect.selectedIndex].text : 'Service';
+        const serviceName = srvSelect && srvSelect.selectedIndex > 0 ? srvSelect.options[srvSelect.selectedIndex].text.replace(/\s*\(₹[\d,]+\)/, '') : 'Service';
         const serviceId = srvSelect ? srvSelect.value : null;
 
-        const date = document.getElementById('inv-form-date')?.value;
+        const date = document.getElementById('inv-form-date')?.value || new Date().toISOString().split('T')[0];
         const stateCode = document.getElementById('inv-form-state')?.value || 'AP';
         const paymentMethod = document.getElementById('inv-form-payment-method')?.value || 'Online / Bank Transfer';
 
@@ -365,7 +374,7 @@ window.setInvoiceListFilter = function(filter) {
         const item = {
             service_id: serviceId,
             description: serviceName,
-            hsn: '', 
+            hsn: '998313', 
             qty: 1,
             rate: totals.subtotal,
             taxRate: parseFloat(document.getElementById('inv-flat-gst')?.value) || 0,
@@ -373,12 +382,15 @@ window.setInvoiceListFilter = function(filter) {
             total: totals.grandTotal
         };
 
+        const generatedNumber = existingInv ? existingInv.invoice_number : (document.getElementById('inv-form-id')?.value || ('SIT-INV-' + String(Date.now()).slice(-6)));
+        const verifyId = existingInv ? existingInv.verification_id : ('SIT-VER-' + String(Date.now()).slice(-6));
+
         return {
             invoice_uuid: uuid,
-            invoice_number: document.getElementById('inv-form-id')?.value || '',
-            verification_id: existingInv ? existingInv.verification_id : 'SIT-VER-PREVIEW',
+            invoice_number: generatedNumber,
+            verification_id: verifyId,
             customer_id: customer_id,
-            customer_name: name,
+            customer_name: name || 'Client Name',
             customer_phone: phone,
             customer_email: email,
             invoice_date: date,
@@ -392,36 +404,57 @@ window.setInvoiceListFilter = function(filter) {
             amount_paid: existingInv ? (existingInv.amount_paid || 0) : 0,
             balance_due: totals.grandTotal - (existingInv ? (existingInv.amount_paid || 0) : 0),
             payment_method: paymentMethod,
-            notes: document.getElementById('inv-flat-summary')?.value,
+            notes: document.getElementById('inv-flat-summary')?.value || '',
             status: existingInv ? existingInv.status : 'DRAFT'
         };
     }
 
     let previewTimeout;
     function updateLivePreview() {
-        if (currentInvoiceView !== 'create') return;
+        const previewElement = document.getElementById('invoice-preview-sheet');
+        if (!previewElement) return;
         clearTimeout(previewTimeout);
         previewTimeout = setTimeout(() => {
             if (window.InvoicePDF) {
                 const data = getCurrentInvoiceData();
                 InvoicePDF.renderLivePreview(data);
             }
-        }, 300); // 300ms debounce
+        }, 10);
     }
+    window.updateLivePreview = updateLivePreview;
+
+    window.handleServiceChange = function(selectEl) {
+        if (!selectEl) selectEl = document.getElementById('inv-flat-service');
+        if (!selectEl) return;
+        const option = selectEl.options[selectEl.selectedIndex];
+        if (option && option.value) {
+            const pr = option.dataset.price || '0';
+            const tx = option.dataset.tax || '18';
+            const ds = option.dataset.desc || '';
+            const priceEl = document.getElementById('inv-flat-price');
+            const gstEl = document.getElementById('inv-flat-gst');
+            const sumEl = document.getElementById('inv-flat-summary');
+            if (priceEl) priceEl.value = pr;
+            if (gstEl) gstEl.value = tx;
+            if (sumEl && (!sumEl.value || sumEl.value.trim().length === 0)) {
+                sumEl.value = ds;
+            }
+        }
+        window.calculateFormTotals(false);
+    };
 
     // Attach reactive listeners to all builder inputs
     ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
-        document.getElementById(id)?.addEventListener('input', calculateFormTotals);
-        document.getElementById(id)?.addEventListener('change', calculateFormTotals);
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => { window.calculateFormTotals(false); });
+            el.addEventListener('change', () => { window.calculateFormTotals(false); });
+            el.addEventListener('keyup', () => { window.calculateFormTotals(false); });
+        }
     });
 
     document.getElementById('inv-flat-service')?.addEventListener('change', (e) => {
-        const option = e.target.options[e.target.selectedIndex];
-        if (option && option.dataset.price) {
-            document.getElementById('inv-flat-price').value = option.dataset.price;
-            document.getElementById('inv-flat-gst').value = option.dataset.tax || 18;
-            calculateFormTotals();
-        }
+        window.handleServiceChange(e.target);
     });
 
     window.saveInvoiceForm = function(targetStatus = 'DRAFT') {
@@ -562,16 +595,16 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(c => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${escapeHTML(c.customer_id)}</span></td>
-                    <td><strong>${escapeHTML(c.name)}</strong></td>
-                    <td>${escapeHTML(c.company || '-')}</td>
-                    <td>${escapeHTML(c.email || '-')}</td>
+                    <td><span class="tag tag-cyan">${invEscapeHTML(c.customer_id)}</span></td>
+                    <td><strong>${invEscapeHTML(c.name)}</strong></td>
+                    <td>${invEscapeHTML(c.company || '-')}</td>
+                    <td>${invEscapeHTML(c.email || '-')}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')" title="Edit Customer">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${invEscapeHTML(c.customer_id)}')" title="Edit Customer">
                                 <i class="fa-solid fa-pen"></i> <span>Edit</span>
                             </button>
-                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteCustomer('${escapeHTML(c.customer_id)}')" title="Delete Customer">
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteCustomer('${invEscapeHTML(c.customer_id)}')" title="Delete Customer">
                                 <i class="fa-solid fa-trash"></i> <span>Delete</span>
                             </button>
                         </div>
@@ -667,16 +700,16 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(s => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${escapeHTML(s.service_id)}</span></td>
-                    <td><strong>${escapeHTML(s.name)}</strong></td>
-                    <td>${escapeHTML(s.hsn || '-')}</td>
+                    <td><span class="tag tag-cyan">${invEscapeHTML(s.service_id)}</span></td>
+                    <td><strong>${invEscapeHTML(s.name)}</strong></td>
+                    <td>${invEscapeHTML(s.hsn || '-')}</td>
                     <td>₹${Number(s.price).toLocaleString('en-IN')} (${s.tax_rate}%)</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${escapeHTML(s.service_id)}')" title="Edit Service">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${invEscapeHTML(s.service_id)}')" title="Edit Service">
                                 <i class="fa-solid fa-pen"></i> <span>Edit</span>
                             </button>
-                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteService('${escapeHTML(s.service_id)}')" title="Delete Service">
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteService('${invEscapeHTML(s.service_id)}')" title="Delete Service">
                                 <i class="fa-solid fa-trash"></i> <span>Delete</span>
                             </button>
                         </div>
@@ -752,9 +785,9 @@ window.setInvoiceListFilter = function(filter) {
             services.forEach(s => {
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${escapeHTML(s.name)}</strong><br><small>${escapeHTML(s.hsn||'')}</small></td>
+                        <td><strong>${invEscapeHTML(s.name)}</strong><br><small>${invEscapeHTML(s.hsn||'')}</small></td>
                         <td>₹${Number(s.price).toLocaleString('en-IN')}</td>
-                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${escapeHTML(s.service_id)}')">Add</button></td>
+                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${invEscapeHTML(s.service_id)}')">Add</button></td>
                     </tr>
                 `;
             });
@@ -898,10 +931,10 @@ window.setInvoiceListFilter = function(filter) {
                 list.innerHTML += `
                     <li>
                         <div>
-                            <strong>${escapeHTML(log.action)}</strong>
-                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${escapeHTML(log.user)}</div>
+                            <strong>${invEscapeHTML(log.action)}</strong>
+                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${invEscapeHTML(log.user)}</div>
                         </div>
-                        <span class="tag ${getStatusColor(log.status)}">${escapeHTML(log.status)}</span>
+                        <span class="tag ${getStatusColor(log.status)}">${invEscapeHTML(log.status)}</span>
                     </li>
                 `;
             });
@@ -959,8 +992,8 @@ window.setInvoiceListFilter = function(filter) {
 
         // Builder inputs reactive binding
         ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
-            document.getElementById(id)?.addEventListener('input', calculateFormTotals);
-            document.getElementById(id)?.addEventListener('change', calculateFormTotals);
+            document.getElementById(id)?.addEventListener('input', () => window.calculateFormTotals());
+            document.getElementById(id)?.addEventListener('change', () => window.calculateFormTotals());
         });
 
         document.getElementById('inv-flat-service')?.addEventListener('change', (e) => {
@@ -968,7 +1001,7 @@ window.setInvoiceListFilter = function(filter) {
             if (option && option.dataset.price) {
                 document.getElementById('inv-flat-price').value = option.dataset.price;
                 document.getElementById('inv-flat-gst').value = option.dataset.tax || 18;
-                calculateFormTotals();
+                window.calculateFormTotals();
             }
         });
 
@@ -986,3 +1019,4 @@ window.setInvoiceListFilter = function(filter) {
     } else {
         initInvoiceManager();
     }
+})();

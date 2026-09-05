@@ -1426,8 +1426,8 @@
                                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:20px;">
                                     <h3><i class="fa fa-magic"></i> Invoice Builder</h3>
                                     <div style="display:flex; gap:10px;">
-                                        <button class="premium-btn action-btn" onclick="window.saveInvoiceForm('DRAFT')">Save Draft</button>
-                                        <button class="premium-btn save-btn" onclick="window.generateFinalInvoice()"><i class="fa fa-check-circle"></i> Generate & Issue</button>
+                                        <button type="button" class="premium-btn action-btn" onclick="window.saveInvoiceForm('DRAFT')">Save Draft</button>
+                                        <button type="button" class="premium-btn save-btn" onclick="window.generateFinalInvoice()"><i class="fa fa-check-circle"></i> Generate & Issue</button>
                                     </div>
                                 </div>
                                 
@@ -1439,15 +1439,15 @@
                                 <div class="inv-form-grid" style="margin-bottom: 25px;">
                                     <div class="inv-form-group form-full">
                                         <label>Full Name *</label>
-                                        <input type="text" id="inv-flat-name" class="inv-input" placeholder="Client Name" required>
+                                        <input type="text" id="inv-flat-name" class="inv-input" placeholder="Client Name" required oninput="if(window.calculateFormTotals) window.calculateFormTotals();">
                                     </div>
                                     <div class="inv-form-group">
                                         <label>Phone Number</label>
-                                        <input type="text" id="inv-flat-phone" class="inv-input" placeholder="e.g. 9876543210">
+                                        <input type="text" id="inv-flat-phone" class="inv-input" placeholder="e.g. 9876543210" oninput="if(window.calculateFormTotals) window.calculateFormTotals();">
                                     </div>
                                     <div class="inv-form-group">
                                         <label>Email</label>
-                                        <input type="email" id="inv-flat-email" class="inv-input" placeholder="client@example.com">
+                                        <input type="email" id="inv-flat-email" class="inv-input" placeholder="client@example.com" oninput="if(window.calculateFormTotals) window.calculateFormTotals();">
                                     </div>
                                 </div>
 
@@ -1456,22 +1456,22 @@
                                 <div class="inv-form-grid" style="margin-bottom: 25px;">
                                     <div class="inv-form-group form-full">
                                         <label>Service *</label>
-                                        <select id="inv-flat-service" class="inv-input" required>
+                                        <select id="inv-flat-service" class="inv-input" required onchange="if(window.handleServiceChange) window.handleServiceChange(this); else if(window.calculateFormTotals) window.calculateFormTotals();">
                                             <option value="">Select a service...</option>
                                             <!-- Populated by JS -->
                                         </select>
                                     </div>
                                     <div class="inv-form-group">
                                         <label>Price (₹) *</label>
-                                        <input type="number" id="inv-flat-price" class="inv-input" min="0" value="0" required>
+                                        <input type="number" id="inv-flat-price" class="inv-input" min="0" value="0" required oninput="if(window.calculateFormTotals) window.calculateFormTotals();" onchange="if(window.calculateFormTotals) window.calculateFormTotals();" onkeyup="if(window.calculateFormTotals) window.calculateFormTotals();">
                                     </div>
                                     <div class="inv-form-group">
                                         <label>GST (%)</label>
-                                        <input type="number" id="inv-flat-gst" class="inv-input" min="0" value="18">
+                                        <input type="number" id="inv-flat-gst" class="inv-input" min="0" value="18" oninput="if(window.calculateFormTotals) window.calculateFormTotals();" onchange="if(window.calculateFormTotals) window.calculateFormTotals();" onkeyup="if(window.calculateFormTotals) window.calculateFormTotals();">
                                     </div>
                                     <div class="inv-form-group form-full inv-total-box" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px 16px; border-radius: 10px;">
                                         <label style="color: #10b981; font-weight: 700; margin-bottom: 4px; display: block;">Total Amount (₹)</label>
-                                        <input type="number" id="inv-flat-total" class="inv-input read-only" style="font-size: 20px; font-weight: 800; background: transparent; border: none; padding: 0; color: #10b981;" readonly value="0">
+                                        <input type="text" id="inv-flat-total" class="inv-input read-only" style="font-size: 20px; font-weight: 800; background: transparent; border: none; padding: 0; color: #10b981;" readonly value="₹0.00">
                                     </div>
                                 </div>
 
@@ -1480,18 +1480,18 @@
                                 <div class="inv-form-grid" style="margin-bottom: 20px;">
                                     <div class="inv-form-group">
                                         <label>Invoice Date</label>
-                                        <input type="date" id="inv-form-date" class="inv-input">
+                                        <input type="date" id="inv-form-date" class="inv-input" onchange="if(window.calculateFormTotals) window.calculateFormTotals();">
                                     </div>
                                     <div class="inv-form-group">
                                         <label>State Code (for GST)</label>
-                                        <select id="inv-form-state" class="inv-input">
+                                        <select id="inv-form-state" class="inv-input" onchange="if(window.calculateFormTotals) window.calculateFormTotals();">
                                             <option value="AP">Andhra Pradesh (Intra-state)</option>
                                             <option value="OTHER">Other State (Inter-state)</option>
                                         </select>
                                     </div>
                                     <div class="inv-form-group">
                                         <label>Payment Method</label>
-                                        <select id="inv-form-payment-method" class="inv-input">
+                                        <select id="inv-form-payment-method" class="inv-input" onchange="if(window.calculateFormTotals) window.calculateFormTotals();">
                                             <option value="Online / Bank Transfer">Online / Bank Transfer</option>
                                             <option value="Cash">Cash</option>
                                             <option value="UPI">UPI</option>
@@ -1500,7 +1500,7 @@
                                     </div>
                                     <div class="inv-form-group form-full">
                                         <label>Summary / Notes</label>
-                                        <textarea id="inv-flat-summary" class="inv-input" rows="3" placeholder="Description of work or payment terms..."></textarea>
+                                        <textarea id="inv-flat-summary" class="inv-input" rows="3" placeholder="Description of work or payment terms..." oninput="if(window.calculateFormTotals) window.calculateFormTotals();"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1516,9 +1516,9 @@
                                     </div>
                                 </div>
                                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                                    <button class="premium-btn action-btn" onclick="window.downloadInvoicePDF()"><i class="fa fa-download"></i> Download PDF</button>
-                                    <button class="premium-btn action-btn" onclick="window.sendInvoiceEmail()"><i class="fa fa-envelope"></i> Email</button>
-                                    <button class="premium-btn" style="background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;" onclick="window.sendInvoiceWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                                    <button type="button" class="premium-btn action-btn" onclick="window.downloadInvoicePDF()"><i class="fa fa-download"></i> Download PDF</button>
+                                    <button type="button" class="premium-btn action-btn" onclick="window.sendInvoiceEmail()"><i class="fa fa-envelope"></i> Email</button>
+                                    <button type="button" class="premium-btn" style="background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;" onclick="window.sendInvoiceWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
                                 </div>
                             </div>
 
@@ -1743,7 +1743,7 @@
                 
                 /* Premium Buttons */
                 .premium-btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
-                .premium-btn::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent); }
+                .premium-btn::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent); pointer-events: none; }
                 .premium-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
                 .premium-btn:active { transform: translateY(1px); }
                 .save-btn { background: linear-gradient(135deg, #00b09b, #96c93d); color: white; }
@@ -1763,37 +1763,39 @@
                 .text-gradient { background: linear-gradient(135deg, #00C9FF, #92FE9D); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
                 /* Split Screen Layout */
-                .inv-split-screen { display: flex; gap: 30px; align-items: flex-start; }
-                .inv-builder-pane { flex: 1; min-width: 45%; }
-                .inv-preview-pane { flex: 1; position: sticky; top: 30px; display: flex; flex-direction: column; align-items: center; }
+                .inv-split-screen { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: flex-start; }
+                .inv-builder-pane { width: 100%; min-width: 0; }
+                .inv-preview-pane { width: 100%; position: sticky; top: 30px; display: flex; flex-direction: column; align-items: center; min-width: 0; }
                 
                 /* A4 Preview Container */
                 .a4-container {
                     width: 100%;
-                    max-width: 800px;
                     display: flex;
                     justify-content: center;
-                    background: #111;
-                    padding: 20px;
-                    border-radius: 12px;
-                    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-                    overflow-x: auto;
+                    background: #0f172a;
+                    padding: 16px;
+                    border-radius: 16px;
+                    box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+                    overflow: hidden;
+                    box-sizing: border-box;
+                    transition: height 0.2s ease;
                 }
                 
                 .a4-sheet {
-                    background: white;
-                    color: black;
+                    background: #ffffff !important;
+                    color: #0f172a !important;
                     width: 210mm;
                     min-height: 297mm;
-                    padding: 20mm;
-                    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                    padding: 15mm;
+                    box-shadow: 0 15px 50px rgba(0,0,0,0.4);
                     transform-origin: top center;
-                    /* Scaling will be handled by JS based on container width */
+                    box-sizing: border-box;
                     font-family: 'Inter', sans-serif;
+                    flex-shrink: 0;
                 }
 
                 @media (max-width: 1200px) {
-                    .inv-split-screen { flex-direction: column; }
+                    .inv-split-screen { grid-template-columns: 1fr; }
                     .inv-preview-pane { position: static; width: 100%; }
                 }
 
@@ -2208,7 +2210,7 @@
         };
         window.showToast = showToast;
 
-        const escapeHTML = (str) => {
+        window.escapeHTML = function(str) {
             if (str == null) return '';
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -2217,7 +2219,7 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
         };
-        window.escapeHTML = escapeHTML;
+        var escapeHTML = window.escapeHTML;
 
         const sanitizeUrl = (url) => {
             if (!url) return '';
@@ -2249,7 +2251,7 @@
             // Categories
             try {
                 let cats = localStorage.getItem('shaivika_portfolio_categories');
-                if (cats && JSON.parse(cats).length > 0) {
+                if (cats !== null) {
                     database.categories = JSON.parse(cats);
                 } else {
                     database.categories = [
@@ -2381,6 +2383,8 @@
             updateDashboardStats();
             populateCategoryCheckboxes();
             window.dispatchEvent(new CustomEvent('shaivika_portfolio_updated', { detail: database.projects }));
+            window.dispatchEvent(new CustomEvent('shaivika_jobs_updated', { detail: database.jobs }));
+            window.dispatchEvent(new CustomEvent('shaivika_applications_updated', { detail: database.applications }));
         };
 
         // Export portfolio.json for deployment
@@ -2889,15 +2893,18 @@
         });
 
         window.openEditJob = (jobIdOrIdx) => {
-            let job = database.jobs.find(j => j.id === jobIdOrIdx);
+            let job = database.jobs.find(j => String(j.id) === String(jobIdOrIdx));
             let idx = -1;
             if (job) {
                 idx = database.jobs.indexOf(job);
-            } else if (typeof jobIdOrIdx === 'number' || !isNaN(Number(jobIdOrIdx))) {
+            } else if (!isNaN(Number(jobIdOrIdx)) && Number(jobIdOrIdx) >= 0 && Number(jobIdOrIdx) < database.jobs.length) {
                 idx = Number(jobIdOrIdx);
                 job = database.jobs[idx];
             }
-            if (!job) return;
+            if (!job) {
+                showToast('Job record not found.', 'error');
+                return;
+            }
 
             document.getElementById('editJobIndex').value = idx;
             document.getElementById('jobModalTitle').textContent = 'Edit Job Opening';
@@ -2918,8 +2925,8 @@
         };
 
         window.toggleJobStatus = (jobIdOrIdx) => {
-            let job = database.jobs.find(j => j.id === jobIdOrIdx);
-            if (!job && (typeof jobIdOrIdx === 'number' || !isNaN(Number(jobIdOrIdx)))) {
+            let job = database.jobs.find(j => String(j.id) === String(jobIdOrIdx));
+            if (!job && (!isNaN(Number(jobIdOrIdx)) && Number(jobIdOrIdx) >= 0 && Number(jobIdOrIdx) < database.jobs.length)) {
                 job = database.jobs[Number(jobIdOrIdx)];
             }
             if (!job) return;
@@ -2932,15 +2939,18 @@
         };
 
         window.deleteJob = (jobIdOrIdx) => {
-            let job = database.jobs.find(j => j.id === jobIdOrIdx);
+            let job = database.jobs.find(j => String(j.id) === String(jobIdOrIdx));
             let idx = -1;
             if (job) {
                 idx = database.jobs.indexOf(job);
-            } else if (typeof jobIdOrIdx === 'number' || !isNaN(Number(jobIdOrIdx))) {
+            } else if (!isNaN(Number(jobIdOrIdx)) && Number(jobIdOrIdx) >= 0 && Number(jobIdOrIdx) < database.jobs.length) {
                 idx = Number(jobIdOrIdx);
                 job = database.jobs[idx];
             }
-            if (!job) return;
+            if (!job) {
+                showToast('Job record not found.', 'error');
+                return;
+            }
 
             if (confirm(`Are you sure you want to delete "${job.title}"?`)) {
                 const deletedId = job.id;
@@ -2948,7 +2958,7 @@
                 saveData();
                 renderJobsTable();
                 updateDashboardStats();
-                showToast('Job posting deleted.', 'success');
+                showToast('Job posting deleted successfully.', 'success');
 
                 // Also delete from Google Sheet
                 const JOBS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbw2QB_wFrV8JAPsA-bEfEJ8ivdXkRUTXVZFurC6q9_bD5ntxY2pXH2HlSzllULQp3Jd/exec';
@@ -2972,7 +2982,7 @@
         const applicationDetailModal = document.getElementById('applicationDetailModal');
 
         window.viewApplicationDetails = (appId) => {
-            const app = database.applications.find(a => a.id === appId);
+            const app = database.applications.find(a => String(a.id) === String(appId));
             if (!app) return;
 
             const modalBody = document.getElementById('appModalBody');
@@ -3089,7 +3099,7 @@
             let idx = -1;
             if (app) {
                 idx = database.applications.indexOf(app);
-            } else if (typeof appIdOrIdx === 'number' || (!isNaN(Number(appIdOrIdx)) && Number(appIdOrIdx) >= 0)) {
+            } else if (!isNaN(Number(appIdOrIdx)) && Number(appIdOrIdx) >= 0 && Number(appIdOrIdx) < database.applications.length) {
                 idx = Number(appIdOrIdx);
                 app = database.applications[idx];
             }
@@ -3454,15 +3464,19 @@
         });
 
         window.openEditCategory = (catIdOrIdx) => {
-            let cat = database.categories.find(c => c.id === catIdOrIdx);
+            const searchKey = String(catIdOrIdx).trim().toLowerCase();
+            let cat = database.categories.find(c => String(c.id).trim().toLowerCase() === searchKey);
             let idx = -1;
             if (cat) {
                 idx = database.categories.indexOf(cat);
-            } else if (typeof catIdOrIdx === 'number' || !isNaN(Number(catIdOrIdx))) {
+            } else if (!isNaN(Number(catIdOrIdx)) && Number(catIdOrIdx) >= 0 && Number(catIdOrIdx) < database.categories.length) {
                 idx = Number(catIdOrIdx);
                 cat = database.categories[idx];
             }
-            if (!cat) return;
+            if (!cat) {
+                showToast('Category record not found.', 'error');
+                return;
+            }
 
             document.getElementById('editCatIndex').value = idx;
             const originalIdInput = document.getElementById('editCatOriginalId');
@@ -3489,7 +3503,7 @@
             let idx = -1;
             if (cat) {
                 idx = database.categories.indexOf(cat);
-            } else if (!isNaN(Number(catIdOrIdx))) {
+            } else if (!isNaN(Number(catIdOrIdx)) && Number(catIdOrIdx) >= 0 && Number(catIdOrIdx) < database.categories.length) {
                 idx = Number(catIdOrIdx);
                 cat = database.categories[idx];
             }
@@ -4004,14 +4018,13 @@
         }, 300);
     </script>
 
-    <!-- INVOICE SYSTEM LOCAL SCRIPTS FIRST -->
-    <script src="../js/invoice-db.js"></script>
-    <script src="../js/invoice-pdf.js"></script>
-    <script src="../js/invoice-manager.js"></script>
+    <!-- EXTERNAL CDN DEPENDENCIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    <!-- EXTERNAL CDN DEPENDENCIES DEFERRED -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    <!-- INVOICE SYSTEM LOCAL SCRIPTS -->
+    <script src="../js/invoice-db.js?v=2.0"></script>
+    <script src="../js/invoice-pdf.js?v=2.0"></script>
+    <script src="../js/invoice-manager.js?v=2.0"></script>
 </body>
 </html>

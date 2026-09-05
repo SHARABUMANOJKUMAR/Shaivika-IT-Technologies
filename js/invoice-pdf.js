@@ -32,48 +32,51 @@ const InvoicePDF = {
         return str;
     },
 
-    // Generates a QR Code as a Data URI (safe fallback if QRCode library is unavailable)
-    generateQR: async function(text) {
-        if (!text || typeof QRCode === 'undefined') return '';
-        return new Promise((resolve) => {
+    // Generates a QR Code URL (instant high-resolution Data URI or fallback)
+    generateQR: function(text) {
+        if (!text) return '';
+        if (typeof QRCode !== 'undefined') {
             try {
                 const tempDiv = document.createElement('div');
-                tempDiv.style.cssText = 'position:absolute; left:-9999px; top:-9999px; opacity:0; pointer-events:none;';
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.top = '-9999px';
                 document.body.appendChild(tempDiv);
+                
                 new QRCode(tempDiv, {
                     text: text,
                     width: 120,
                     height: 120,
-                    colorDark : "#1e3a8a",
-                    colorLight : "#ffffff",
-                    correctLevel : (typeof QRCode !== 'undefined' && QRCode.CorrectLevel) ? QRCode.CorrectLevel.M : 0
+                    colorDark: "#1e3a8a",
+                    colorLight: "#ffffff",
+                    correctLevel: (QRCode.CorrectLevel && QRCode.CorrectLevel.M) ? QRCode.CorrectLevel.M : 0
                 });
-                setTimeout(() => {
-                    try {
-                        const img = tempDiv.querySelector('img');
-                        const canvas = tempDiv.querySelector('canvas');
-                        let src = '';
-                        if (img && img.src && img.src.length > 50) src = img.src;
-                        else if (canvas) src = canvas.toDataURL("image/png");
-                        if (tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
-                        resolve(src);
-                    } catch (err) {
-                        if (tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
-                        resolve('');
-                    }
-                }, 40);
-            } catch (e) {
-                resolve('');
+                
+                const canvas = tempDiv.querySelector('canvas');
+                const img = tempDiv.querySelector('img');
+                let dataUrl = '';
+                if (canvas && typeof canvas.toDataURL === 'function') {
+                    dataUrl = canvas.toDataURL('image/png');
+                } else if (img && img.src) {
+                    dataUrl = img.src;
+                }
+                document.body.removeChild(tempDiv);
+                if (dataUrl && dataUrl.startsWith('data:image/')) return dataUrl;
+            } catch (err) {
+                console.warn('QRCode JS render exception:', err);
             }
-        });
+        }
+        return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(text)}&color=1e3a8a`;
     },
 
     // Generates the core HTML template used by both Preview and PDF export
-    getInvoiceHTML: async function(inv, settings, customer) {
+    getInvoiceHTML: function(inv, settings, customer) {
         const esc = this.escapeHTML;
         const isInterState = inv.state_code && inv.state_code !== 'AP';
-        const verifyUrl = window.location.origin + '/verify.html?id=' + encodeURIComponent(inv.verification_id || '');
-        const verifyQrData = await this.generateQR(verifyUrl);
+        const verifyIdParam = inv.verification_id || inv.invoice_number || 'PREVIEW';
+        const originUrl = (window.location && window.location.origin && window.location.origin.startsWith('http')) ? window.location.origin : 'https://shaivikagroups.in';
+        const verifyUrl = originUrl + '/verify.html?id=' + encodeURIComponent(verifyIdParam);
+        const verifyQrData = this.generateQR(verifyUrl);
 
         let itemsHtml = '';
         (inv.items || []).forEach(item => {
@@ -332,7 +335,7 @@ const InvoicePDF = {
         `;
     },
 
-    renderLivePreview: async function(invoiceData) {
+    renderLivePreview: function(invoiceData) {
         const previewElement = document.getElementById('invoice-preview-sheet');
         if (!previewElement) return;
         
@@ -348,25 +351,24 @@ const InvoicePDF = {
                 if (dbCust) customer = Object.assign(customer, dbCust);
             }
 
-            const html = await this.getInvoiceHTML(invoiceData, settings, customer);
+            const html = this.getInvoiceHTML(invoiceData, settings, customer);
             previewElement.innerHTML = html;
             
             // Scale logic for preview based on parent container width
             const container = document.querySelector('.a4-container');
             if (container) {
-                const containerWidth = container.clientWidth - 30; // 30px padding
+                const containerWidth = container.clientWidth - 32;
                 const a4Width = 794; // approx px width of A4 at 96dpi
-                if (containerWidth > 0 && containerWidth < a4Width) {
-                    const scale = containerWidth / a4Width;
-                    previewElement.style.transform = `scale(${scale})`;
-                    previewElement.style.transformOrigin = 'top center';
-                    const targetHeight = Math.max((previewElement.scrollHeight || 1123) * scale + 30, 400);
-                    container.style.height = `${targetHeight}px`;
-                } else {
-                    previewElement.style.transform = 'scale(1)';
-                    previewElement.style.transformOrigin = 'top center';
-                    container.style.height = 'auto';
+                let scale = 1;
+                if (containerWidth >= 250 && containerWidth < a4Width) {
+                    scale = containerWidth / a4Width;
+                } else if (containerWidth < 250) {
+                    scale = 0.75; // Safe fallback when measuring hidden/collapsed parent
                 }
+                previewElement.style.transform = `scale(${scale})`;
+                previewElement.style.transformOrigin = 'top center';
+                const baseHeight = previewElement.scrollHeight || 1123;
+                container.style.minHeight = `${Math.max(baseHeight * scale + 40, 500)}px`;
             }
         } catch (err) {
             console.error('Invoice Live Preview Error:', err);
@@ -384,7 +386,7 @@ const InvoicePDF = {
 
             const settings = InvoiceDB.getSettings();
             const customer = InvoiceDB.getCustomerById(inv.customer_id) || {};
-            const html = await this.getInvoiceHTML(inv, settings, customer);
+            const html = this.getInvoiceHTML(inv, settings, customer);
 
             container = document.createElement('div');
             container.innerHTML = html;

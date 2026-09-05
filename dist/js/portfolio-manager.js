@@ -298,17 +298,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function resolveCategories(loadedCats, projectList) {
     const catMap = new Map();
 
-    // 1. Add base categories first
-    DEFAULT_CATEGORIES.forEach(c => catMap.set(c.id, c.name));
+    // 1. If explicit loadedCats provided, respect user's deleted/modified categories; otherwise fallback
+    const baseCats = (Array.isArray(loadedCats) && loadedCats.length >= 0) ? loadedCats : DEFAULT_CATEGORIES;
+    baseCats.forEach(c => {
+      if (c && c.id) catMap.set(c.id, c.name || c.id);
+    });
 
-    // 2. Add loaded categories
-    if (Array.isArray(loadedCats)) {
-      loadedCats.forEach(c => {
-        if (c && c.id) catMap.set(c.id, c.name || c.id);
-      });
-    }
-
-    // 3. Add any custom categories discovered in projects
+    // 2. Add any custom categories discovered in projects
     projectList.forEach(p => {
       if (Array.isArray(p.categories)) {
         p.categories.forEach(cId => {

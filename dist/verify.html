@@ -224,99 +224,156 @@
         const rawVerifyId = urlParams.get('id') || '';
         const verifyId = rawVerifyId.trim();
 
-        setTimeout(() => {
+        async function initVerification() {
             const loadingState = document.getElementById('loading-state');
             const resultState = document.getElementById('result-state');
             
-            loadingState.style.display = 'none';
-            resultState.style.display = 'block';
-
             if (!verifyId) {
-                showError("Invalid Link", "No document verification ID was provided.");
+                loadingState.style.display = 'none';
+                resultState.style.display = 'block';
+                showError("Invalid Verification Link", "No document or invoice verification ID was provided in the URL.");
                 return;
             }
 
             try {
-                // In production, this data is fetched from the Google Apps Script API endpoint.
+                // 1. Check local storage invoices
                 const invoices = JSON.parse(localStorage.getItem('shaivika_invoices')) || [];
-                const invoice = invoices.find(i => i.verification_id === verifyId);
+                const searchLower = verifyId.toLowerCase();
+                let invoice = invoices.find(i => 
+                    String(i.verification_id || '').toLowerCase() === searchLower ||
+                    String(i.invoice_number || '').toLowerCase() === searchLower ||
+                    String(i.invoice_uuid || '').toLowerCase() === searchLower
+                );
+
+                // 2. If not found locally, attempt to fetch from Google Apps Script Web App
+                if (!invoice) {
+                    const GAS_URL = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
+                    try {
+                        const res = await fetch(GAS_URL + '?action=get&id=' + encodeURIComponent(verifyId), { method: 'GET' }).catch(() => null);
+                        if (res && res.ok) {
+                            const data = await res.json().catch(() => null);
+                            if (data && data.success && data.invoice) {
+                                invoice = data.invoice;
+                            }
+                        }
+                    } catch(err) {
+                        console.log('GAS fetch fallback:', err);
+                    }
+                }
+
+                loadingState.style.display = 'none';
+                resultState.style.display = 'block';
 
                 if (invoice) {
-                    if (invoice.status === 'DRAFT') {
-                        showError("Document Pending", "This document is still a draft and has not been officially issued.");
-                    } else {
-                        showSuccess(invoice);
-                    }
+                    showSuccess(invoice);
                 } else {
-                    showError("Document Not Found", `The document with Verification ID <strong>${escapeHTML(verifyId)}</strong> could not be authenticated. It may have been forged or deleted.`);
+                    showError("Document Not Found", `The document with ID <strong>${escapeHTML(verifyId)}</strong> could not be authenticated in our records. Please verify the ID or contact support.`);
                 }
             } catch (e) {
+                loadingState.style.display = 'none';
+                resultState.style.display = 'block';
                 showError("System Error", "Unable to connect to the verification database.");
             }
+        }
 
-        }, 1200);
+        setTimeout(initVerification, 600);
 
         function showSuccess(invoice) {
             let statusTag = '';
             if (invoice.status === 'PAID') statusTag = '<span class="tag tag-success">Paid in Full</span>';
-            else if (invoice.balance_due > 0) statusTag = `<span class="tag tag-danger">Balance: ₹${Number(invoice.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</span>`;
-            else statusTag = `<span class="tag tag-primary">${escapeHTML(invoice.status || 'ACTIVE')}</span>`;
+            else if (invoice.status === 'DRAFT') statusTag = '<span class="tag tag-primary">Draft / Pending Approval</span>';
+            else if (Number(invoice.balance_due || 0) > 0) statusTag = `<span class="tag tag-danger">Balance Due: ₹${Number(invoice.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</span>`;
+            else statusTag = `<span class="tag tag-success">Issued & Verified</span>`;
 
             let itemsHtml = '';
+            let totalTaxRate = 18;
             (invoice.items || []).forEach(item => {
                 const desc = escapeHTML(item.description || 'Service Item');
                 const qty = Number(item.qty || 1);
                 const rate = Number(item.rate || 0);
+                const taxRate = Number(item.taxRate || 18);
+                totalTaxRate = taxRate;
                 const total = Number(item.total || (qty * rate));
                 itemsHtml += `
                     <tr>
-                        <td><strong style="color:var(--text-primary); font-size: 15px;">${desc}</strong><br><span style="color:var(--text-secondary); font-size:12px;">Qty: ${qty} × ₹${rate.toLocaleString('en-IN')}</span></td>
-                        <td style="text-align:right; font-weight: 700; color:var(--text-primary);">₹${total.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                        <td>
+                            <strong style="color:var(--text-primary); font-size: 15px;">${desc}</strong>
+                            <div style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Rate: ₹${rate.toLocaleString('en-IN')} | GST: ${taxRate}%</div>
+                        </td>
+                        <td style="text-align:right; font-weight: 700; color:var(--text-primary); font-size:15px;">₹${total.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     </tr>
                 `;
             });
 
-            const totalAmount = Number(invoice.total_amount || 0);
+            const subtotal = Number(invoice.subtotal || 0);
+            const taxAmount = Number(invoice.tax_amount || 0);
+            const totalAmount = Number(invoice.total_amount || (subtotal + taxAmount));
             const invoiceDate = invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
 
             const html = `
                 <div class="status-icon status-success">✓</div>
-                <h1 style="color:var(--success)">Document Verified</h1>
-                <p>This is an authentic, tamper-proof document issued by Shaivika IT Technologies.</p>
+                <h1 style="color:var(--success)">Invoice Verified Authentic</h1>
+                <p style="margin-bottom:20px;">Official Tax Invoice issued by <strong>Shaivika IT Technologies</strong></p>
                 
                 <div class="details-box">
                     <div class="detail-row">
                         <span class="detail-label">Verification ID</span>
-                        <span class="detail-value" style="font-family:monospace; color:var(--primary); background: rgba(59,130,246,0.1); padding: 4px 8px; border-radius: 6px;">${escapeHTML(invoice.verification_id)}</span>
+                        <span class="detail-value" style="font-family:monospace; color:var(--primary); background: rgba(59,130,246,0.15); padding: 4px 10px; border-radius: 6px; font-weight:700;">${escapeHTML(invoice.verification_id || invoice.invoice_number)}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Invoice Number</span>
-                        <span class="detail-value">${escapeHTML(invoice.invoice_number)}</span>
+                        <span class="detail-value" style="font-weight:700;">${escapeHTML(invoice.invoice_number)}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Issue Date</span>
                         <span class="detail-value">${escapeHTML(invoiceDate)}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Billed To</span>
-                        <span class="detail-value">${escapeHTML(invoice.customer_name)}</span>
+                        <span class="detail-label">Customer Name</span>
+                        <span class="detail-value" style="font-size:16px; color:#38bdf8;">${escapeHTML(invoice.customer_name || 'Client')}</span>
                     </div>
+                    ${invoice.customer_phone ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">${escapeHTML(invoice.customer_phone)}</span>
+                    </div>` : ''}
+                    ${invoice.customer_email ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">${escapeHTML(invoice.customer_email)}</span>
+                    </div>` : ''}
                     
-                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                        <span class="detail-label">Itemized Breakdown</span>
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border);">
+                        <span class="detail-label" style="font-weight:700; color:var(--text-secondary); display:block; margin-bottom:10px;">Services & Billing Details</span>
                         <table class="item-table">
                             ${itemsHtml}
                         </table>
                     </div>
 
-                    <div class="detail-row" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
-                        <span class="detail-label">Total Amount</span>
-                        <span class="detail-value" style="color:var(--success); font-size:22px; font-weight: 800; text-shadow: 0 0 15px rgba(16,185,129,0.3);">₹${totalAmount.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+                        <div class="detail-row" style="margin-bottom:8px;">
+                            <span class="detail-label">Subtotal (Base Price)</span>
+                            <span class="detail-value">₹${subtotal.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>
+                        </div>
+                        <div class="detail-row" style="margin-bottom:8px;">
+                            <span class="detail-label">GST (${totalTaxRate}%)</span>
+                            <span class="detail-value">₹${taxAmount.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>
+                        </div>
+                        <div class="detail-row" style="margin-top:12px; padding-top:12px; border-top: 1px dashed rgba(255,255,255,0.2);">
+                            <span class="detail-label" style="font-size:16px; font-weight:800; color:var(--text-primary);">Total Bill Amount</span>
+                            <span class="detail-value" style="color:var(--success); font-size:24px; font-weight: 800; text-shadow: 0 0 15px rgba(16,185,129,0.4);">₹${totalAmount.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>
+                        </div>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Status</span>
+
+                    <div class="detail-row" style="margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--border);">
+                        <span class="detail-label">Payment Status</span>
                         <span class="detail-value">${statusTag}</span>
                     </div>
+                </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                    <a href="contact.html" style="display:inline-block; padding: 10px 20px; background: rgba(59,130,246,0.2); border:1px solid #3b82f6; border-radius:10px; color:#60a5fa; text-decoration:none; font-size:14px; font-weight:600;">Contact Support</a>
+                    <a href="index.html" style="display:inline-block; padding: 10px 20px; background: rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:10px; color:var(--text-primary); text-decoration:none; font-size:14px; font-weight:600;">Visit Website</a>
                 </div>
             `;
             document.getElementById('result-state').innerHTML = html;
@@ -328,7 +385,10 @@
                 <h1 style="color:var(--danger)">${escapeHTML(title)}</h1>
                 <p>${message}</p>
                 <div style="margin-top: 25px; padding: 20px; background: rgba(239,68,68,0.1); border-radius: 12px; border: 1px solid rgba(239,68,68,0.2); font-size: 14px; text-align: left; line-height: 1.6;">
-                    <strong style="color:var(--danger); display:block; margin-bottom:8px; font-size: 15px;">Security Warning:</strong> If you received a physical document claiming to match this ID, it is likely fraudulent. Please contact Shaivika IT Technologies immediately.
+                    <strong style="color:var(--danger); display:block; margin-bottom:8px; font-size: 15px;">Security Verification:</strong> If you received an invoice that does not match this record, please contact Shaivika IT Technologies at <a href="mailto:shaivikagroups@gmail.com" style="color:#60a5fa;">shaivikagroups@gmail.com</a>.
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="index.html" style="display:inline-block; padding: 10px 20px; background: rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:10px; color:var(--text-primary); text-decoration:none; font-size:14px; font-weight:600;">Return to Website</a>
                 </div>
             `;
             document.getElementById('result-state').innerHTML = html;

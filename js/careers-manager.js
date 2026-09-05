@@ -138,6 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
+  let handlersAttached = false;
+
   initCareers();
 
   function initCareers() {
@@ -158,7 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderFilterBar();
     renderJobs();
-    attachFormHandlers();
+    if (!handlersAttached) {
+      attachFormHandlers();
+      handlersAttached = true;
+    }
   }
 
   function renderFilterBar() {
@@ -875,4 +880,44 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => toast.remove(), 500);
     }, 5500);
   }
+
+  // Reactive listeners to immediately reflect changes from Admin Dashboard
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'shaivika_job_postings') {
+      try {
+        const cached = localStorage.getItem('shaivika_job_postings');
+        if (cached) {
+          activeJobs = JSON.parse(cached);
+          renderJobs();
+        }
+      } catch (err) {
+        console.warn('Error reloading job postings from storage:', err);
+      }
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    try {
+      const cached = localStorage.getItem('shaivika_job_postings');
+      if (cached) {
+        activeJobs = JSON.parse(cached);
+        renderJobs();
+      }
+    } catch (err) {}
+  });
+
+  document.addEventListener('shaivika_jobs_updated', (e) => {
+    if (e.detail && Array.isArray(e.detail)) {
+      activeJobs = e.detail;
+      renderJobs();
+    } else {
+      try {
+        const cached = localStorage.getItem('shaivika_job_postings');
+        if (cached) {
+          activeJobs = JSON.parse(cached);
+          renderJobs();
+        }
+      } catch (err) {}
+    }
+  });
 });
