@@ -314,16 +314,16 @@ const InvoicePDF = {
                             </td>
                             <td style="vertical-align: middle; text-align: right; width: 30%; padding-top: 20px;">
                                 ${verifyQrData ? `
-                                    <div style="display: inline-block; text-align: center; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
-                                        <img src="${verifyQrData}" style="width: 80px; height: 80px;"><br>
-                                        <div style="font-size: 10px; color: #4f46e5; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Verify</div>
-                                    </div>
-                                ` : `
-                                    <div style="display: inline-block; text-align: center; background: white; padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
-                                        <div style="font-size: 24px; color: #4f46e5; margin-bottom: 4px;">🛡️</div>
-                                        <div style="font-size: 10px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Verified Invoice</div>
-                                    </div>
-                                `}
+                                     <div style="display: inline-block; text-align: center; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                                         <img src="${verifyQrData}" style="width: 80px; height: 80px;"><br>
+                                         <div style="font-size: 10px; color: #4f46e5; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Verify</div>
+                                     </div>
+                                 ` : `
+                                     <div style="display: inline-block; text-align: center; background: white; padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                                         <div style="font-size: 24px; color: #4f46e5; margin-bottom: 4px;">🛡️</div>
+                                         <div style="font-size: 10px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Verified Invoice</div>
+                                     </div>
+                                 `}
                             </td>
                         </tr>
                     </table>

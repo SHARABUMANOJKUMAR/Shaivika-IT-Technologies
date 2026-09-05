@@ -4,6 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <script>
     (function() {
       const theme = localStorage.getItem('theme') || 'light';
@@ -277,12 +279,13 @@
           </div>
         </a>
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html" class="active">Services</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html" class="active">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="careers.html">Careers <span class="badge-hiring">Hiring</span></a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
             <div class="nav-cta">
           <button class="theme-toggle-btn" aria-label="Toggle Theme">🌙</button>
                 <a href="contact.html" class="btn btn-ghost btn-sm">Get in Touch</a>

@@ -4,6 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <script>
     (function() {
       const theme = localStorage.getItem('theme') || 'light';
@@ -235,28 +237,38 @@
     #jobDetailModal .modal-box {
       background: #ffffff;
       border: 1px solid rgba(0, 0, 0, 0.08);
+      max-height: 88vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      padding: 32px 28px;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
 
     [data-theme="dark"] #applyModal .modal-box,
     [data-theme="dark"] #jobDetailModal .modal-box {
       background: #0f172a;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
 
     /* ===== FILE UPLOAD BOX ===== */
     .file-upload-box {
       border: 2px dashed rgba(37, 99, 235, 0.35);
-      padding: 20px;
-      border-radius: 12px;
+      padding: 22px 18px;
+      border-radius: 14px;
       text-align: center;
       background: rgba(37, 99, 235, 0.04);
       cursor: pointer;
       transition: all 0.3s ease;
+      position: relative;
     }
 
-    .file-upload-box:hover {
-      background: rgba(37, 99, 235, 0.09);
+    .file-upload-box:hover,
+    .file-upload-box.dragover {
+      background: rgba(37, 99, 235, 0.1);
       border-color: #2563eb;
+      transform: scale(1.01);
     }
 
     [data-theme="dark"] .file-upload-box {
@@ -264,9 +276,18 @@
       background: rgba(37, 99, 235, 0.06);
     }
 
-    [data-theme="dark"] .file-upload-box:hover {
-      background: rgba(37, 99, 235, 0.12);
+    [data-theme="dark"] .file-upload-box:hover,
+    [data-theme="dark"] .file-upload-box.dragover {
+      background: rgba(37, 99, 235, 0.14);
       border-color: #6366f1;
+    }
+
+    .form-group input.field-error,
+    .form-group select.field-error,
+    .form-group textarea.field-error {
+      border-color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.05) !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
     }
 
     /* ===== BADGE HIRING ===== */
@@ -338,6 +359,7 @@
         <li><a href="about.html">About</a></li>
         <li><a href="services.html">Services</a></li>
         <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="careers.html" class="active">Careers <span class="badge-hiring">Hiring</span></a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="nav-cta">
@@ -371,10 +393,10 @@
     <div class="hero-grid"></div>
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
-    <div class="hero-content">
+    <div class="container">
       <div class="section-badge careers-hero-badge">⚡ We Are Hiring</div>
-      <h1 class="section-title" style="font-size:clamp(2.5rem,5vw,4rem);">Join Our Team & <span class="gradient-text">Shape the Future</span></h1>
-      <p class="section-subtitle" style="margin:0 auto;">Work on cutting-edge AI automation pipelines, web applications, and enterprise products with a high-growth tech team in Kadapa & remote India.</p>
+      <h1 class="page-title">Join Our Team & <span class="gradient-text">Shape the Future</span></h1>
+      <p class="page-subtitle">Build transformative digital solutions, AI automations, and scalable platforms with passionate creators in Kadapa & across India.</p>
     </div>
   </section>
 
@@ -439,7 +461,7 @@
   <!-- JOB DETAIL MODAL -->
   <div class="modal-overlay" id="jobDetailModal">
     <div class="modal-box" style="max-width:700px;">
-      <button class="modal-close modal-close-3d" aria-label="Close"></button>
+      <button type="button" class="modal-close modal-close-3d" aria-label="Close" title="Close">✕</button>
       <div class="modal-body-content">
         <!-- Dynamically filled -->
       </div>
@@ -449,31 +471,31 @@
   <!-- APPLICATION FORM MODAL -->
   <div class="modal-overlay" id="applyModal">
     <div class="modal-box" style="max-width:680px;">
-      <button class="modal-close modal-close-3d" aria-label="Close"></button>
+      <button type="button" class="modal-close modal-close-3d" aria-label="Close" title="Close">✕</button>
       <div style="text-align:center;margin-bottom:20px;">
         <span class="section-badge" style="margin-bottom:8px;">Job Application</span>
         <h2 style="font-size:1.5rem;font-weight:800;color:var(--text-primary);">Apply for <span id="applyJobTitleDisplay" class="gradient-text">Position</span></h2>
         <p style="font-size:13px;color:var(--text-secondary);">Fill in your details below. Upload your resume to complete application.</p>
       </div>
 
-      <form id="jobApplicationForm">
+      <form id="jobApplicationForm" novalidate>
         <input type="hidden" id="applyJobId" value="" />
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           <div class="form-group">
             <label>Full Name *</label>
-            <input type="text" id="applicantName" placeholder="e.g. Rahul Sharma" required />
+            <input type="text" id="applicantName" placeholder="e.g. Rahul Sharma" required autocomplete="name" />
           </div>
           <div class="form-group">
             <label>Email Address *</label>
-            <input type="email" id="applicantEmail" placeholder="e.g. rahul@gmail.com" required />
+            <input type="email" id="applicantEmail" placeholder="e.g. rahul@gmail.com" required autocomplete="email" />
           </div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           <div class="form-group">
             <label>Mobile Number (WhatsApp) *</label>
-            <input type="tel" id="applicantPhone" placeholder="+91 9876543210" required />
+            <input type="tel" id="applicantPhone" placeholder="+91 9876543210" required autocomplete="tel" />
           </div>
           <div class="form-group">
             <label>Current Status *</label>
@@ -503,12 +525,13 @@
         </div>
 
         <div class="form-group">
-          <label>Upload Resume / CV (PDF, DOCX, JPG, PNG) *</label>
-          <div class="file-upload-box" onclick="document.getElementById('applicantResume').click()">
-            <input type="file" id="applicantResume" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display:none;" required />
-            <div style="font-size:1.8rem;margin-bottom:6px;">📄</div>
-            <div style="font-weight:600;font-size:14px;color:var(--primary);">Click to upload your resume</div>
-            <div id="resumeFileStatus" style="font-size:12px;color:var(--text-muted);margin-top:4px;">No file selected (Max 5MB)</div>
+          <label>Upload Resume / CV (PDF, DOCX, TXT, PNG, JPG) *</label>
+          <div class="file-upload-box" id="resumeUploadArea">
+            <input type="file" id="applicantResume" accept=".pdf,.doc,.docx,.txt,.rtf,.png,.jpg,.jpeg" style="display:none;" />
+            <div style="font-size:1.8rem;margin-bottom:6px;" id="resumeUploadIcon">📄</div>
+            <div style="font-weight:600;font-size:14px;color:var(--primary);" id="resumeUploadTitle">Click or drag & drop resume file here</div>
+            <div id="resumeFileStatus" style="font-size:12px;color:var(--text-muted);margin-top:4px;">Supports PDF, DOC, DOCX, TXT, PNG, JPG (Max 5MB)</div>
+            <button type="button" id="clearResumeBtn" style="display:none;margin:8px auto 0;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">Remove File ✕</button>
           </div>
         </div>
 
@@ -518,8 +541,8 @@
         </div>
 
         <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;">
-          <button type="button" class="btn btn-ghost modal-close" title="Cancel" aria-label="Cancel">✕</button>
-          <button type="submit" class="btn btn-primary btn-lg">Submit Application 🚀</button>
+          <button type="button" class="btn btn-ghost modal-close" title="Cancel" aria-label="Cancel">Cancel</button>
+          <button type="submit" id="submitAppBtn" class="btn btn-primary btn-lg" style="min-width:200px;">Submit Application 🚀</button>
         </div>
       </form>
     </div>

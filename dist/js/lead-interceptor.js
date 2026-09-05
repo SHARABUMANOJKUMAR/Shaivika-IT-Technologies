@@ -7,16 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const contactForm = document.querySelector('#contactForm');
   if (contactForm) {
     contactForm.addEventListener('submit', () => {
-      // Extract values
-      const nameVal = contactForm.fullName?.value || contactForm.querySelector('[name="fullName"]')?.value || 'Anonymous';
-      const emailVal = contactForm.email?.value || contactForm.querySelector('[type="email"]')?.value || '';
-      const phoneVal = contactForm.phone?.value || '';
-      const companyVal = contactForm.company?.value || '';
-      const serviceVal = contactForm.service?.value || '';
-      const messageVal = contactForm.message?.value || '';
+      // Extract values with safe bounds
+      const nameVal = String(contactForm.fullName?.value || contactForm.querySelector('[name="fullName"]')?.value || 'Anonymous').trim().slice(0, 100);
+      const emailVal = String(contactForm.email?.value || contactForm.querySelector('[type="email"]')?.value || '').trim().slice(0, 150);
+      const phoneVal = String(contactForm.phone?.value || '').trim().slice(0, 30);
+      const companyVal = String(contactForm.company?.value || '').trim().slice(0, 100);
+      const serviceVal = String(contactForm.service?.value || '').trim().slice(0, 100);
+      const messageVal = String(contactForm.message?.value || '').trim().slice(0, 3000);
       
       // Simple validation matching contact.html validation
-      if (nameVal && emailVal && messageVal) {
+      if (nameVal && emailVal && emailVal.includes('@') && messageVal) {
         // Format message to display all metadata
         let formattedMessage = '';
         if (serviceVal) formattedMessage += `Service Requested: ${serviceVal}\n`;

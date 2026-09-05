@@ -1,10 +1,4 @@
 /**
-<<<<<<< HEAD
- * SHAIVIKA IT TECHNOLOGIES - Dynamic Portfolio Manager
- * ALWAYS fetches fresh data from data/portfolio.json (server source of truth).
- * Falls back to localStorage cache only when fetch fails (offline/file:// protocol).
- * Admin changes to data/portfolio.json are immediately reflected for all visitors.
-=======
  * SHAIVIKA IT TECHNOLOGIES - Dynamic Portfolio Manager (Production Grade)
  * 
  * Features:
@@ -15,10 +9,30 @@
  * - Multi-Tab, Same-Window, & Tab-Switch (Visibility) Event Sync
  * - Dynamic Modal Drawer for Custom Projects
  * - Responsive Pagination & Smooth Scroll
->>>>>>> upstream/main
+ * - Strict XSS sanitization and URL validation for robust security
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Security utilities
+  function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function sanitizeUrl(url) {
+    if (!url || typeof url !== 'string') return '#';
+    const trimmed = url.trim();
+    if (/^(https?:\/\/|mailto:|tel:|\/|\.\/|\.\.\/|[a-zA-Z0-9_\-\.\/]+\.html)/i.test(trimmed)) {
+      return trimmed;
+    }
+    return '#';
+  }
+
   const filterBar = document.querySelector('.filter-bar');
   const projectsGrid = document.querySelector('.projects-grid');
   const paginationContainer = document.querySelector('.pagination');
@@ -562,12 +576,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Thumbnail Construction
         let thumbHTML = '';
-        if (proj.image && proj.image.trim() !== '') {
+        const safeImage = sanitizeUrl(proj.image);
+        const safeEmoji = escapeHTML(proj.emoji || '💼');
+        const safeTitle = escapeHTML(proj.title || 'Untitled');
+        const safeDesc = escapeHTML(proj.description || '');
+        const safeLink = sanitizeUrl(proj.link || 'contact.html');
+
+        if (safeImage && safeImage !== '#') {
           thumbHTML = `
             <div class="project-thumb" style="position:relative; overflow:hidden; background:#0f172a;">
-              <img src="${proj.image}" alt="${proj.title}" loading="lazy" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <img src="${safeImage}" alt="${safeTitle}" loading="lazy" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
               <div style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; align-items:center; justify-content:center; background:${thumbGradients[idx % thumbGradients.length]};">
-                <span style="font-size:2.8rem;">${proj.emoji || '💼'}</span>
+                <span style="font-size:2.8rem;">${safeEmoji}</span>
               </div>
             </div>
           `;
@@ -575,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const gradient = thumbGradients[idx % thumbGradients.length];
           thumbHTML = `
             <div class="project-thumb" style="background:${gradient}; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
-              <span style="position:relative; z-index:2; font-size:2.8rem; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3));">${proj.emoji || '💼'}</span>
+              <span style="position:relative; z-index:2; font-size:2.8rem; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3));">${safeEmoji}</span>
             </div>
           `;
         }
@@ -585,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const cat = categories.find(c => c.id === catId);
           const name = cat ? cat.name : catId;
           const tagClass = tagClassMap[catId] || 'tag-blue';
-          return `<span class="tag ${tagClass}" style="font-size: 0.72rem; padding: 4px 10px;">${name}</span>`;
+          return `<span class="tag ${tagClass}" style="font-size: 0.72rem; padding: 4px 10px;">${escapeHTML(name)}</span>`;
         }).join('');
 
         // Action Buttons
@@ -597,10 +617,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let liveButtonHTML = '';
-        if (proj.link && proj.link !== '#' && proj.link !== 'contact.html') {
-          const isExternal = proj.link.startsWith('http');
+        if (safeLink && safeLink !== '#' && safeLink !== 'contact.html') {
+          const isExternal = safeLink.startsWith('http');
           liveButtonHTML = `
-            <a href="${proj.link}" target="${isExternal ? '_blank' : '_self'}" rel="${isExternal ? 'noopener noreferrer' : ''}" class="btn btn-ghost btn-sm" style="padding: 6px 14px; font-size: 0.8rem;" onclick="event.stopPropagation()">
+            <a href="${safeLink}" target="${isExternal ? '_blank' : '_self'}" rel="${isExternal ? 'noopener noreferrer' : ''}" class="btn btn-ghost btn-sm" style="padding: 6px 14px; font-size: 0.8rem;" onclick="event.stopPropagation()">
               <span>Live Demo</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:4px;">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -621,8 +641,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
               ${tagsHTML}
             </div>
-            <h3 class="project-title">${proj.title}</h3>
-            <p class="project-desc">${proj.description}</p>
+            <h3 class="project-title">${safeTitle}</h3>
+            <p class="project-desc">${safeDesc}</p>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06);">
               ${actionButtonHTML}
               ${liveButtonHTML}
@@ -637,8 +657,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const modal = document.querySelector(proj.modalId);
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
-          } else if (proj.link && proj.link.startsWith('http')) {
-            window.open(proj.link, '_blank');
+          } else if (safeLink && safeLink.startsWith('http')) {
+            window.open(safeLink, '_blank', 'noopener,noreferrer');
           } else {
             openDynamicProjectModal(proj);
           }
@@ -676,27 +696,35 @@ document.addEventListener('DOMContentLoaded', () => {
       const cat = categories.find(c => c.id === catId);
       const name = cat ? cat.name : catId;
       const tagClass = tagClassMap[catId] || 'tag-blue';
-      return `<span class="tag ${tagClass}">${name}</span>`;
+      return `<span class="tag ${tagClass}">${escapeHTML(name)}</span>`;
     }).join(' ');
 
+    const safeImage = sanitizeUrl(proj.image);
+    const safeTitle = escapeHTML(proj.title || 'Untitled Project');
+    const safeDesc = escapeHTML(proj.description || '');
+    const safeEmoji = escapeHTML(proj.emoji || '💼');
+    const safeLink = sanitizeUrl(proj.link || 'contact.html');
+
     let imgHeader = '';
-    if (proj.image) {
-      imgHeader = `<img src="${proj.image}" style="width:100%; height:220px; object-fit:cover; border-radius:12px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,0.4);">`;
+    if (safeImage && safeImage !== '#') {
+      imgHeader = `<img src="${safeImage}" alt="${safeTitle}" style="width:100%; height:220px; object-fit:cover; border-radius:12px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,0.4);">`;
     } else {
-      imgHeader = `<div style="width:100%; height:140px; border-radius:12px; background:linear-gradient(135deg, rgba(0,102,255,0.2), rgba(124,58,237,0.3)); display:flex; align-items:center; justify-content:center; font-size:3.5rem; margin-bottom:20px;">${proj.emoji || '💼'}</div>`;
+      imgHeader = `<div style="width:100%; height:140px; border-radius:12px; background:linear-gradient(135deg, rgba(0,102,255,0.2), rgba(124,58,237,0.3)); display:flex; align-items:center; justify-content:center; font-size:3.5rem; margin-bottom:20px;">${safeEmoji}</div>`;
     }
+
+    const isExternal = safeLink.startsWith('http');
 
     content.innerHTML = `
       ${imgHeader}
       <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
         ${tagsHTML}
       </div>
-      <h2 style="font-size: 1.6rem; color: #fff; margin-bottom: 12px; font-weight: 700;">${proj.title}</h2>
-      <p style="color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem; margin-bottom: 24px;">${proj.description}</p>
+      <h2 style="font-size: 1.6rem; color: #fff; margin-bottom: 12px; font-weight: 700;">${safeTitle}</h2>
+      <p style="color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem; margin-bottom: 24px;">${safeDesc}</p>
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
         <button class="btn btn-secondary" onclick="closeDynamicProjectModal()">Close</button>
-        <a href="${proj.link || 'contact.html'}" target="${proj.link && proj.link.startsWith('http') ? '_blank' : '_self'}" class="btn btn-primary">
-          <span>${proj.link && proj.link.startsWith('http') ? 'Launch Project ↗' : 'Inquire About Similar 💬'}</span>
+        <a href="${safeLink}" target="${isExternal ? '_blank' : '_self'}" rel="${isExternal ? 'noopener noreferrer' : ''}" class="btn btn-primary">
+          <span>${isExternal ? 'Launch Project ↗' : 'Inquire About Similar 💬'}</span>
         </a>
       </div>
     `;
