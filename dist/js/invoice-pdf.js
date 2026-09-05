@@ -32,26 +32,39 @@ const InvoicePDF = {
         return str;
     },
 
-    // Generates a QR Code as a Data URI
+    // Generates a QR Code as a Data URI (safe fallback if QRCode library is unavailable)
     generateQR: async function(text) {
-        if (!text) return '';
+        if (!text || typeof QRCode === 'undefined') return '';
         return new Promise((resolve) => {
-            const tempDiv = document.createElement('div');
-            new QRCode(tempDiv, {
-                text: text,
-                width: 150,
-                height: 150,
-                colorDark : "#1e3a8a",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.M
-            });
-            setTimeout(() => {
-                const img = tempDiv.querySelector('img');
-                const canvas = tempDiv.querySelector('canvas');
-                if (img && img.src) resolve(img.src);
-                else if (canvas) resolve(canvas.toDataURL("image/png"));
-                else resolve('');
-            }, 50);
+            try {
+                const tempDiv = document.createElement('div');
+                tempDiv.style.cssText = 'position:absolute; left:-9999px; top:-9999px; opacity:0; pointer-events:none;';
+                document.body.appendChild(tempDiv);
+                new QRCode(tempDiv, {
+                    text: text,
+                    width: 120,
+                    height: 120,
+                    colorDark : "#1e3a8a",
+                    colorLight : "#ffffff",
+                    correctLevel : (typeof QRCode !== 'undefined' && QRCode.CorrectLevel) ? QRCode.CorrectLevel.M : 0
+                });
+                setTimeout(() => {
+                    try {
+                        const img = tempDiv.querySelector('img');
+                        const canvas = tempDiv.querySelector('canvas');
+                        let src = '';
+                        if (img && img.src && img.src.length > 50) src = img.src;
+                        else if (canvas) src = canvas.toDataURL("image/png");
+                        if (tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
+                        resolve(src);
+                    } catch (err) {
+                        if (tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
+                        resolve('');
+                    }
+                }, 40);
+            } catch (e) {
+                resolve('');
+            }
         });
     },
 
@@ -300,10 +313,17 @@ const InvoicePDF = {
                                 </div>
                             </td>
                             <td style="vertical-align: middle; text-align: right; width: 30%; padding-top: 20px;">
-                                <div style="display: inline-block; text-align: center; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
-                                    <img src="${verifyQrData}" style="width: 80px; height: 80px;"><br>
-                                    <div style="font-size: 10px; color: #4f46e5; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Verify</div>
-                                </div>
+                                ${verifyQrData ? `
+                                     <div style="display: inline-block; text-align: center; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                                         <img src="${verifyQrData}" style="width: 80px; height: 80px;"><br>
+                                         <div style="font-size: 10px; color: #4f46e5; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Scan to Verify</div>
+                                     </div>
+                                 ` : `
+                                     <div style="display: inline-block; text-align: center; background: white; padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                                         <div style="font-size: 24px; color: #4f46e5; margin-bottom: 4px;">🛡️</div>
+                                         <div style="font-size: 10px; color: #4f46e5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Verified Invoice</div>
+                                     </div>
+                                 `}
                             </td>
                         </tr>
                     </table>
@@ -316,33 +336,40 @@ const InvoicePDF = {
         const previewElement = document.getElementById('invoice-preview-sheet');
         if (!previewElement) return;
         
-        const settings = window.InvoiceDB ? window.InvoiceDB.getSettings() : InvoiceDB.defaultSettings;
-        let customer = {
-            name: invoiceData.customer_name || 'Client Name',
-            phone: invoiceData.customer_phone || '',
-            email: invoiceData.customer_email || ''
-        };
-        if (window.InvoiceDB && invoiceData.customer_id) {
-            const dbCust = window.InvoiceDB.getCustomerById(invoiceData.customer_id);
-            if (dbCust) customer = Object.assign(customer, dbCust);
-        }
-
-        const html = await this.getInvoiceHTML(invoiceData, settings, customer);
-        previewElement.innerHTML = html;
-        
-        // Scale logic for preview based on parent container width
-        const container = document.querySelector('.a4-container');
-        if (container) {
-            const containerWidth = container.clientWidth - 40; // 40px padding
-            const a4Width = 794; // approx px width of A4 at 96dpi
-            if (containerWidth < a4Width) {
-                const scale = containerWidth / a4Width;
-                previewElement.style.transform = `scale(${scale})`;
-                container.style.height = `${(1123 * scale) + 40}px`; // 1123px is A4 height
-            } else {
-                previewElement.style.transform = `scale(1)`;
-                container.style.height = `1163px`;
+        try {
+            const settings = window.InvoiceDB ? window.InvoiceDB.getSettings() : (this.defaultSettings || {});
+            let customer = {
+                name: invoiceData.customer_name || 'Client Name',
+                phone: invoiceData.customer_phone || '',
+                email: invoiceData.customer_email || ''
+            };
+            if (window.InvoiceDB && invoiceData.customer_id) {
+                const dbCust = window.InvoiceDB.getCustomerById(invoiceData.customer_id);
+                if (dbCust) customer = Object.assign(customer, dbCust);
             }
+
+            const html = await this.getInvoiceHTML(invoiceData, settings, customer);
+            previewElement.innerHTML = html;
+            
+            // Scale logic for preview based on parent container width
+            const container = document.querySelector('.a4-container');
+            if (container) {
+                const containerWidth = container.clientWidth - 30; // 30px padding
+                const a4Width = 794; // approx px width of A4 at 96dpi
+                if (containerWidth > 0 && containerWidth < a4Width) {
+                    const scale = containerWidth / a4Width;
+                    previewElement.style.transform = `scale(${scale})`;
+                    previewElement.style.transformOrigin = 'top center';
+                    const targetHeight = Math.max((previewElement.scrollHeight || 1123) * scale + 30, 400);
+                    container.style.height = `${targetHeight}px`;
+                } else {
+                    previewElement.style.transform = 'scale(1)';
+                    previewElement.style.transformOrigin = 'top center';
+                    container.style.height = 'auto';
+                }
+            }
+        } catch (err) {
+            console.error('Invoice Live Preview Error:', err);
         }
     },
 

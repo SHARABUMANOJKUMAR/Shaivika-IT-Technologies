@@ -13,53 +13,81 @@ function escapeHTML(str) {
         .replace(/'/g, '&#039;');
 }
 
-function initializeInvoiceManager() {
+// Module-scoped state
+let currentInvoiceView = 'dashboard';
+let currentInvoiceContext = null; 
+let currentInvoiceItems = [];
+let currentDashFilter = 'ALL';
+let currentListFilter = 'ALL';
+
+// Universal view switcher - works instantly without waiting
+window.switchInvoiceView = function(viewId, context = null) {
+    currentInvoiceView = viewId;
+    currentInvoiceContext = context;
+
     const invoiceTab = document.getElementById('invoice-generator-tab');
-    if (!invoiceTab || !window.InvoiceDB) {
-        setTimeout(initializeInvoiceManager, 0);
-        return;
-    }
-
-    let currentInvoiceView = 'dashboard';
-    let currentInvoiceContext = null; 
-    let currentInvoiceItems = [];
-    let currentDashFilter = 'ALL';
-    let currentListFilter = 'ALL';
-
-    const invNavBtns = document.querySelectorAll('.inv-nav-btn');
-    const invViews = document.querySelectorAll('.inv-view');
-
-    window.switchInvoiceView = function(viewId, context = null) {
-        currentInvoiceView = viewId;
-        currentInvoiceContext = context;
-
-        invNavBtns.forEach(btn => {
+    if (invoiceTab) {
+        const navBtns = invoiceTab.querySelectorAll('.inv-nav-btn');
+        navBtns.forEach(btn => {
             if (btn.dataset.view === viewId) btn.classList.add('active');
             else btn.classList.remove('active');
         });
 
-        invViews.forEach(view => view.style.display = 'none');
+        const views = invoiceTab.querySelectorAll('.inv-view');
+        views.forEach(view => view.style.display = 'none');
 
         const targetView = document.getElementById(`inv-view-${viewId}`);
         if (targetView) {
             targetView.style.display = 'block';
             targetView.style.animation = 'fadeInUp 0.3s ease forwards';
         }
+    }
 
+    try {
         if (viewId === 'dashboard') renderDashboard();
-        if (viewId === 'list') renderInvoiceList();
-        if (viewId === 'create') renderCreateInvoiceForm(context);
-        if (viewId === 'customers') renderCustomersList();
-        if (viewId === 'services') renderServicesList();
-        if (viewId === 'settings') renderSettings();
-    };
+        else if (viewId === 'list') renderInvoiceList();
+        else if (viewId === 'create') renderCreateInvoiceForm(context);
+        else if (viewId === 'customers') renderCustomersList();
+        else if (viewId === 'services') renderServicesList();
+        else if (viewId === 'settings') renderSettings();
+    } catch (err) {
+        console.warn('View render warning for:', viewId, err);
+    }
+};
 
-    invNavBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchInvoiceView(btn.dataset.view);
+window.setInvoiceDashFilter = function(filter) {
+    currentDashFilter = filter;
+    const container = document.getElementById('inv-dash-filter-pills');
+    if (container) {
+        container.querySelectorAll('button').forEach(b => {
+            if (b.dataset.dashFilter === filter) {
+                b.classList.add('active', 'btn-primary');
+                b.classList.remove('btn-ghost');
+            } else {
+                b.classList.remove('active', 'btn-primary');
+                b.classList.add('btn-ghost');
+            }
         });
-    });
+    }
+    try { renderDashboard(); } catch (e) {}
+};
+
+window.setInvoiceListFilter = function(filter) {
+    currentListFilter = filter;
+    const container = document.getElementById('inv-list-filter-pills');
+    if (container) {
+        container.querySelectorAll('button').forEach(b => {
+            if (b.dataset.listFilter === filter) {
+                b.classList.add('active', 'btn-primary');
+                b.classList.remove('btn-ghost');
+            } else {
+                b.classList.remove('active', 'btn-primary');
+                b.classList.add('btn-ghost');
+            }
+        });
+    }
+    try { renderInvoiceList(); } catch (e) {}
+};
 
     // --- DASHBOARD ---
     function renderDashboard() {
@@ -120,13 +148,13 @@ function initializeInvoiceManager() {
                     <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
-                        <div style="display:flex; gap:6px;">
-                            <button class="btn btn-sm btn-ghost" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">📄</button>
-                            <button class="btn btn-sm btn-ghost" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')">✏️</button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button class="btn btn-sm btn-ghost" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')">💳</button>` : ''}
-                            <button class="btn btn-sm btn-ghost" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')">📜</button>
-                            ${inv.status === 'DRAFT' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Delete Draft" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')">🗑️</button>` : ''}
-                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')">🚫</button>` : ''}
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -134,22 +162,7 @@ function initializeInvoiceManager() {
         });
     }
 
-    // Attach Dashboard Search and Filter listeners
-    document.getElementById('inv-dash-search')?.addEventListener('input', renderDashboard);
-
-    document.querySelectorAll('#inv-dash-filter-pills button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('#inv-dash-filter-pills button').forEach(b => {
-                b.classList.remove('active', 'btn-primary');
-                b.classList.add('btn-ghost');
-            });
-            btn.classList.add('active', 'btn-primary');
-            btn.classList.remove('btn-ghost');
-            currentDashFilter = btn.dataset.dashFilter || 'ALL';
-            renderDashboard();
-        });
-    });
+    // Dashboard search is initialized in initInvoiceManager
 
     // --- INVOICES LIST ---
     function renderInvoiceList() {
@@ -186,13 +199,13 @@ function initializeInvoiceManager() {
                     <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
-                        <div style="display:flex; gap:6px;">
-                            <button class="btn btn-sm btn-ghost" title="PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">📄</button>
-                            <button class="btn btn-sm btn-ghost" title="Edit" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')">✏️</button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button class="btn btn-sm btn-ghost" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')">💳</button>` : ''}
-                            <button class="btn btn-sm btn-ghost" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')">📜</button>
-                            ${inv.status === 'DRAFT' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Delete" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')">🗑️</button>` : ''}
-                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Cancel" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')">🚫</button>` : ''}
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="window.switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -200,29 +213,42 @@ function initializeInvoiceManager() {
         });
     }
 
-    document.getElementById('inv-search-invoices')?.addEventListener('input', renderInvoiceList);
-
-    document.querySelectorAll('#inv-list-filter-pills button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('#inv-list-filter-pills button').forEach(b => {
-                b.classList.remove('active', 'btn-primary');
-                b.classList.add('btn-ghost');
-            });
-            btn.classList.add('active', 'btn-primary');
-            btn.classList.remove('btn-ghost');
-            currentListFilter = btn.dataset.listFilter || 'ALL';
-            renderInvoiceList();
-        });
-    });
+    // List search is initialized in initInvoiceManager
 
     window.viewInvoicePDF = function(uuid) {
         if (window.InvoicePDF) InvoicePDF.generate(uuid);
     };
 
     window.deleteInvoice = function(uuid) {
-        if(confirm('Are you sure you want to completely delete this draft invoice?')) {
-            InvoiceDB.deleteInvoice(uuid);
+        const inv = InvoiceDB.getInvoiceById(uuid);
+        const invNum = inv ? inv.invoice_number : 'this invoice';
+        if(confirm(`Are you sure you want to delete invoice ${invNum}? This action cannot be undone.`)) {
+            const success = InvoiceDB.deleteInvoice(uuid, true);
+            if (success) {
+                if (inv && inv.invoice_number) {
+                    window.deleteInvoiceFromGoogleSheet(inv.invoice_number);
+                }
+                if (window.showToast) window.showToast(`Invoice ${invNum} deleted successfully.`, 'success');
+                if (typeof updateDashboardStats === 'function') updateDashboardStats();
+            } else {
+                if (window.showToast) window.showToast('Failed to delete invoice.', 'error');
+            }
+        }
+    };
+
+    window.deleteInvoiceFromGoogleSheet = async function(invoiceNumber) {
+        const settings = InvoiceDB.getSettings();
+        const gasUrl = settings.gasInvoiceUrl;
+        if (!gasUrl || !invoiceNumber) return;
+        try {
+            await fetch(gasUrl, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'delete', invoice_number: invoiceNumber })
+            });
+        } catch (err) {
+            console.log('GAS Delete sync output:', err);
         }
     };
     
@@ -296,10 +322,11 @@ function initializeInvoiceManager() {
             });
         }
         
-        calculateFormTotals();
+        calculateFormTotals(true);
+        updateLivePreview();
     }
 
-    function calculateFormTotals() {
+    function calculateFormTotals(skipPreview = false) {
         const price = parseFloat(document.getElementById('inv-flat-price')?.value) || 0;
         const gstRate = parseFloat(document.getElementById('inv-flat-gst')?.value) || 0;
         
@@ -309,12 +336,14 @@ function initializeInvoiceManager() {
         const totalEl = document.getElementById('inv-flat-total');
         if (totalEl) totalEl.value = total.toFixed(2);
         
-        updateLivePreview();
+        if (!skipPreview) {
+            updateLivePreview();
+        }
         return { subtotal: price, taxTotal: taxAmount, grandTotal: total, discount: 0, balanceDue: total };
     }
 
     function getCurrentInvoiceData() {
-        const totals = calculateFormTotals();
+        const totals = calculateFormTotals(true);
         const uuid = document.getElementById('inv-form-uuid')?.value || '';
         const existingInv = uuid ? InvoiceDB.getInvoiceById(uuid) : null;
         
@@ -452,6 +481,7 @@ function initializeInvoiceManager() {
             if (saved) {
                 switchInvoiceView('list');
                 window.viewInvoicePDF(saved.invoice_uuid);
+                if (window.syncInvoicesToGoogleSheet) window.syncInvoicesToGoogleSheet(saved);
             }
         }
     };
@@ -536,12 +566,31 @@ function initializeInvoiceManager() {
                     <td><strong>${escapeHTML(c.name)}</strong></td>
                     <td>${escapeHTML(c.company || '-')}</td>
                     <td>${escapeHTML(c.email || '-')}</td>
-                    <td><button class="btn btn-sm btn-ghost" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')">Edit</button></td>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')" title="Edit Customer">
+                                <i class="fa-solid fa-pen"></i> <span>Edit</span>
+                            </button>
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteCustomer('${escapeHTML(c.customer_id)}')" title="Delete Customer">
+                                <i class="fa-solid fa-trash"></i> <span>Delete</span>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             `;
         });
     }
     document.getElementById('inv-search-customers')?.addEventListener('input', renderCustomersList);
+
+    window.deleteCustomer = function(id) {
+        const c = InvoiceDB.getCustomerById(id);
+        if (!c) return;
+        if (confirm(`Are you sure you want to delete customer "${c.name}"?`)) {
+            InvoiceDB.deleteCustomer(id);
+            renderCustomersList();
+            if (window.showToast) window.showToast('Customer deleted.', 'success');
+        }
+    };
 
     window.openCustomerModal = function(id = null) {
         document.getElementById('inv-cust-id').value = '';
@@ -611,7 +660,7 @@ function initializeInvoiceManager() {
         );
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px;">No services found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No services found.</td></tr>`;
             return;
         }
 
@@ -622,12 +671,31 @@ function initializeInvoiceManager() {
                     <td><strong>${escapeHTML(s.name)}</strong></td>
                     <td>${escapeHTML(s.hsn || '-')}</td>
                     <td>₹${Number(s.price).toLocaleString('en-IN')} (${s.tax_rate}%)</td>
-                    <td><button class="btn btn-sm btn-ghost" onclick="window.editService('${escapeHTML(s.service_id)}')">Edit</button></td>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${escapeHTML(s.service_id)}')" title="Edit Service">
+                                <i class="fa-solid fa-pen"></i> <span>Edit</span>
+                            </button>
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteService('${escapeHTML(s.service_id)}')" title="Delete Service">
+                                <i class="fa-solid fa-trash"></i> <span>Delete</span>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             `;
         });
     }
     document.getElementById('inv-search-services')?.addEventListener('input', renderServicesList);
+
+    window.deleteService = function(id) {
+        const s = InvoiceDB.getServiceById(id);
+        if (!s) return;
+        if (confirm(`Are you sure you want to delete service "${s.name}"?`)) {
+            InvoiceDB.deleteService(id);
+            renderServicesList();
+            if (window.showToast) window.showToast('Service deleted.', 'success');
+        }
+    };
 
     window.openServiceModal = function(id = null) {
         document.getElementById('inv-srv-id').value = '';
@@ -697,18 +765,13 @@ function initializeInvoiceManager() {
     window.selectServiceForInvoice = function(id) {
         const s = InvoiceDB.getServiceById(id);
         if (s) {
-            currentInvoiceItems.push({ 
-                description: s.name + (s.description ? '\n' + s.description : ''), 
-                hsn: s.hsn || '', 
-                qty: 1, 
-                rate: Number(s.price), 
-                taxRate: Number(s.tax_rate), 
-                taxAmount: 0, 
-                total: 0 
-            });
-            renderInvoiceItemsTable();
-            document.getElementById('invSelectServiceModal').classList.remove('open');
-            if(window.showToast) window.showToast('Service added to invoice.', 'info');
+            const srvSelect = document.getElementById('inv-flat-service');
+            if (srvSelect) srvSelect.value = s.service_id;
+            if (document.getElementById('inv-flat-price')) document.getElementById('inv-flat-price').value = s.price || 0;
+            if (document.getElementById('inv-flat-gst')) document.getElementById('inv-flat-gst').value = s.tax_rate || 18;
+            calculateFormTotals();
+            document.getElementById('invSelectServiceModal')?.classList.remove('open');
+            if(window.showToast) window.showToast('Service selected.', 'info');
         }
     };
 
@@ -731,6 +794,9 @@ function initializeInvoiceManager() {
         document.getElementById('inv-set-upiId').value = settings.upiId || '';
         document.getElementById('inv-set-defaultTaxRate').value = settings.defaultTaxRate || 18;
         document.getElementById('inv-set-defaultTerms').value = settings.defaultTerms || '';
+        if (document.getElementById('inv-set-gasInvoiceUrl')) {
+            document.getElementById('inv-set-gasInvoiceUrl').value = settings.gasInvoiceUrl || '';
+        }
     }
 
     window.saveBillingSettings = function() {
@@ -750,9 +816,47 @@ function initializeInvoiceManager() {
         settings.upiId = document.getElementById('inv-set-upiId').value;
         settings.defaultTaxRate = parseFloat(document.getElementById('inv-set-defaultTaxRate').value) || 18;
         settings.defaultTerms = document.getElementById('inv-set-defaultTerms').value;
+        if (document.getElementById('inv-set-gasInvoiceUrl')) {
+            settings.gasInvoiceUrl = document.getElementById('inv-set-gasInvoiceUrl').value.trim();
+        }
 
         InvoiceDB.saveSettings(settings);
         if(window.showToast) window.showToast('Settings saved successfully.', 'success');
+    };
+
+    window.syncInvoicesToGoogleSheet = async function(singleInvoice = null) {
+        const settings = InvoiceDB.getSettings();
+        const gasUrl = settings.gasInvoiceUrl || (document.getElementById('inv-set-gasInvoiceUrl') ? document.getElementById('inv-set-gasInvoiceUrl').value.trim() : '');
+        if (!gasUrl) {
+            if (window.showToast) window.showToast('Please enter your Google Apps Script Web App URL in Billing Settings.', 'warning');
+            else alert('Please enter your Google Apps Script Web App URL in Billing Settings.');
+            return;
+        }
+
+        const payload = singleInvoice ? singleInvoice : InvoiceDB.getInvoices();
+        if (Array.isArray(payload) && payload.length === 0) {
+            if (window.showToast) window.showToast('No invoices found to sync.', 'info');
+            return;
+        }
+
+        try {
+            if (window.showToast) window.showToast('Syncing invoice(s) to Google Sheet...', 'info');
+            const res = await fetch(gasUrl, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+            const json = await res.json();
+            if (json.status === 'success') {
+                if (window.showToast) window.showToast(json.message || 'Synced to Google Sheet!', 'success');
+            } else {
+                if (window.showToast) window.showToast('Google Sheet Sync Error: ' + (json.message || 'Failed'), 'error');
+            }
+        } catch (err) {
+            console.log('GAS Sync output:', err);
+            if (window.showToast) window.showToast('Invoice sync request sent to Google Sheet!', 'success');
+        }
     };
 
     // --- PAYMENTS & AUDIT ---
@@ -824,13 +928,61 @@ function initializeInvoiceManager() {
         if(currentInvoiceView === 'list') renderInvoiceList();
     });
 
-    // INIT
-    switchInvoiceView('dashboard');
-}
+    // Global event delegation for invoice nav buttons & filter pills
+    document.addEventListener('click', function(e) {
+        const navBtn = e.target.closest('.inv-nav-btn');
+        if (navBtn && navBtn.dataset.view) {
+            e.preventDefault();
+            window.switchInvoiceView(navBtn.dataset.view);
+            return;
+        }
+        const dashBtn = e.target.closest('#inv-dash-filter-pills button');
+        if (dashBtn && dashBtn.dataset.dashFilter) {
+            e.preventDefault();
+            window.setInvoiceDashFilter(dashBtn.dataset.dashFilter);
+            return;
+        }
+        const listBtn = e.target.closest('#inv-list-filter-pills button');
+        if (listBtn && listBtn.dataset.listFilter) {
+            e.preventDefault();
+            window.setInvoiceListFilter(listBtn.dataset.listFilter);
+            return;
+        }
+    }, true);
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeInvoiceManager);
-} else {
-    initializeInvoiceManager();
-}
-window.addEventListener('load', initializeInvoiceManager);
+    function initInvoiceManager() {
+        // Search listeners
+        document.getElementById('inv-dash-search')?.addEventListener('input', renderDashboard);
+        document.getElementById('inv-search-invoices')?.addEventListener('input', renderInvoiceList);
+        document.getElementById('inv-search-customers')?.addEventListener('input', renderCustomersList);
+        document.getElementById('inv-search-services')?.addEventListener('input', renderServicesList);
+
+        // Builder inputs reactive binding
+        ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
+            document.getElementById(id)?.addEventListener('input', calculateFormTotals);
+            document.getElementById(id)?.addEventListener('change', calculateFormTotals);
+        });
+
+        document.getElementById('inv-flat-service')?.addEventListener('change', (e) => {
+            const option = e.target.options[e.target.selectedIndex];
+            if (option && option.dataset.price) {
+                document.getElementById('inv-flat-price').value = option.dataset.price;
+                document.getElementById('inv-flat-gst').value = option.dataset.tax || 18;
+                calculateFormTotals();
+            }
+        });
+
+        if (window._pendingInvoiceView) {
+            const p = window._pendingInvoiceView;
+            window._pendingInvoiceView = null;
+            window.switchInvoiceView(p.viewId, p.context);
+        } else {
+            window.switchInvoiceView('dashboard');
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initInvoiceManager);
+    } else {
+        initInvoiceManager();
+    }

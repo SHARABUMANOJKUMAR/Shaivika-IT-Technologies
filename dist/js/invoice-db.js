@@ -35,7 +35,8 @@ window.InvoiceDB = {
         nextInvoiceSeq: 127,
         nextCustomerSeq: 1,
         nextServiceSeq: 1,
-        defaultTerms: '1. Payment is due within 15 days.\n2. Late payment is subject to 1.5% monthly interest.\n3. All disputes are subject to Kadapa jurisdiction.'
+        defaultTerms: '1. Payment is due within 15 days.\n2. Late payment is subject to 1.5% monthly interest.\n3. All disputes are subject to Kadapa jurisdiction.',
+        gasInvoiceUrl: 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec'
     },
 
     init: function() {
@@ -97,6 +98,13 @@ window.InvoiceDB = {
         return customer;
     },
 
+    deleteCustomer: function(id) {
+        let customers = this.getCustomers();
+        customers = customers.filter(c => c.customer_id !== id);
+        localStorage.setItem(this.K_CUSTOMERS, JSON.stringify(customers));
+        return true;
+    },
+
     // --- SERVICES ---
     getServices: function() {
         return JSON.parse(localStorage.getItem(this.K_SERVICES)) || [];
@@ -129,6 +137,13 @@ window.InvoiceDB = {
         }
         localStorage.setItem(this.K_SERVICES, JSON.stringify(services));
         return service;
+    },
+
+    deleteService: function(id) {
+        let services = this.getServices();
+        services = services.filter(s => s.service_id !== id);
+        localStorage.setItem(this.K_SERVICES, JSON.stringify(services));
+        return true;
     },
 
     // --- INVOICES ---
@@ -222,15 +237,17 @@ window.InvoiceDB = {
         }
     },
     
-    deleteInvoice: function(uuid) {
+    deleteInvoice: function(uuid, force = true) {
         let invoices = this.getInvoices();
-        const invoice = invoices.find(i => i.invoice_uuid === uuid);
-        if (invoice && invoice.status !== 'DRAFT') {
-            console.error("Cannot delete a non-draft invoice. Use cancel instead.");
-            return false; // Prevent deleting non-drafts
+        const invoice = invoices.find(i => i.invoice_uuid === uuid || i.invoice_number === uuid);
+        if (!invoice) return false;
+        if (!force && invoice.status !== 'DRAFT') {
+            console.error("Cannot delete a non-draft invoice without force option.");
+            return false;
         }
-        invoices = invoices.filter(i => i.invoice_uuid !== uuid);
+        invoices = invoices.filter(i => i.invoice_uuid !== invoice.invoice_uuid);
         localStorage.setItem(this.K_INVOICES, JSON.stringify(invoices));
+        this.logAudit(invoice.invoice_number, 'Deleted Invoice', 'DELETED');
         window.dispatchEvent(new Event('shaivika_invoice_updated'));
         return true;
     },
