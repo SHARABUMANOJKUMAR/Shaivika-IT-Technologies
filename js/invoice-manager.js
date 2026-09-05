@@ -23,6 +23,8 @@ function initializeInvoiceManager() {
     let currentInvoiceView = 'dashboard';
     let currentInvoiceContext = null; 
     let currentInvoiceItems = [];
+    let currentDashFilter = 'ALL';
+    let currentListFilter = 'ALL';
 
     const invNavBtns = document.querySelectorAll('.inv-nav-btn');
     const invViews = document.querySelectorAll('.inv-view');
@@ -75,35 +77,79 @@ function initializeInvoiceManager() {
             }
         });
 
-        document.getElementById('inv-dash-total-inv').innerText = invoices.length;
-        document.getElementById('inv-dash-revenue').innerText = '₹' + totalRevenue.toLocaleString('en-IN', {minimumFractionDigits:2});
-        document.getElementById('inv-dash-pending').innerText = '₹' + pendingAmt.toLocaleString('en-IN', {minimumFractionDigits:2});
-        document.getElementById('inv-dash-overdue').innerText = '₹' + overdueAmt.toLocaleString('en-IN', {minimumFractionDigits:2});
+        const totalInvCount = invoices.length;
+        if (document.getElementById('inv-dash-total-inv')) document.getElementById('inv-dash-total-inv').innerText = totalInvCount;
+        if (document.getElementById('inv-dash-revenue')) document.getElementById('inv-dash-revenue').innerText = '₹' + totalRevenue.toLocaleString('en-IN', {minimumFractionDigits:2});
+        if (document.getElementById('inv-dash-pending')) document.getElementById('inv-dash-pending').innerText = '₹' + pendingAmt.toLocaleString('en-IN', {minimumFractionDigits:2});
+        if (document.getElementById('inv-dash-overdue')) document.getElementById('inv-dash-overdue').innerText = '₹' + overdueAmt.toLocaleString('en-IN', {minimumFractionDigits:2});
+        if (document.getElementById('statTotalInvoices')) document.getElementById('statTotalInvoices').innerText = totalInvCount;
 
         const recentBody = document.getElementById('inv-dash-recent-body');
         if (!recentBody) return;
         recentBody.innerHTML = '';
-        const recent = invoices.slice(0, 5);
 
-        if (recent.length === 0) {
-            recentBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No invoices yet.</td></tr>`;
+        const searchTerm = (document.getElementById('inv-dash-search')?.value || '').toLowerCase();
+
+        const filtered = invoices.filter(inv => {
+            const matchesSearch = inv.invoice_number.toLowerCase().includes(searchTerm) || 
+                (inv.customer_name && inv.customer_name.toLowerCase().includes(searchTerm));
+            if (!matchesSearch) return false;
+
+            if (currentDashFilter === 'ALL') return true;
+            if (currentDashFilter === 'PAID') return inv.status === 'PAID';
+            if (currentDashFilter === 'PENDING') return inv.status === 'SENT' || inv.status === 'PARTIALLY_PAID';
+            if (currentDashFilter === 'OVERDUE') return inv.status === 'OVERDUE';
+            if (currentDashFilter === 'DRAFT') return inv.status === 'DRAFT';
+            return true;
+        });
+
+        const countBadge = document.getElementById('inv-dash-count-badge');
+        if (countBadge) countBadge.innerText = filtered.length;
+
+        if (filtered.length === 0) {
+            recentBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:35px 20px;">No invoices match your current filter.</td></tr>`;
             return;
         }
 
-        recent.forEach(inv => {
+        filtered.forEach(inv => {
             recentBody.innerHTML += `
                 <tr>
-                    <td><strong>${escapeHTML(inv.invoice_number)}</strong></td>
+                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
                     <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
+                    <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
-                        <button class="btn btn-sm btn-ghost" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">PDF</button>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn btn-sm btn-ghost" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">📄</button>
+                            <button class="btn btn-sm btn-ghost" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')">✏️</button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button class="btn btn-sm btn-ghost" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')">💳</button>` : ''}
+                            <button class="btn btn-sm btn-ghost" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')">📜</button>
+                            ${inv.status === 'DRAFT' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Delete Draft" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')">🗑️</button>` : ''}
+                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')">🚫</button>` : ''}
+                        </div>
                     </td>
                 </tr>
             `;
         });
     }
+
+    // Attach Dashboard Search and Filter listeners
+    document.getElementById('inv-dash-search')?.addEventListener('input', renderDashboard);
+
+    document.querySelectorAll('#inv-dash-filter-pills button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('#inv-dash-filter-pills button').forEach(b => {
+                b.classList.remove('active', 'btn-primary');
+                b.classList.add('btn-ghost');
+            });
+            btn.classList.add('active', 'btn-primary');
+            btn.classList.remove('btn-ghost');
+            currentDashFilter = btn.dataset.dashFilter || 'ALL';
+            renderDashboard();
+        });
+    });
 
     // --- INVOICES LIST ---
     function renderInvoiceList() {
@@ -113,10 +159,18 @@ function initializeInvoiceManager() {
         if (!tbody) return;
 
         tbody.innerHTML = '';
-        const filtered = invoices.filter(inv => 
-            inv.invoice_number.toLowerCase().includes(searchTerm) || 
-            (inv.customer_name && inv.customer_name.toLowerCase().includes(searchTerm))
-        );
+        const filtered = invoices.filter(inv => {
+            const matchesSearch = inv.invoice_number.toLowerCase().includes(searchTerm) || 
+                (inv.customer_name && inv.customer_name.toLowerCase().includes(searchTerm));
+            if (!matchesSearch) return false;
+
+            if (currentListFilter === 'ALL') return true;
+            if (currentListFilter === 'PAID') return inv.status === 'PAID';
+            if (currentListFilter === 'PENDING') return inv.status === 'SENT' || inv.status === 'PARTIALLY_PAID';
+            if (currentListFilter === 'OVERDUE') return inv.status === 'OVERDUE';
+            if (currentListFilter === 'DRAFT') return inv.status === 'DRAFT';
+            return true;
+        });
 
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-muted);">No invoices found.</td></tr>`;
@@ -147,6 +201,20 @@ function initializeInvoiceManager() {
     }
 
     document.getElementById('inv-search-invoices')?.addEventListener('input', renderInvoiceList);
+
+    document.querySelectorAll('#inv-list-filter-pills button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('#inv-list-filter-pills button').forEach(b => {
+                b.classList.remove('active', 'btn-primary');
+                b.classList.add('btn-ghost');
+            });
+            btn.classList.add('active', 'btn-primary');
+            btn.classList.remove('btn-ghost');
+            currentListFilter = btn.dataset.listFilter || 'ALL';
+            renderInvoiceList();
+        });
+    });
 
     window.viewInvoicePDF = function(uuid) {
         if (window.InvoicePDF) InvoicePDF.generate(uuid);
