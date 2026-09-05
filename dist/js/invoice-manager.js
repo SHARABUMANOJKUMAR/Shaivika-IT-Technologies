@@ -120,13 +120,13 @@ function initializeInvoiceManager() {
                     <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
-                        <div style="display:flex; gap:6px;">
-                            <button class="btn btn-sm btn-ghost" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">📄</button>
-                            <button class="btn btn-sm btn-ghost" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')">✏️</button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button class="btn btn-sm btn-ghost" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')">💳</button>` : ''}
-                            <button class="btn btn-sm btn-ghost" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')">📜</button>
-                            ${inv.status === 'DRAFT' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Delete Draft" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')">🗑️</button>` : ''}
-                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')">🚫</button>` : ''}
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${inv.status === 'DRAFT' ? `<button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Draft" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button type="button" class="action-btn action-btn-delete action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
                         </div>
                     </td>
                 </tr>
@@ -186,13 +186,13 @@ function initializeInvoiceManager() {
                     <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
-                        <div style="display:flex; gap:6px;">
-                            <button class="btn btn-sm btn-ghost" title="PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')">📄</button>
-                            <button class="btn btn-sm btn-ghost" title="Edit" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')">✏️</button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button class="btn btn-sm btn-ghost" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')">💳</button>` : ''}
-                            <button class="btn btn-sm btn-ghost" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')">📜</button>
-                            ${inv.status === 'DRAFT' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Delete" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')">🗑️</button>` : ''}
-                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button class="btn btn-sm btn-ghost" style="color:var(--danger)" title="Cancel" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')">🚫</button>` : ''}
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${inv.status === 'DRAFT' ? `<button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Draft" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            ${inv.status === 'SENT' || inv.status === 'OVERDUE' ? `<button type="button" class="action-btn action-btn-delete action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
                         </div>
                     </td>
                 </tr>
@@ -536,7 +536,13 @@ function initializeInvoiceManager() {
                     <td><strong>${escapeHTML(c.name)}</strong></td>
                     <td>${escapeHTML(c.company || '-')}</td>
                     <td>${escapeHTML(c.email || '-')}</td>
-                    <td><button class="btn btn-sm btn-ghost" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')">Edit</button></td>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')" title="Edit Customer">
+                                <i class="fa-solid fa-pen"></i> <span>Edit</span>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             `;
         });
@@ -611,7 +617,7 @@ function initializeInvoiceManager() {
         );
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px;">No services found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No services found.</td></tr>`;
             return;
         }
 
@@ -622,7 +628,13 @@ function initializeInvoiceManager() {
                     <td><strong>${escapeHTML(s.name)}</strong></td>
                     <td>${escapeHTML(s.hsn || '-')}</td>
                     <td>₹${Number(s.price).toLocaleString('en-IN')} (${s.tax_rate}%)</td>
-                    <td><button class="btn btn-sm btn-ghost" onclick="window.editService('${escapeHTML(s.service_id)}')">Edit</button></td>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${escapeHTML(s.service_id)}')" title="Edit Service">
+                                <i class="fa-solid fa-pen"></i> <span>Edit</span>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             `;
         });

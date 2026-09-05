@@ -471,13 +471,13 @@
     position: absolute;
     right: 0;
     top: calc(100% + 10px);
-    background: rgba(30, 30, 30, 0.95);
+    background: var(--surface);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     min-width: 180px;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
     z-index: 100;
     opacity: 0;
     transform: scale(0.95) translateY(-10px);
@@ -507,173 +507,163 @@
 .export-dropdown-content a:last-child { border-radius: 0 0 12px 12px; }
 
 .export-dropdown-content a:hover {
-    background: rgba(255,255,255,0.05);
+    background: var(--background);
 }
 
-/* --- 3D ANIMATED ACTION BUTTONS ENHANCEMENT --- */
+/* --- MODERN SAAS ACTION BUTTONS & TABLE ENHANCEMENTS --- */
 
-.action-btn, .action-btn-edit, .action-btn-delete, 
-.premium-btn, .premium-btn.edit-btn, .premium-btn.view-btn, .premium-btn.delete-btn,
-button.btn-primary, button.btn-secondary, button.btn-danger, button.btn-success {
-    position: relative;
-    border: none !important;
-    border-radius: 12px !important;
-    font-weight: 700 !important;
-    cursor: pointer;
-    overflow: visible !important;
-    transform-style: preserve-3d;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+.action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: white !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    z-index: 1;
-    margin: 4px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15), 0 5px 0 rgba(0,0,0,0.1) !important;
-    animation: float-btn 3s ease-in-out infinite alternate;
+    gap: 6px;
+    padding: 6px 12px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    user-select: none;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary, #f8fafc);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-@keyframes float-btn {
-    0% { transform: translateY(0px); }
-    100% { transform: translateY(-3px); }
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-.data-table tbody tr .action-btn, 
-.data-table tbody tr .premium-btn,
-.data-table tbody tr button {
-    animation-play-state: paused;
-}
-.data-table tbody tr:hover .action-btn, 
-.data-table tbody tr:hover .premium-btn,
-.data-table tbody tr:hover button {
-    animation-play-state: running;
+.action-btn:active {
+    transform: translateY(0);
 }
 
-.action-btn::after, .premium-btn::after, button.btn-primary::after, button.btn-danger::after, button.btn-success::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 50%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));
-    border-radius: 12px 12px 0 0;
-    pointer-events: none;
+.action-btn i, .action-btn svg {
+    font-size: 0.82rem;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
 }
 
-.action-btn:hover, .premium-btn:hover, button.btn-primary:hover, button.btn-secondary:hover, button.btn-danger:hover, button.btn-success:hover {
-    transform: translateY(-6px) scale(1.05) translateZ(10px) !important;
-    filter: brightness(1.15) contrast(1.1);
+/* Specific Action Button Colorways */
+.action-btn-edit {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
+}
+.action-btn-edit:hover {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: #3b82f6;
+    color: #ffffff;
 }
 
-.action-btn:active, .premium-btn:active, button.btn-primary:active, button.btn-secondary:active, button.btn-danger:active, button.btn-success:active {
-    transform: translateY(3px) scale(0.95) !important;
+.action-btn-delete, .action-btn.delete {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #f87171;
+}
+.action-btn-delete:hover, .action-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #ef4444;
+    color: #ffffff;
 }
 
-.action-btn-edit, .premium-btn.edit-btn, .premium-btn.view-btn, button.btn-primary {
-    background: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%) !important;
-    box-shadow: 0 5px 15px rgba(0, 201, 255, 0.4), 0 5px 0 #0088aa !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+.action-btn-view {
+    background: rgba(6, 182, 212, 0.12);
+    border-color: rgba(6, 182, 212, 0.25);
+    color: #22d3ee;
 }
-.action-btn-edit:hover, .premium-btn.edit-btn:hover, .premium-btn.view-btn:hover, button.btn-primary:hover {
-    box-shadow: 0 15px 25px rgba(0, 201, 255, 0.6), 0 8px 0 #0088aa, inset 0 -3px 5px rgba(0,0,0,0.1) !important;
-}
-.action-btn-edit:active, .premium-btn.edit-btn:active, .premium-btn.view-btn:active, button.btn-primary:active {
-    box-shadow: 0 2px 5px rgba(0, 201, 255, 0.6), 0 2px 0 #0088aa !important;
-}
-
-.action-btn-delete, .premium-btn.delete-btn, button.btn-danger {
-    background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%) !important;
-    box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4), 0 5px 0 #cc3456 !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-.action-btn-delete:hover, .premium-btn.delete-btn:hover, button.btn-danger:hover {
-    box-shadow: 0 15px 25px rgba(255, 65, 108, 0.6), 0 8px 0 #cc3456, inset 0 -3px 5px rgba(0,0,0,0.1) !important;
-}
-.action-btn-delete:active, .premium-btn.delete-btn:active, button.btn-danger:active {
-    box-shadow: 0 2px 5px rgba(255, 65, 108, 0.6), 0 2px 0 #cc3456 !important;
+.action-btn-view:hover {
+    background: rgba(6, 182, 212, 0.25);
+    border-color: #06b6d4;
+    color: #ffffff;
 }
 
-button.btn-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
-    box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4), 0 5px 0 #0e7a71 !important;
+.action-btn-toggle {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.25);
+    color: #34d399;
 }
-button.btn-success:hover {
-    box-shadow: 0 15px 25px rgba(17, 153, 142, 0.6), 0 8px 0 #0e7a71, inset 0 -3px 5px rgba(0,0,0,0.1) !important;
-}
-button.btn-success:active {
-    box-shadow: 0 2px 5px rgba(17, 153, 142, 0.6), 0 2px 0 #0e7a71 !important;
-}
-
-.action-btn, button.btn-secondary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4), 0 5px 0 #4c5ea8 !important;
-}
-.action-btn:hover, button.btn-secondary:hover {
-    box-shadow: 0 15px 25px rgba(102, 126, 234, 0.6), 0 8px 0 #4c5ea8, inset 0 -3px 5px rgba(0,0,0,0.1) !important;
-}
-.action-btn:active, button.btn-secondary:active {
-    box-shadow: 0 2px 5px rgba(102, 126, 234, 0.6), 0 2px 0 #4c5ea8 !important;
+.action-btn-toggle:hover {
+    background: rgba(16, 185, 129, 0.25);
+    border-color: #10b981;
+    color: #ffffff;
 }
 
+.action-btn-neutral {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary, #94a3b8);
+}
+.action-btn-neutral:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary, #ffffff);
+}
+
+/* Icon-only compact variant */
+.action-btn-icon {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+}
+
+/* Theme Toggle Button Modern Styling */
 #themeToggleBtn, .theme-toggle-btn {
-    position: relative !important;
-    width: 50px !important;
-    height: 50px !important;
-    border-radius: 50% !important;
-    border: none !important;
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%) !important;
-    box-shadow: 0 8px 20px rgba(253, 160, 133, 0.5), 0 6px 0 #c77b65, inset 0 2px 8px rgba(255,255,255,0.6) !important;
-    cursor: pointer !important;
-    font-size: 1.6rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
-    transform-style: preserve-3d !important;
-    z-index: 100 !important;
-    animation: pulse-glow 3s infinite alternate !important;
-}
-
-@keyframes pulse-glow {
-    0% { filter: drop-shadow(0 0 5px rgba(253, 160, 133, 0.4)); transform: scale(1); }
-    100% { filter: drop-shadow(0 0 15px rgba(253, 160, 133, 0.8)); transform: scale(1.05); }
-}
-
-body.dark-mode #themeToggleBtn, body.dark-mode .theme-toggle-btn {
-    background: linear-gradient(135deg, #434343 0%, #000000 100%) !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7), 0 6px 0 #1a1a1a, inset 0 2px 8px rgba(255,255,255,0.2) !important;
-    color: #ffd700 !important;
-    animation: pulse-glow-dark 3s infinite alternate !important;
-}
-
-@keyframes pulse-glow-dark {
-    0% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3)); transform: scale(1); }
-    100% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6)); transform: scale(1.05); }
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--border-glass, rgba(255,255,255,0.1));
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: var(--text-primary, #f8fafc);
 }
 
 #themeToggleBtn:hover, .theme-toggle-btn:hover {
-    transform: translateY(-8px) scale(1.15) rotate(25deg) !important;
-    box-shadow: 0 20px 30px rgba(253, 160, 133, 0.6), 0 10px 0 #c77b65, inset 0 3px 10px rgba(255,255,255,0.7) !important;
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
 }
 
-body.dark-mode #themeToggleBtn:hover, body.dark-mode .theme-toggle-btn:hover {
-    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.9), 0 10px 0 #1a1a1a, inset 0 3px 10px rgba(255,255,255,0.3) !important;
-    transform: translateY(-8px) scale(1.15) rotate(-25deg) !important;
+/* Smooth Elegant Custom Scrollbar for all table wrappers */
+.data-table-wrapper, .table-responsive {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
-#themeToggleBtn:active, .theme-toggle-btn:active {
-    transform: translateY(6px) scale(0.9) rotate(0deg) !important;
-    box-shadow: 0 2px 5px rgba(253, 160, 133, 0.4), 0 2px 0 #c77b65 !important;
-    animation: none !important;
+.data-table-wrapper::-webkit-scrollbar, .table-responsive::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
 }
 
-body.dark-mode #themeToggleBtn:active, body.dark-mode .theme-toggle-btn:active {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), 0 2px 0 #1a1a1a !important;
+.data-table-wrapper::-webkit-scrollbar-track, .table-responsive::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
 }
 
-.action-btn i, .premium-btn i, button i {
-    transition: transform 0.3s ease !important;
+.data-table-wrapper::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
 }
-.action-btn:hover i, .premium-btn:hover i, button:hover i {
-    transform: scale(1.2) !important;
+
+.data-table-wrapper::-webkit-scrollbar-thumb:hover, .table-responsive::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
+
