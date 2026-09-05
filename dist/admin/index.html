@@ -1426,8 +1426,8 @@
                                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:20px;">
                                     <h3><i class="fa fa-magic"></i> Invoice Builder</h3>
                                     <div style="display:flex; gap:10px;">
-                                        <button class="premium-btn action-btn" onclick="window.saveInvoiceForm('DRAFT')">Save Draft</button>
-                                        <button class="premium-btn save-btn" onclick="window.generateFinalInvoice()"><i class="fa fa-check-circle"></i> Generate & Issue</button>
+                                        <button type="button" id="inv-save-btn" class="premium-btn action-btn" onclick="window.saveInvoiceForm()">Save Draft</button>
+                                        <button type="button" id="inv-generate-btn" class="premium-btn save-btn" onclick="window.generateFinalInvoice()"><i class="fa fa-check-circle"></i> Generate & Issue</button>
                                     </div>
                                 </div>
                                 
@@ -1456,10 +1456,28 @@
                                 <div class="inv-form-grid" style="margin-bottom: 25px;">
                                     <div class="inv-form-group form-full">
                                         <label>Service *</label>
-                                        <select id="inv-flat-service" class="inv-input" required>
+                                        <select id="inv-flat-service" class="inv-input" required onchange="window.toggleOtherServiceField && window.toggleOtherServiceField(this.value)">
                                             <option value="">Select a service...</option>
-                                            <!-- Populated by JS -->
+                                            <option value="preset-1">Web &amp; App Development (2-in-1)</option>
+                                            <option value="preset-2">Web Development</option>
+                                            <option value="preset-3">App Development</option>
+                                            <option value="preset-4">AI Automations Suite</option>
+                                            <option value="preset-5">SEO Optimisation</option>
+                                            <option value="preset-6">Analytical Dashboards</option>
+                                            <option value="preset-7">AI Chatbot Builders</option>
+                                            <option value="preset-8">Logo Designing</option>
+                                            <option value="preset-9">AI Video &amp; Photo Business Promotions</option>
+                                            <option value="preset-10">Virtual Wedding &amp; Invitation Cards</option>
+                                            <option value="preset-11">Final Year Projects</option>
+                                            <option value="preset-12">Custom CRM Systems</option>
+                                            <option value="preset-13">SaaS Products</option>
+                                            <option value="preset-14">Product Mentence</option>
+                                            <option value="others">Others</option>
                                         </select>
+                                    </div>
+                                    <div class="inv-form-group form-full" id="inv-other-service-group" style="display: none;">
+                                        <label for="inv-flat-other-service">Enter Service Name *</label>
+                                        <input type="text" id="inv-flat-other-service" class="inv-input" placeholder="Enter the service name">
                                     </div>
                                     <div class="inv-form-group">
                                         <label>Price (₹) *</label>
@@ -1491,7 +1509,7 @@
                                     </div>
                                     <div class="inv-form-group">
                                         <label>Payment Method</label>
-                                        <select id="inv-form-payment-method" class="inv-input">
+                                        <select id="inv-form-payment-method" class="inv-input" onchange="window.renderInvoicePreview && window.renderInvoicePreview()">
                                             <option value="Online / Bank Transfer">Online / Bank Transfer</option>
                                             <option value="Cash">Cash</option>
                                             <option value="UPI">UPI</option>
@@ -1516,9 +1534,11 @@
                                     </div>
                                 </div>
                                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                                    <button class="premium-btn action-btn" onclick="window.downloadInvoicePDF()"><i class="fa fa-download"></i> Download PDF</button>
-                                    <button class="premium-btn action-btn" onclick="window.sendInvoiceEmail()"><i class="fa fa-envelope"></i> Email</button>
-                                    <button class="premium-btn" style="background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;" onclick="window.sendInvoiceWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                                    <button type="button" id="inv-download-btn" class="premium-btn action-btn" onclick="window.downloadInvoicePDF()"><i class="fa fa-download"></i> Download PDF</button>
+                                    <button type="button" id="inv-email-btn" class="premium-btn action-btn" onclick="window.sendInvoiceEmail()"><i class="fa fa-envelope"></i> Email</button>
+                                    <button type="button" id="inv-whatsapp-btn" class="premium-btn" style="background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;" onclick="window.sendInvoiceWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                                    <button type="button" class="premium-btn action-btn" onclick="window.shareInvoice()"><i class="fa fa-share-alt"></i> Share</button>
+                                    <button type="button" class="premium-btn action-btn" onclick="window.copyInvoiceLink()"><i class="fa fa-link"></i> Copy Link</button>
                                 </div>
                             </div>
 
@@ -4008,9 +4028,13 @@
     <script src="../js/invoice-db.js"></script>
     <script src="../js/invoice-pdf.js"></script>
     <script src="../js/invoice-manager.js"></script>
+    <script src="../js/invoice-preview.js"></script>
+    <script src="../js/invoice-actions.js"></script>
 
     <!-- EXTERNAL CDN DEPENDENCIES DEFERRED -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 </body>

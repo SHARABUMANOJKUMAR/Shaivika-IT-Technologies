@@ -262,11 +262,33 @@ window.setInvoiceListFilter = function(filter) {
     function renderCreateInvoiceForm(uuid = null) {
         const services = InvoiceDB.getServices();
         const srvSelect = document.getElementById('inv-flat-service');
+        const standardServices = [
+            'Web & App Development (2-in-1)',
+            'Web Development',
+            'App Development',
+            'AI Automations Suite',
+            'SEO Optimisation',
+            'Analytical Dashboards',
+            'AI Chatbot Builders',
+            'Logo Designing',
+            'AI Video & Photo Business Promotions',
+            'Virtual Wedding & Invitation Cards',
+            'Final Year Projects',
+            'Custom CRM Systems',
+            'SaaS Products',
+            'Product Mentence'
+        ];
         if (srvSelect) {
             srvSelect.innerHTML = '<option value="">-- Select Service --</option>';
-            services.forEach(s => {
-                srvSelect.innerHTML += `<option value="${s.service_id}" data-price="${s.price}" data-tax="${s.tax_rate}">${s.name}</option>`;
+            standardServices.forEach((name, index) => {
+                srvSelect.innerHTML += `<option value="preset-${index + 1}">${name}</option>`;
             });
+            services.forEach(s => {
+                if (!standardServices.includes(s.name)) {
+                    srvSelect.innerHTML += `<option value="${s.service_id}" data-price="${s.price}" data-tax="${s.tax_rate}">${s.name}</option>`;
+                }
+            });
+            srvSelect.innerHTML += '<option value="others">Others</option>';
         }
 
         const today = new Date().toISOString().split('T')[0];
@@ -291,15 +313,23 @@ window.setInvoiceListFilter = function(filter) {
                 if (inv.items && inv.items.length > 0) {
                     const item = inv.items[0];
                     if (srvSelect && item.service_id) {
-                        srvSelect.value = item.service_id;
+                        if (srvSelect.querySelector(`option[value="${item.service_id}"]`)) {
+                            srvSelect.value = item.service_id;
+                        } else {
+                            srvSelect.value = 'others';
+                        }
                     }
                     if (document.getElementById('inv-flat-price')) document.getElementById('inv-flat-price').value = item.rate || 0;
                     if (document.getElementById('inv-flat-gst')) document.getElementById('inv-flat-gst').value = item.taxRate || 0;
+                    if (document.getElementById('inv-flat-other-service')) {
+                        const otherService = srvSelect?.value === 'others' ? item.description : '';
+                        document.getElementById('inv-flat-other-service').value = otherService;
+                    }
                 }
                 
                 // Disable certain fields if SENT or PAID
                 const isLocked = (inv.status === 'SENT' || inv.status === 'PAID' || inv.status === 'PARTIALLY_PAID');
-                ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
+                ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-other-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
                     if (document.getElementById(id)) document.getElementById(id).disabled = isLocked;
                 });
             }
@@ -316,14 +346,24 @@ window.setInvoiceListFilter = function(filter) {
             if (document.getElementById('inv-flat-price')) document.getElementById('inv-flat-price').value = 0;
             if (document.getElementById('inv-flat-gst')) document.getElementById('inv-flat-gst').value = InvoiceDB.getSettings().defaultTaxRate || 18;
             if(srvSelect) srvSelect.value = '';
+            if (document.getElementById('inv-flat-other-service')) document.getElementById('inv-flat-other-service').value = '';
             
-            ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
+            ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-other-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
                 if (document.getElementById(id)) document.getElementById(id).disabled = false;
             });
         }
         
+        updateOtherServiceField();
         calculateFormTotals(true);
         updateLivePreview();
+    }
+
+    function updateOtherServiceField() {
+        const isOther = document.getElementById('inv-flat-service')?.value === 'others';
+        const group = document.getElementById('inv-other-service-group');
+        const input = document.getElementById('inv-flat-other-service');
+        if (group) group.style.display = isOther ? '' : 'none';
+        if (input) input.required = isOther;
     }
 
     function calculateFormTotals(skipPreview = false) {
@@ -352,7 +392,10 @@ window.setInvoiceListFilter = function(filter) {
         const email = document.getElementById('inv-flat-email')?.value || '';
         
         const srvSelect = document.getElementById('inv-flat-service');
-        const serviceName = srvSelect && srvSelect.selectedIndex > 0 ? srvSelect.options[srvSelect.selectedIndex].text : 'Service';
+        const selectedService = srvSelect && srvSelect.selectedIndex > 0 ? srvSelect.options[srvSelect.selectedIndex] : null;
+        const serviceName = selectedService?.value === 'others'
+            ? (document.getElementById('inv-flat-other-service')?.value || 'Other Service')
+            : (selectedService?.text || 'Service');
         const serviceId = srvSelect ? srvSelect.value : null;
 
         const date = document.getElementById('inv-form-date')?.value;
@@ -410,12 +453,13 @@ window.setInvoiceListFilter = function(filter) {
     }
 
     // Attach reactive listeners to all builder inputs
-    ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
+    ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-other-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
         document.getElementById(id)?.addEventListener('input', calculateFormTotals);
         document.getElementById(id)?.addEventListener('change', calculateFormTotals);
     });
 
     document.getElementById('inv-flat-service')?.addEventListener('change', (e) => {
+        updateOtherServiceField();
         const option = e.target.options[e.target.selectedIndex];
         if (option && option.dataset.price) {
             document.getElementById('inv-flat-price').value = option.dataset.price;
@@ -424,10 +468,16 @@ window.setInvoiceListFilter = function(filter) {
         }
     });
 
+    document.getElementById('inv-form-payment-method')?.addEventListener('change', () => {
+        updateLivePreview();
+        window.renderInvoicePreview?.();
+    });
+
     window.saveInvoiceForm = function(targetStatus = 'DRAFT') {
         const data = getCurrentInvoiceData();
         
         if (!data.customer_name) { alert("Please enter the customer's full name."); return; }
+        if (data.items[0].service_id === 'others' && !data.items[0].description.trim()) { alert('Please enter the service name.'); return; }
         if (!data.items[0].service_id && !data.items[0].rate) { alert("Please select a service or enter a price."); return; }
 
         // Automatically create or link the customer record
@@ -958,12 +1008,13 @@ window.setInvoiceListFilter = function(filter) {
         document.getElementById('inv-search-services')?.addEventListener('input', renderServicesList);
 
         // Builder inputs reactive binding
-        ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
+        ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service', 'inv-flat-other-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date', 'inv-form-state', 'inv-form-payment-method', 'inv-flat-summary'].forEach(id => {
             document.getElementById(id)?.addEventListener('input', calculateFormTotals);
             document.getElementById(id)?.addEventListener('change', calculateFormTotals);
         });
 
         document.getElementById('inv-flat-service')?.addEventListener('change', (e) => {
+            updateOtherServiceField();
             const option = e.target.options[e.target.selectedIndex];
             if (option && option.dataset.price) {
                 document.getElementById('inv-flat-price').value = option.dataset.price;

@@ -72,7 +72,9 @@ const InvoicePDF = {
     getInvoiceHTML: async function(inv, settings, customer) {
         const esc = this.escapeHTML;
         const isInterState = inv.state_code && inv.state_code !== 'AP';
-        const verifyUrl = window.location.origin + '/verify.html?id=' + encodeURIComponent(inv.verification_id || '');
+        const invoiceNumber = inv.invoice_number || inv.invoiceNumber || inv.invoice_id || inv.invoiceId || '';
+        const verificationUrl = inv.verification_url || inv.verificationUrl || ((window.location.protocol === 'https:' || !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)) ? `${window.location.origin}/verify.html?id=${encodeURIComponent(invoiceNumber)}` : `https://shaivikagroups.in/verify.html?id=${encodeURIComponent(invoiceNumber)}`);
+        const verifyUrl = verificationUrl;
         const verifyQrData = await this.generateQR(verifyUrl);
 
         let itemsHtml = '';
@@ -135,7 +137,7 @@ const InvoicePDF = {
         const safeCompanyPhone = esc(settings.companyPhone || '');
         const safeCompanyGstin = esc(settings.gstin || '');
 
-        const safeInvNumber = esc(inv.invoice_number || 'INV-001');
+        const safeInvNumber = esc(invoiceNumber || 'INV-001');
         const safeInvDate = inv.invoice_date ? new Date(inv.invoice_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) : 'N/A';
         const safeDueDate = inv.due_date ? new Date(inv.due_date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) : 'N/A';
 
@@ -146,9 +148,9 @@ const InvoicePDF = {
         const safeCustEmail = customer.email ? 'Email: ' + esc(customer.email) + '<br>' : '';
         const safeCustGstin = customer.gstin ? 'GSTIN: <strong style="color: #0f172a;">' + esc(customer.gstin) + '</strong>' : '';
 
-        const safePaymentMethod = esc(inv.payment_method || 'Online / Bank Transfer');
+        const safePaymentMethod = esc(inv.payment_method || inv.paymentMethod || 'Online / Bank Transfer');
         const safeStatus = esc(inv.status || 'PENDING');
-        const safeVerificationId = esc(inv.verification_id || '');
+        const safeVerificationId = esc(inv.verification_id || inv.verificationId || invoiceNumber);
 
         const safeNotes = inv.notes ? `<strong style="color: #334155; font-size: 12px;">Summary:</strong><br>${esc(inv.notes).replace(/\n/g, '<br>')}<br><br>` : '';
         const safeTerms = settings.defaultTerms ? `<strong style="color: #334155; font-size: 12px;">Terms & Conditions:</strong><br>${esc(settings.defaultTerms).replace(/\n/g, '<br>')}` : '';
@@ -166,6 +168,20 @@ const InvoicePDF = {
                 .invoice-print-wrapper { background: #ffffff !important; color: #1e293b !important; }
                 .invoice-print-wrapper table { border-collapse: collapse !important; }
                 .invoice-print-wrapper td, .invoice-print-wrapper th { background-color: transparent; }
+                @page { size: A4 portrait; margin: 0; }
+                .invoice-print-wrapper { padding: 20px 22px 16px !important; font-size: 12px !important; }
+                .invoice-print-wrapper > div > div:first-child { padding: 34px !important; margin: -22px -22px 22px !important; }
+                .invoice-print-wrapper h1 { font-size: 40px !important; }
+                .invoice-print-wrapper td, .invoice-print-wrapper th { padding: 13px !important; }
+                .invoice-print-wrapper table[style*="margin-bottom: 30px"] { margin-bottom: 22px !important; }
+                .invoice-print-wrapper table[style*="margin-top: 10px"] { margin-top: 4px !important; }
+                .invoice-print-wrapper table[style*="padding-top: 25px"] { padding-top: 16px !important; }
+                .invoice-print-wrapper [style*="font-size: 11px"] { font-size: 12px !important; }
+                .invoice-print-wrapper [style*="font-size: 10px"] { font-size: 10px !important; }
+                .invoice-print-wrapper [style*="font-size: 9px"] { font-size: 10px !important; }
+                .invoice-print-wrapper img[style*="width: 80px"] { width: 92px !important; height: 92px !important; }
+                .invoice-print-wrapper img[style*="height: 55px"] { height: 60px !important; }
+                .invoice-print-wrapper > div > div:last-child td { padding-top: 12px !important; }
             </style>
             <div class="invoice-print-wrapper" style="font-family: 'Inter', Helvetica, sans-serif; color: #1e293b; background: #ffffff; width: 100%; height: 100%; position: relative; box-sizing: border-box; overflow: hidden;">
                 <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(236, 72, 153, 0.1)); z-index: 0;"></div>
@@ -308,8 +324,8 @@ const InvoicePDF = {
                                     ${safeTerms}
                                 </div>
                                 <div style="font-size: 10px; color: #94a3b8; background: #f8fafc; padding: 10px 15px; border-radius: 8px; display: inline-block;">
-                                    <span style="color: #10b981; font-size: 14px; margin-right: 6px;">✓</span> Verification ID: <strong style="color: #475569;">${safeVerificationId}</strong><br>
-                                    <span style="margin-left: 22px;">This is a computer generated invoice and does not require a physical signature.</span>
+                                    <span style="color: #10b981; font-size: 14px; margin-right: 6px;">✓</span> Invoice Verification: <strong style="color: #475569;">${safeVerificationId}</strong><br>
+                                    <span style="margin-left: 22px;">Scan to verify this invoice at the Shaivika verification page. This is not a government GST e-invoice.</span>
                                 </div>
                             </td>
                             <td style="vertical-align: middle; text-align: right; width: 30%; padding-top: 20px;">
@@ -373,46 +389,57 @@ const InvoicePDF = {
         }
     },
 
-    generate: async function(uuid) {
+    generate: async function(invoiceOrId) {
         let container;
         try {
-            const inv = InvoiceDB.getInvoiceById(uuid);
+            const inv = typeof invoiceOrId === 'object' ? invoiceOrId : window.InvoiceDB?.getInvoiceById(invoiceOrId);
             if (!inv) {
-                alert('Invoice not found!');
-                return;
+                throw new Error('Invoice data is not available for PDF generation.');
             }
+            if (typeof html2canvas !== 'function' || typeof (window.jspdf?.jsPDF || window.jsPDF) !== 'function') throw new Error('PDF rendering library is still loading. Please try again.');
 
-            const settings = InvoiceDB.getSettings();
-            const customer = InvoiceDB.getCustomerById(inv.customer_id) || {};
+            const settings = window.InvoiceDB?.getSettings?.() || {};
+            const customer = window.InvoiceDB?.getCustomerById?.(inv.customer_id) || { name: inv.customerName || inv.customer_name || '', phone: inv.phone || inv.customer_phone || '', email: inv.email || inv.customer_email || '' };
             const html = await this.getInvoiceHTML(inv, settings, customer);
 
             container = document.createElement('div');
+            container.id = 'invoice-pdf';
             container.innerHTML = html;
-            container.style.width = '800px';
-            container.style.minHeight = '1131px';
-            container.style.padding = '0';
-            container.style.backgroundColor = '#ffffff';
-            container.style.position = 'absolute';
-            container.style.left = '-9999px';
-            container.style.top = '0';
+            container.setAttribute('data-invoice-pdf-capture', 'true');
+            container.style.cssText = 'position:absolute;left:0;top:0;width:794px;height:1123px;min-height:1123px;padding:0;margin:0;background:#fff;overflow:hidden;z-index:2147483647;';
             document.body.appendChild(container);
+            if (document.fonts?.ready) await document.fonts.ready;
+            await Promise.all(Array.from(container.querySelectorAll('img')).map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.addEventListener('load', resolve, { once: true }); img.addEventListener('error', resolve, { once: true }); })));
+            const invoiceContent = container.querySelector('.invoice-print-wrapper');
+            if (!invoiceContent || invoiceContent.textContent.trim().length < 40) throw new Error('Invoice content is empty; PDF was not created.');
+            const captureRect = invoiceContent.getBoundingClientRect();
+            console.log('[PDF] Invoice element found', { width: captureRect.width, height: captureRect.height, htmlLength: invoiceContent.innerHTML.length, invoiceNumber: inv.invoice_number || inv.invoiceNumber, customer: inv.customer_name || inv.customerName, paymentMethod: inv.payment_method || inv.paymentMethod, qrUrl: inv.verification_url || inv.verificationUrl });
+            if (captureRect.width <= 0 || captureRect.height <= 0) throw new Error('Invoice rendering area has zero dimensions.');
+            invoiceContent.style.width = '794px';
+            invoiceContent.style.height = '1123px';
+            invoiceContent.style.minHeight = '1123px';
+            invoiceContent.style.maxHeight = '1123px';
+            invoiceContent.style.boxSizing = 'border-box';
+            invoiceContent.style.overflow = 'hidden';
+            invoiceContent.style.backgroundColor = '#ffffff';
 
-            const filename = `${inv.invoice_number}_${(customer.company || customer.name || 'Invoice').replace(/[^a-z0-9]/gi, '_')}.pdf`;
-            const opt = {
-                margin: 0,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 800, scrollY: 0, scrollX: 0 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
+            const filename = `SHAIVIKA_INVOICE_${inv.invoice_number || inv.invoiceNumber || 'INVOICE'}.pdf`;
             if(window.showToast) window.showToast('Generating high-quality PDF...', 'info');
-            // Passing the unattached container directly avoids viewport/scrolling bugs (like blank pages)
-            await html2pdf().set(opt).from(container).save();
+            const canvas = await html2canvas(invoiceContent, { width: 794, height: 1123, windowWidth: 794, windowHeight: 1123, scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0 });
+            if (!canvas || canvas.width < 100 || canvas.height < 100) throw new Error('Invoice canvas was empty.');
+            const JsPdf = window.jspdf?.jsPDF || window.jsPDF;
+            const pdf = new JsPdf({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+            const pdfBlob = pdf.output('blob');
+            console.log('[PDF] Generated PDF size:', pdfBlob.size);
+            if (!pdfBlob || pdfBlob.size < 10000) throw new Error('Generated PDF is unexpectedly small.');
+            pdf.save(filename);
             if(window.showToast) window.showToast('PDF Downloaded successfully!', 'success');
+            return { filename, pageCount: 1 };
         } catch(e) {
             console.error('PDF Generation Error:', e);
-            alert('Failed to generate PDF. Check console.');
+            if (window.showToast) window.showToast(`Unable to generate PDF: ${e.message}`, 'error');
+            throw e;
         } finally {
             if (container && container.parentNode) container.parentNode.removeChild(container);
         }
