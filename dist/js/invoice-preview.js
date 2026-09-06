@@ -1,4 +1,4 @@
-﻿(function() {
+(function() {
     window.toggleOtherServiceField = function(value) {
         const group = document.getElementById('inv-other-service-group');
         const input = document.getElementById('inv-flat-other-service');
@@ -21,7 +21,8 @@
         if (totalField) totalField.value = total.toFixed(2);
         const paymentMethod = document.getElementById('inv-form-payment-method')?.value || 'Online / Bank Transfer';
         const invoiceNumber = document.getElementById('inv-form-id')?.value || 'INV-PREVIEW';
-        const verificationOrigin = window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ? window.location.origin : 'https://shaivikaittechnologies.in';
+        const verificationOrigin = window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+            ? window.location.origin : 'https://shaivikaittechnologies.in';
         const serviceName = selected?.value === 'others'
             ? (document.getElementById('inv-flat-other-service')?.value.trim() || 'Other Service')
             : (selected?.textContent.trim() || 'Service');
@@ -64,20 +65,30 @@
     function bindPreview() {
         if (window.__invoicePreviewBound) return;
         window.__invoicePreviewBound = true;
+
         ['inv-flat-name', 'inv-flat-phone', 'inv-flat-email', 'inv-flat-service',
             'inv-flat-other-service', 'inv-flat-price', 'inv-flat-gst', 'inv-form-date',
             'inv-form-state', 'inv-flat-summary'].forEach(id => {
             document.getElementById(id)?.addEventListener('input', renderPreview);
             document.getElementById(id)?.addEventListener('change', renderPreview);
         });
+
         document.addEventListener('change', event => {
-            if (event.target?.id === 'inv-flat-service') window.toggleOtherServiceField(event.target.value);
+            if (event.target?.id === 'inv-flat-service') {
+                window.toggleOtherServiceField(event.target.value);
+            }
         });
+
         window.toggleOtherServiceField(document.getElementById('inv-flat-service')?.value || '');
+
         renderPreview();
     }
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindPreview);
-    else bindPreview();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindPreview);
+    } else {
+        bindPreview();
+    }
+
     window.renderInvoicePreview = renderPreview;
 })();

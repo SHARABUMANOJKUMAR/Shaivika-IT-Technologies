@@ -3,7 +3,7 @@
  * Handles UI rendering, reactive data binding, and interactions.
  */
 
-function escapeHTML(str) {
+function invEscapeHTML(str) {
     if (str == null) return '';
     return String(str)
         .replace(/&/g, '&amp;')
@@ -89,29 +89,231 @@ window.setInvoiceListFilter = function(filter) {
     try { renderInvoiceList(); } catch (e) {}
 };
 
-    // --- DASHBOARD ---
+    // --- DASHBOARD ANALYTICS & CHARTS ---
+    let activeCharts = {};
+
+    window.refreshDashboardData = async function() {
+        const btn = document.getElementById('inv-dash-refresh-btn');
+        if (btn) {
+            btn.innerHTML = '<i class="fa fa-sync fa-spin"></i> Refreshing...';
+            btn.disabled = true;
+        }
+        await InvoiceDB.fetchRemoteInvoices();
+        if (btn) {
+            btn.innerHTML = '<i class="fa fa-sync"></i> Refresh';
+            btn.disabled = false;
+        }
+        // Event listener will automatically call renderDashboard
+    };
+
     function renderDashboard() {
         const invoices = InvoiceDB.getInvoices();
-        let totalRevenue = 0, pendingAmt = 0, overdueAmt = 0;
+        const state = window.InvoiceDBState || { lastFetch: null, error: null, isFetching: false };
+        
+        // 1. Update UI Status Indicator
+        const indicator = document.getElementById('inv-dash-status-indicator');
+        const lastUpdated = document.getElementById('inv-dash-last-updated');
+        
+        if (indicator && lastUpdated) {
+            if (state.isFetching) {
+                indicator.innerHTML = '<i class="fa fa-sync fa-spin"></i> FETCHING';
+                indicator.style.background = 'rgba(59, 130, 246, 0.1)';
+                indicator.style.color = '#3b82f6';
+            } else if (state.error) {
+                indicator.innerHTML = '<i class="fa fa-exclamation-triangle"></i> OFFLINE';
+                indicator.style.background = 'rgba(239, 68, 68, 0.1)';
+                indicator.style.color = '#ef4444';
+                lastUpdated.innerText = state.error;
+            } else {
+                indicator.innerHTML = '<span style="height:8px; width:8px; background:currentColor; border-radius:50%; display:inline-block; box-shadow:0 0 8px currentColor;"></span> LIVE';
+                indicator.style.background = 'rgba(16, 185, 129, 0.1)';
+                indicator.style.color = 'var(--success)';
+                const d = state.lastFetch ? new Date(state.lastFetch) : new Date();
+                lastUpdated.innerText = `Last updated: ${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+            }
+        }
+
+        // 2. Calculate KPIs
+        let totalRevenue = 0, totalPaid = 0, pendingAmt = 0, overdueAmt = 0;
+        let countPaid = 0, countDraft = 0, countPending = 0, countOverdue = 0;
+        
+        // Data for charts
+        const monthlyRev = {}, statusCounts = { PAID:0, PENDING:0, OVERDUE:0, DRAFT:0, CANCELLED:0 };
+        const clientStats = {};
+
         const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
         invoices.forEach(inv => {
-            if (inv.status === 'PAID' || inv.status === 'PARTIALLY_PAID') {
-                totalRevenue += Number(inv.amount_paid || 0);
+            const amtPaid = Number(inv.amount_paid) || 0;
+            const balDue = Number(inv.balance_due) || 0;
+            const totAmt = Number(inv.total_amount) || 0;
+            const status = inv.status;
+
+            totalRevenue += totAmt;
+            totalPaid += amtPaid;
+
+            if (status === 'PAID') { countPaid++; statusCounts.PAID++; }
+            if (status === 'DRAFT') { countDraft++; statusCounts.DRAFT++; }
+            if (status === 'CANCELLED') statusCounts.CANCELLED++;
+
+            if (status === 'SENT' || status === 'PARTIALLY_PAID' || status === 'PENDING') {
+                const dueDt = new Date(inv.due_date);
+                if (dueDt < startOfToday) {
+                    overdueAmt += balDue;
+                    countOverdue++;
+                    statusCounts.OVERDUE++;
+                } else {
+                    pendingAmt += balDue;
+                    countPending++;
+                    statusCounts.PENDING++;
+                }
+            } else if (status === 'OVERDUE') {
+                overdueAmt += balDue;
+                countOverdue++;
+                statusCounts.OVERDUE++;
             }
-            if (inv.status === 'SENT' || inv.status === 'PARTIALLY_PAID' || inv.status === 'OVERDUE') {
-                pendingAmt += Number(inv.balance_due || 0);
-                if (new Date(inv.due_date) < now) overdueAmt += Number(inv.balance_due || 0);
+
+            // Client Stats grouping
+            const cName = inv.customer_name || 'Unknown';
+            if (!clientStats[cName]) clientStats[cName] = { billed: 0, paid: 0, out: 0, count: 0 };
+            clientStats[cName].billed += totAmt;
+            clientStats[cName].paid += amtPaid;
+            clientStats[cName].out += balDue;
+            clientStats[cName].count++;
+
+            // Monthly grouping (last 6 months)
+            if (status !== 'DRAFT' && status !== 'CANCELLED') {
+                const dt = new Date(inv.invoice_date || inv.created_at);
+                const monthKey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+                if (!monthlyRev[monthKey]) monthlyRev[monthKey] = { billed: 0, col: 0, count: 0 };
+                monthlyRev[monthKey].billed += totAmt;
+                monthlyRev[monthKey].col += amtPaid;
+                monthlyRev[monthKey].count++;
             }
         });
 
         const totalInvCount = invoices.length;
-        if (document.getElementById('inv-dash-total-inv')) document.getElementById('inv-dash-total-inv').innerText = totalInvCount;
-        if (document.getElementById('inv-dash-revenue')) document.getElementById('inv-dash-revenue').innerText = '₹' + totalRevenue.toLocaleString('en-IN', {minimumFractionDigits:2});
-        if (document.getElementById('inv-dash-pending')) document.getElementById('inv-dash-pending').innerText = '₹' + pendingAmt.toLocaleString('en-IN', {minimumFractionDigits:2});
-        if (document.getElementById('inv-dash-overdue')) document.getElementById('inv-dash-overdue').innerText = '₹' + overdueAmt.toLocaleString('en-IN', {minimumFractionDigits:2});
-        if (document.getElementById('statTotalInvoices')) document.getElementById('statTotalInvoices').innerText = totalInvCount;
+        const fm = (n) => '₹' + n.toLocaleString('en-IN', {minimumFractionDigits:0, maximumFractionDigits:0});
 
+        if (document.getElementById('inv-dash-total-inv')) document.getElementById('inv-dash-total-inv').innerText = totalInvCount;
+        if (document.getElementById('inv-dash-revenue')) document.getElementById('inv-dash-revenue').innerText = fm(totalRevenue);
+        if (document.getElementById('inv-dash-paid')) document.getElementById('inv-dash-paid').innerText = fm(totalPaid);
+        if (document.getElementById('inv-dash-pending')) document.getElementById('inv-dash-pending').innerText = fm(pendingAmt);
+        if (document.getElementById('inv-dash-overdue')) document.getElementById('inv-dash-overdue').innerText = fm(overdueAmt);
+        if (document.getElementById('inv-dash-draft')) document.getElementById('inv-dash-draft').innerText = countDraft;
+
+        // Rates
+        const collectionRate = totalRevenue > 0 ? ((totalPaid / totalRevenue) * 100).toFixed(1) : 0;
+        const outstandingRate = totalRevenue > 0 ? (((pendingAmt + overdueAmt) / totalRevenue) * 100).toFixed(1) : 0;
+        const overdueRate = (pendingAmt + overdueAmt) > 0 ? ((overdueAmt / (pendingAmt + overdueAmt)) * 100).toFixed(1) : 0;
+
+        if (document.getElementById('inv-metric-collection-rate')) document.getElementById('inv-metric-collection-rate').innerText = collectionRate + '%';
+        if (document.getElementById('inv-metric-outstanding-rate')) document.getElementById('inv-metric-outstanding-rate').innerText = outstandingRate + '%';
+        if (document.getElementById('inv-metric-overdue-rate')) document.getElementById('inv-metric-overdue-rate').innerText = overdueRate + '%';
+
+        // 3. Render Top Clients Table
+        const topClientsBody = document.getElementById('inv-top-clients-body');
+        if (topClientsBody) {
+            const sortedClients = Object.keys(clientStats).map(k => ({ name: k, ...clientStats[k] })).sort((a,b) => b.billed - a.billed).slice(0, 5);
+            topClientsBody.innerHTML = sortedClients.length === 0 ? `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No client data available</td></tr>` : sortedClients.map(c => `
+                <tr>
+                    <td><strong>${invEscapeHTML(c.name)}</strong></td>
+                    <td style="text-align:center;">${c.count}</td>
+                    <td style="text-align:right;">${fm(c.billed)}</td>
+                    <td style="text-align:right; color:var(--success);">${fm(c.paid)}</td>
+                    <td style="text-align:right; color:${c.out > 0 ? 'var(--warning)' : 'inherit'};">${fm(c.out)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 4. Render Charts (Requires Chart.js)
+        if (window.Chart) {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = 'Inter, sans-serif';
+            
+            const destroyChart = (id) => { if(activeCharts[id]) activeCharts[id].destroy(); };
+
+            // Monthly Sorting Logic
+            let months = Object.keys(monthlyRev).sort();
+            if (months.length > 6) months = months.slice(months.length - 6);
+            const mLabels = months.map(m => {
+                const d = new Date(m + '-01');
+                return d.toLocaleDateString('en-US', {month:'short', year:'2-digit'});
+            });
+            const mBilled = months.map(m => monthlyRev[m].billed);
+            const mCol = months.map(m => monthlyRev[m].col);
+            const mCount = months.map(m => monthlyRev[m].count);
+
+            // Chart 1: Revenue Trend (Area)
+            destroyChart('chart-revenue-trend');
+            const ctxRev = document.getElementById('chart-revenue-trend');
+            if (ctxRev) {
+                activeCharts['chart-revenue-trend'] = new Chart(ctxRev, {
+                    type: 'line',
+                    data: { labels: mLabels, datasets: [{ label: 'Billed Revenue', data: mBilled, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            // Chart 2: Status Dist (Donut)
+            destroyChart('chart-status-dist');
+            const ctxStat = document.getElementById('chart-status-dist');
+            if (ctxStat) {
+                activeCharts['chart-status-dist'] = new Chart(ctxStat, {
+                    type: 'doughnut',
+                    data: { labels: ['Paid', 'Pending', 'Overdue', 'Draft'], datasets: [{ data: [statusCounts.PAID, statusCounts.PENDING, statusCounts.OVERDUE, statusCounts.DRAFT], backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#94a3b8'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right' } } }
+                });
+            }
+
+            // Chart 3: Rev vs Col (Bar)
+            destroyChart('chart-rev-vs-col');
+            const ctxRvsC = document.getElementById('chart-rev-vs-col');
+            if (ctxRvsC) {
+                activeCharts['chart-rev-vs-col'] = new Chart(ctxRvsC, {
+                    type: 'bar',
+                    data: { labels: mLabels, datasets: [{ label: 'Billed', data: mBilled, backgroundColor: '#6366f1' }, { label: 'Collected', data: mCol, backgroundColor: '#10b981' }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            // Chart 4: Outstanding (Top Clients Bar)
+            const sortedOut = Object.keys(clientStats).map(k => ({ name: k, out: clientStats[k].out })).filter(c => c.out > 0).sort((a,b) => b.out - a.out).slice(0, 5);
+            destroyChart('chart-outstanding');
+            const ctxOut = document.getElementById('chart-outstanding');
+            if (ctxOut) {
+                activeCharts['chart-outstanding'] = new Chart(ctxOut, {
+                    type: 'bar',
+                    data: { labels: sortedOut.map(c => c.name), datasets: [{ label: 'Outstanding Balance', data: sortedOut.map(c => c.out), backgroundColor: '#f43f5e' }] },
+                    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+                });
+            }
+
+            // Chart 5: Monthly Volume
+            destroyChart('chart-monthly-volume');
+            const ctxVol = document.getElementById('chart-monthly-volume');
+            if (ctxVol) {
+                activeCharts['chart-monthly-volume'] = new Chart(ctxVol, {
+                    type: 'bar',
+                    data: { labels: mLabels, datasets: [{ label: 'Invoices Count', data: mCount, backgroundColor: '#8b5cf6', borderRadius: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                });
+            }
+            
+            // Chart 6: Payment Trend (Area)
+            destroyChart('chart-payment-trend');
+            const ctxPay = document.getElementById('chart-payment-trend');
+            if (ctxPay) {
+                activeCharts['chart-payment-trend'] = new Chart(ctxPay, {
+                    type: 'line',
+                    data: { labels: mLabels, datasets: [{ label: 'Collections', data: mCol, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                });
+            }
+        }
+
+        // 5. Render Recent Invoices List
         const recentBody = document.getElementById('inv-dash-recent-body');
         if (!recentBody) return;
         recentBody.innerHTML = '';
@@ -125,8 +327,10 @@ window.setInvoiceListFilter = function(filter) {
 
             if (currentDashFilter === 'ALL') return true;
             if (currentDashFilter === 'PAID') return inv.status === 'PAID';
-            if (currentDashFilter === 'PENDING') return inv.status === 'SENT' || inv.status === 'PARTIALLY_PAID';
-            if (currentDashFilter === 'OVERDUE') return inv.status === 'OVERDUE';
+            if (currentDashFilter === 'PENDING') return inv.status === 'SENT' || inv.status === 'PARTIALLY_PAID' || inv.status === 'PENDING';
+            if (currentDashFilter === 'OVERDUE') {
+                return inv.status === 'OVERDUE' || (new Date(inv.due_date) < startOfToday && inv.status !== 'PAID' && inv.status !== 'CANCELLED');
+            }
             if (currentDashFilter === 'DRAFT') return inv.status === 'DRAFT';
             return true;
         });
@@ -139,22 +343,23 @@ window.setInvoiceListFilter = function(filter) {
             return;
         }
 
-        filtered.forEach(inv => {
+        // Only show top 10 on dashboard
+        filtered.slice(0, 10).forEach(inv => {
+            let sC = getStatusColor(inv.status);
+            if (new Date(inv.due_date) < startOfToday && inv.status !== 'PAID' && inv.status !== 'CANCELLED') sC = 'tag-danger';
+
             recentBody.innerHTML += `
                 <tr>
-                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
-                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
+                    <td><strong>${invEscapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
+                    <td>${invEscapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
+                    <td><span class="tag ${sC}">${invEscapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
                         </div>
                     </td>
                 </tr>
@@ -193,19 +398,19 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(inv => {
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
-                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
+                    <td><strong>${invEscapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
+                    <td>${invEscapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
+                    <td><span class="tag ${getStatusColor(inv.status)}">${invEscapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="window.switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="window.switchInvoiceView('create', '${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -612,16 +817,16 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(c => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${escapeHTML(c.customer_id)}</span></td>
-                    <td><strong>${escapeHTML(c.name)}</strong></td>
-                    <td>${escapeHTML(c.company || '-')}</td>
-                    <td>${escapeHTML(c.email || '-')}</td>
+                    <td><span class="tag tag-cyan">${invEscapeHTML(c.customer_id)}</span></td>
+                    <td><strong>${invEscapeHTML(c.name)}</strong></td>
+                    <td>${invEscapeHTML(c.company || '-')}</td>
+                    <td>${invEscapeHTML(c.email || '-')}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')" title="Edit Customer">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${invEscapeHTML(c.customer_id)}')" title="Edit Customer">
                                 <i class="fa-solid fa-pen"></i> <span>Edit</span>
                             </button>
-                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteCustomer('${escapeHTML(c.customer_id)}')" title="Delete Customer">
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteCustomer('${invEscapeHTML(c.customer_id)}')" title="Delete Customer">
                                 <i class="fa-solid fa-trash"></i> <span>Delete</span>
                             </button>
                         </div>
@@ -717,16 +922,16 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(s => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${escapeHTML(s.service_id)}</span></td>
-                    <td><strong>${escapeHTML(s.name)}</strong></td>
-                    <td>${escapeHTML(s.hsn || '-')}</td>
+                    <td><span class="tag tag-cyan">${invEscapeHTML(s.service_id)}</span></td>
+                    <td><strong>${invEscapeHTML(s.name)}</strong></td>
+                    <td>${invEscapeHTML(s.hsn || '-')}</td>
                     <td>₹${Number(s.price).toLocaleString('en-IN')} (${s.tax_rate}%)</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${escapeHTML(s.service_id)}')" title="Edit Service">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${invEscapeHTML(s.service_id)}')" title="Edit Service">
                                 <i class="fa-solid fa-pen"></i> <span>Edit</span>
                             </button>
-                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteService('${escapeHTML(s.service_id)}')" title="Delete Service">
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteService('${invEscapeHTML(s.service_id)}')" title="Delete Service">
                                 <i class="fa-solid fa-trash"></i> <span>Delete</span>
                             </button>
                         </div>
@@ -802,9 +1007,9 @@ window.setInvoiceListFilter = function(filter) {
             services.forEach(s => {
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${escapeHTML(s.name)}</strong><br><small>${escapeHTML(s.hsn||'')}</small></td>
+                        <td><strong>${invEscapeHTML(s.name)}</strong><br><small>${invEscapeHTML(s.hsn||'')}</small></td>
                         <td>₹${Number(s.price).toLocaleString('en-IN')}</td>
-                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${escapeHTML(s.service_id)}')">Add</button></td>
+                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${invEscapeHTML(s.service_id)}')">Add</button></td>
                     </tr>
                 `;
             });
@@ -948,10 +1153,10 @@ window.setInvoiceListFilter = function(filter) {
                 list.innerHTML += `
                     <li>
                         <div>
-                            <strong>${escapeHTML(log.action)}</strong>
-                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${escapeHTML(log.user)}</div>
+                            <strong>${invEscapeHTML(log.action)}</strong>
+                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${invEscapeHTML(log.user)}</div>
                         </div>
-                        <span class="tag ${getStatusColor(log.status)}">${escapeHTML(log.status)}</span>
+                        <span class="tag ${getStatusColor(log.status)}">${invEscapeHTML(log.status)}</span>
                     </li>
                 `;
             });
@@ -1037,6 +1242,13 @@ window.setInvoiceListFilter = function(filter) {
                 InvoiceDB.fetchRemoteInvoices();
             }
         }, 100);
+
+        // Auto poll every 30 seconds
+        setInterval(() => {
+            if (InvoiceDB && InvoiceDB.fetchRemoteInvoices) {
+                InvoiceDB.fetchRemoteInvoices();
+            }
+        }, 30000);
     }
 
     if (document.readyState === 'loading') {

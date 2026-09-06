@@ -1,35 +1,224 @@
-﻿/* Invoice Builder actions: one state for local storage, Apps Script, preview, and sharing. */
+/* Invoice Builder actions: one state for local storage, Apps Script, preview, and sharing. */
 (function() {
     const PENDING_KEY = 'shaivika_invoice_drafts';
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
     let activeRequest = false;
+
     const money = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
     const toast = (message, type) => window.showToast ? window.showToast(message, type || 'success') : console[type === 'error' ? 'error' : 'log'](message);
     const field = id => document.getElementById(id);
-    const verificationOrigin = () => window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ? window.location.origin : 'https://shaivikaittechnologies.in';
-    const setBusy = (id, busy, label) => { const button = field(id); if (!button) return; if (busy) { button.dataset.originalLabel = button.innerHTML; button.disabled = true; button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${label}`; } else { button.disabled = false; if (button.dataset.originalLabel) button.innerHTML = button.dataset.originalLabel; } };
-    function calculateInvoice() { const serviceSelect = field('inv-flat-service'); const selected = serviceSelect?.selectedOptions[0]; const price = money(field('inv-flat-price')?.value || 0); const gstPercent = Number(field('inv-flat-gst')?.value || 0); const subtotal = money(price); const gstAmount = money(subtotal * gstPercent / 100); const intraState = (field('inv-form-state')?.value || 'AP') === 'AP'; const cgst = intraState ? money(gstAmount / 2) : 0; const sgst = intraState ? money(gstAmount - cgst) : 0; return { subtotal, gstPercent, gstAmount, cgst, sgst, totalAmount: money(subtotal + gstAmount), serviceSelect, selected }; }
-    function invoiceNumber() { const current = field('inv-form-id')?.value.trim(); if (current) return current; const date = field('inv-form-date')?.value || new Date().toISOString().slice(0, 10); const compact = date.replace(/-/g, ''); const key = `shaivika_invoice_sequence_${compact}`; let sequence = Number(localStorage.getItem(key) || 0); let number; do { sequence += 1; number = `INV-${compact}-${String(sequence).padStart(4, '0')}`; } while ((window.InvoiceDB?.getInvoices() || []).some(inv => inv.invoice_number === number)); localStorage.setItem(key, String(sequence)); if (field('inv-form-id')) field('inv-form-id').value = number; return number; }
-    function getInvoiceState(status) { const calc = calculateInvoice(); const selected = calc.selected; const service = selected?.value === 'others' ? (field('inv-flat-other-service')?.value.trim() || '') : (selected?.textContent.trim() || ''); const existing = field('inv-form-uuid')?.value ? window.InvoiceDB?.getInvoiceById(field('inv-form-uuid').value) : null; const now = new Date().toISOString(); const id = field('inv-form-uuid')?.value || window.InvoiceDB?.generateUUID() || crypto.randomUUID(); const number = invoiceNumber(); const date = field('inv-form-date')?.value || now.slice(0, 10); const verificationUrl = `${verificationOrigin()}/verify.html?id=${encodeURIComponent(number)}`; return { invoiceId: id, invoiceNumber: number, status: status || existing?.status || 'DRAFT', customerName: field('inv-flat-name')?.value.trim() || '', phone: field('inv-flat-phone')?.value.trim() || '', email: field('inv-flat-email')?.value.trim() || '', service, price: calc.subtotal, gstPercent: calc.gstPercent, subtotal: calc.subtotal, gstAmount: calc.gstAmount, cgst: calc.cgst, sgst: calc.sgst, totalAmount: calc.totalAmount, invoiceDate: date, dueDate: date, stateCode: field('inv-form-state')?.value || 'AP', paymentMethod: field('inv-form-payment-method')?.value || 'Online / Bank Transfer', notes: field('inv-flat-summary')?.value || '', createdAt: existing?.created_at || now, updatedAt: now, pdfFileName: `SHAIVIKA_INVOICE_${number}.pdf`, pdfUrl: '', shareUrl: verificationUrl, verificationId: number, verificationUrl, verification_id: number, verification_url: verificationUrl, invoice_uuid: id, invoice_number: number, invoice_date: date, due_date: date, customer_name: field('inv-flat-name')?.value.trim() || '', customer_phone: field('inv-flat-phone')?.value.trim() || '', customer_email: field('inv-flat-email')?.value.trim() || '', customer_id: existing?.customer_id || `CUST-${Date.now()}`, state_code: field('inv-form-state')?.value || 'AP', payment_method: field('inv-form-payment-method')?.value || 'Online / Bank Transfer', tax_amount: calc.gstAmount, total_amount: calc.totalAmount, items: [{ service_id: selected?.value || '', description: service || 'Service', qty: 1, rate: calc.subtotal, taxRate: calc.gstPercent, taxAmount: calc.gstAmount, total: calc.totalAmount }] }; }
-    function validateInvoice(invoice, final) { if (!invoice.customerName) return 'Customer name is required.'; if (invoice.phone && !/^(?:\+?91[\s-]?)?[6-9]\d{9}$/.test(invoice.phone.replace(/[()\s-]/g, ''))) return 'Phone number is invalid.'; if (invoice.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invoice.email)) return 'Email address is invalid.'; if (!invoice.service) return 'Service is required.'; if (invoice.price <= 0) return 'Price must be greater than zero.'; if (!Number.isFinite(invoice.gstPercent) || invoice.gstPercent < 0 || invoice.gstPercent > 100) return 'GST must be between 0 and 100.'; if (final && !invoice.invoiceDate) return 'Invoice date is required.'; return ''; }
-    function saveLocal(invoice) { const drafts = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); const index = drafts.findIndex(item => item.invoiceId === invoice.invoiceId || item.invoiceNumber === invoice.invoiceNumber); if (index >= 0) drafts[index] = invoice; else drafts.unshift(invoice); localStorage.setItem(PENDING_KEY, JSON.stringify(drafts.slice(0, 100))); if (window.InvoiceDB) window.InvoiceDB.saveInvoice(invoice); if (field('inv-form-uuid')) field('inv-form-uuid').value = invoice.invoiceId; if (field('inv-form-id')) field('inv-form-id').value = invoice.invoiceNumber; }
-    async function request(action, invoice) { const response = await fetch(ENDPOINT, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action, invoice }) }); if (!response.ok) throw new Error(`Google Sheets returned HTTP ${response.status}`); const result = await response.json(); if (result.status !== 'success' && result.success !== true) throw new Error(result.message || 'Google Sheets rejected the invoice.'); return result; }
-    async function saveInvoice(invoice, issue) { if (activeRequest) return null; activeRequest = true; const buttonId = issue ? 'inv-generate-btn' : 'inv-save-btn'; setBusy(buttonId, true, issue ? 'Generating...' : 'Saving...'); try { saveLocal(invoice); const result = await request('saveInvoice', invoice); invoice.invoiceId = result.invoiceId || invoice.invoiceId; invoice.invoiceNumber = result.invoiceNumber || invoice.invoiceNumber; saveLocal(invoice); toast(issue ? 'Invoice generated and issued successfully.' : 'Invoice draft saved successfully.', 'success'); if (issue && invoice.email) { try { await request('sendInvoiceEmail', invoice); toast('Invoice email sent successfully.', 'success'); } catch (emailError) { toast(`Invoice saved, but email failed: ${emailError.message}`, 'error'); } } return invoice; } catch (error) { saveLocal(invoice); toast(`Invoice saved locally. Google Sheets sync is pending: ${error.message}`, 'error'); return invoice; } finally { activeRequest = false; setBusy(buttonId, false); } }
+    const verificationOrigin = () => window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+        ? window.location.origin
+        : 'https://shaivikaittechnologies.in';
+    const setBusy = (id, busy, label) => {
+        const button = field(id);
+        if (!button) return;
+        if (busy) {
+            button.dataset.originalLabel = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${label}`;
+        } else {
+            button.disabled = false;
+            if (button.dataset.originalLabel) button.innerHTML = button.dataset.originalLabel;
+        }
+    };
+
+    function calculateInvoice() {
+        const serviceSelect = field('inv-flat-service');
+        const selected = serviceSelect?.selectedOptions[0];
+        const price = money(field('inv-flat-price')?.value || 0);
+        const gstPercent = Number(field('inv-flat-gst')?.value || 0);
+        const subtotal = money(price);
+        const gstAmount = money(subtotal * gstPercent / 100);
+        const intraState = (field('inv-form-state')?.value || 'AP') === 'AP';
+        const cgst = intraState ? money(gstAmount / 2) : 0;
+        const sgst = intraState ? money(gstAmount - cgst) : 0;
+        const totalAmount = money(subtotal + gstAmount);
+        return { subtotal, gstPercent, gstAmount, cgst, sgst, totalAmount, serviceSelect, selected };
+    }
+
+    function invoiceNumber() {
+        const current = field('inv-form-id')?.value.trim();
+        if (current) return current;
+        const date = field('inv-form-date')?.value || new Date().toISOString().slice(0, 10);
+        const compact = date.replace(/-/g, '');
+        const key = `shaivika_invoice_sequence_${compact}`;
+        let sequence = Number(localStorage.getItem(key) || 0);
+        let number;
+        do {
+            sequence += 1;
+            number = `INV-${compact}-${String(sequence).padStart(4, '0')}`;
+        } while ((window.InvoiceDB?.getInvoices() || []).some(inv => inv.invoice_number === number));
+        localStorage.setItem(key, String(sequence));
+        if (field('inv-form-id')) field('inv-form-id').value = number;
+        return number;
+    }
+
+    function getInvoiceState(status) {
+        const calc = calculateInvoice();
+        const selected = calc.selected;
+        const service = selected?.value === 'others'
+            ? (field('inv-flat-other-service')?.value.trim() || '')
+            : (selected?.textContent.trim() || '');
+        const existing = field('inv-form-uuid')?.value ? window.InvoiceDB?.getInvoiceById(field('inv-form-uuid').value) : null;
+        const now = new Date().toISOString();
+        const invoiceId = field('inv-form-uuid')?.value || window.InvoiceDB?.generateUUID() || crypto.randomUUID();
+        const createdAt = existing?.created_at || now;
+        const date = field('inv-form-date')?.value || now.slice(0, 10);
+        const number = invoiceNumber();
+        const verificationUrl = `${verificationOrigin()}/verify.html?id=${encodeURIComponent(number)}`;
+        const invoice = {
+            invoiceId, invoiceNumber: number, status: status || existing?.status || 'DRAFT',
+            customerName: field('inv-flat-name')?.value.trim() || '', phone: field('inv-flat-phone')?.value.trim() || '',
+            email: field('inv-flat-email')?.value.trim() || '', service, price: calc.subtotal, gstPercent: calc.gstPercent,
+            subtotal: calc.subtotal, gstAmount: calc.gstAmount, cgst: calc.cgst, sgst: calc.sgst, totalAmount: calc.totalAmount,
+            invoiceDate: date, dueDate: date, stateCode: field('inv-form-state')?.value || 'AP',
+            paymentMethod: field('inv-form-payment-method')?.value || 'Online / Bank Transfer', notes: field('inv-flat-summary')?.value || '',
+            createdAt, updatedAt: now, pdfFileName: `SHAIVIKA_INVOICE_${number}.pdf`, pdfUrl: '',
+            shareUrl: verificationUrl, verificationId: number, verificationUrl,
+            invoice_uuid: invoiceId, invoice_number: number, invoice_date: date, due_date: date,
+            customer_name: field('inv-flat-name')?.value.trim() || '', customer_phone: field('inv-flat-phone')?.value.trim() || '',
+            customer_email: field('inv-flat-email')?.value.trim() || '', customer_id: existing?.customer_id || `CUST-${Date.now()}`,
+            state_code: field('inv-form-state')?.value || 'AP', payment_method: field('inv-form-payment-method')?.value || 'Online / Bank Transfer',
+            subtotal: calc.subtotal, tax_amount: calc.gstAmount, total_amount: calc.totalAmount,
+            verification_id: number, verification_url: verificationUrl,
+            items: [{ service_id: selected?.value || '', description: service || 'Service', qty: 1, rate: calc.subtotal,
+                taxRate: calc.gstPercent, taxAmount: calc.gstAmount, total: calc.totalAmount }]
+        };
+        return invoice;
+    }
+
+    function validateInvoice(invoice, final) {
+        if (!invoice.customerName) return 'Customer name is required.';
+        if (invoice.phone && !/^(?:\+?91[\s-]?)?[6-9]\d{9}$/.test(invoice.phone.replace(/[()\s-]/g, ''))) return 'Phone number is invalid.';
+        if (invoice.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invoice.email)) return 'Email address is invalid.';
+        if (!invoice.service) return 'Service is required.';
+        if (invoice.price <= 0) return 'Price must be greater than zero.';
+        if (!Number.isFinite(invoice.gstPercent) || invoice.gstPercent < 0 || invoice.gstPercent > 100) return 'GST must be between 0 and 100.';
+        if (final && !invoice.invoiceDate) return 'Invoice date is required.';
+        return '';
+    }
+
+    function saveLocal(invoice) {
+        const drafts = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]');
+        const index = drafts.findIndex(item => item.invoiceId === invoice.invoiceId || item.invoiceNumber === invoice.invoiceNumber);
+        if (index >= 0) drafts[index] = invoice; else drafts.unshift(invoice);
+        localStorage.setItem(PENDING_KEY, JSON.stringify(drafts.slice(0, 100)));
+        if (window.InvoiceDB) window.InvoiceDB.saveInvoice(invoice);
+        if (field('inv-form-uuid')) field('inv-form-uuid').value = invoice.invoiceId;
+        if (field('inv-form-id')) field('inv-form-id').value = invoice.invoiceNumber;
+    }
+
+    async function request(action, invoice) {
+        const response = await fetch(ENDPOINT, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action, invoice }) });
+        if (!response.ok) throw new Error(`Google Sheets returned HTTP ${response.status}`);
+        const result = await response.json();
+        if (result.status !== 'success' && result.success !== true) throw new Error(result.message || 'Google Sheets rejected the invoice.');
+        return result;
+    }
+
+    async function saveInvoice(invoice, issue) {
+        if (activeRequest) return null;
+        activeRequest = true;
+        const buttonId = issue ? 'inv-generate-btn' : 'inv-save-btn';
+        setBusy(buttonId, true, issue ? 'Generating...' : 'Saving...');
+        try {
+            saveLocal(invoice);
+            const result = await request('saveInvoice', invoice);
+            invoice.invoiceId = result.invoiceId || invoice.invoiceId;
+            invoice.invoiceNumber = result.invoiceNumber || invoice.invoiceNumber;
+            saveLocal(invoice);
+            toast(issue ? 'Invoice generated and issued successfully.' : 'Invoice draft saved successfully.', 'success');
+            if (issue && invoice.email) {
+                try { await request('sendInvoiceEmail', invoice); toast('Invoice email sent successfully.', 'success'); }
+                catch (emailError) { toast(`Invoice saved, but email failed: ${emailError.message}`, 'error'); }
+            }
+            return invoice;
+        } catch (error) {
+            saveLocal(invoice);
+            toast(`Invoice saved locally. Google Sheets sync is pending: ${error.message}`, 'error');
+            return invoice;
+        } finally {
+            activeRequest = false;
+            setBusy(buttonId, false);
+        }
+    }
+
     window.saveInvoiceToGoogleSheets = invoice => request('saveInvoice', invoice);
     window.updateInvoice = window.saveInvoiceToGoogleSheets;
     window.syncInvoicesToGoogleSheet = async function() {
         if (activeRequest) return;
         const invoices = window.InvoiceDB?.getInvoices?.() || [];
         if (!invoices.length) { toast('No invoices to sync.', 'info'); return; }
-        try { for (const invoice of invoices) await request('saveInvoice', invoice); toast('Invoices synced to Google Sheets successfully.', 'success'); }
-        catch (error) { toast(`Unable to sync invoices: ${error.message}`, 'error'); }
+        try {
+            for (const invoice of invoices) await request('saveInvoice', invoice);
+            toast('Invoices synced to Google Sheets successfully.', 'success');
+        } catch (error) {
+            toast(`Unable to sync invoices: ${error.message}`, 'error');
+        }
     };
     window.calculateInvoice = calculateInvoice;
-    window.saveInvoiceForm = async function() { const invoice = getInvoiceState('DRAFT'); const error = validateInvoice(invoice, false); if (error) { toast(error, 'error'); return null; } return saveInvoice(invoice, false); };
-    window.generateFinalInvoice = async function() { const invoice = getInvoiceState('ISSUED'); const error = validateInvoice(invoice, true); if (error) { toast(error, 'error'); return null; } if (!window.InvoicePDF?.generate) { toast('PDF generator is unavailable.', 'error'); return null; } try { await window.InvoicePDF.generate(invoice); return await saveInvoice(invoice, true); } catch (pdfError) { toast(`Invoice was not issued because PDF generation failed: ${pdfError.message}`, 'error'); return null; } };
-    window.downloadInvoicePDF = async function() { if (activeRequest) return; const invoice = getInvoiceState('DRAFT'); const error = validateInvoice(invoice, false); if (error) { toast(error, 'error'); return; } setBusy('inv-download-btn', true, 'Preparing PDF...'); try { saveLocal(invoice); await window.InvoicePDF.generate(invoice); toast('PDF downloaded successfully.', 'success'); } catch (e) { toast(`Unable to generate PDF: ${e.message}`, 'error'); } finally { setBusy('inv-download-btn', false); } };
-    window.sendInvoiceEmail = async function() { const invoice = getInvoiceState('DRAFT'); if (!invoice.email) { toast('Customer email is required.', 'error'); return; } setBusy('inv-email-btn', true, 'Opening Email...'); try { saveLocal(invoice); await request('sendInvoiceEmail', invoice); toast('Invoice email sent successfully.', 'success'); } catch (error) { toast(`Unable to send invoice email: ${error.message}`, 'error'); } finally { setBusy('inv-email-btn', false); } };
-    window.sendInvoiceWhatsApp = function() { const invoice = getInvoiceState('DRAFT'); if (!invoice.phone) { toast('Customer phone number is required.', 'error'); return; } let phone = invoice.phone.replace(/\D/g, ''); if (phone.length === 10) phone = `91${phone}`; if (phone.length === 11 && phone[0] === '0') phone = `91${phone.slice(1)}`; const text = `Hi ${invoice.customerName} 👋\n\nYour invoice from Shaivika IT Technologies has been generated.\n\n🧾 Invoice: ${invoice.invoiceNumber}\n💰 Total Amount: ₹${invoice.totalAmount.toFixed(2)}\n📅 Invoice Date: ${invoice.invoiceDate}\n💳 Payment Method: ${invoice.paymentMethod}\n\nThank you for choosing Shaivika IT Technologies.\n\nInvoice: ${invoice.shareUrl}`; window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer'); };
-    window.copyInvoiceLink = async function() { const invoice = getInvoiceState('DRAFT'); try { await navigator.clipboard.writeText(invoice.shareUrl); } catch (e) { const area = document.createElement('textarea'); area.value = invoice.shareUrl; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove(); } toast('Invoice link copied successfully.', 'success'); };
-    window.shareInvoice = async function() { const invoice = getInvoiceState('DRAFT'); if (navigator.share) await navigator.share({ title: `Invoice ${invoice.invoiceNumber}`, text: `Invoice ${invoice.invoiceNumber} from Shaivika IT Technologies`, url: invoice.shareUrl }); else { await window.copyInvoiceLink(); toast('Share is unavailable; invoice link copied.', 'success'); } };
+    window.saveInvoiceForm = async function() {
+        const invoice = getInvoiceState('DRAFT');
+        const error = validateInvoice(invoice, false);
+        if (error) { toast(error, 'error'); return null; }
+        return saveInvoice(invoice, false);
+    };
+    window.generateFinalInvoice = async function() {
+        const invoice = getInvoiceState('ISSUED');
+        const error = validateInvoice(invoice, true);
+        if (error) { toast(error, 'error'); return null; }
+        if (!window.InvoicePDF?.generate) { toast('PDF generator is unavailable.', 'error'); return null; }
+        try {
+            await window.InvoicePDF.generate(invoice);
+            return await saveInvoice(invoice, true);
+        } catch (pdfError) {
+            toast(`Invoice was not issued because PDF generation failed: ${pdfError.message}`, 'error');
+            return null;
+        }
+    };
+    window.downloadInvoicePDF = async function() {
+        if (activeRequest) return;
+        const invoice = getInvoiceState('DRAFT');
+        const error = validateInvoice(invoice, false);
+        if (error) { toast(error, 'error'); return; }
+        setBusy('inv-download-btn', true, 'Preparing PDF...');
+        try {
+            saveLocal(invoice);
+            await window.InvoicePDF.generate(invoice);
+            toast('PDF downloaded successfully.', 'success');
+        } catch (e) { toast(`Unable to generate PDF: ${e.message}`, 'error'); }
+        finally { setBusy('inv-download-btn', false); }
+    };
+    window.sendInvoiceEmail = async function() {
+        const invoice = getInvoiceState('DRAFT');
+        if (!invoice.email) { toast('Customer email is required.', 'error'); return; }
+        setBusy('inv-email-btn', true, 'Opening Email...');
+        try {
+            saveLocal(invoice);
+            await request('sendInvoiceEmail', invoice);
+            toast('Invoice email sent successfully.', 'success');
+        } catch (error) { toast(`Unable to send invoice email: ${error.message}`, 'error'); }
+        finally { setBusy('inv-email-btn', false); }
+    };
+    window.sendInvoiceWhatsApp = function() {
+        const invoice = getInvoiceState('DRAFT');
+        if (!invoice.phone) { toast('Customer phone number is required.', 'error'); return; }
+        let phone = invoice.phone.replace(/\D/g, '');
+        if (phone.length === 10) phone = `91${phone}`;
+        if (phone.length === 11 && phone[0] === '0') phone = `91${phone.slice(1)}`;
+        const text = `Hi ${invoice.customerName} 👋\n\nYour invoice from Shaivika IT Technologies has been generated.\n\n🧾 Invoice: ${invoice.invoiceNumber}\n💰 Total Amount: ₹${invoice.totalAmount.toFixed(2)}\n📅 Invoice Date: ${invoice.invoiceDate}\n💳 Payment Method: ${invoice.paymentMethod}\n\nThank you for choosing Shaivika IT Technologies.\n\nInvoice: ${invoice.shareUrl}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+    };
+    window.copyInvoiceLink = async function() {
+        const invoice = getInvoiceState('DRAFT');
+        try { await navigator.clipboard.writeText(invoice.shareUrl); }
+        catch (e) { const area = document.createElement('textarea'); area.value = invoice.shareUrl; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove(); }
+        toast('Invoice link copied successfully.', 'success');
+    };
+    window.shareInvoice = async function() {
+        const invoice = getInvoiceState('DRAFT');
+        if (navigator.share) await navigator.share({ title: `Invoice ${invoice.invoiceNumber}`, text: `Invoice ${invoice.invoiceNumber} from Shaivika IT Technologies`, url: invoice.shareUrl });
+        else { await window.copyInvoiceLink(); toast('Share is unavailable; invoice link copied.', 'success'); }
+    };
 })();

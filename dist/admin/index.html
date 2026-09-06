@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex">
     <title>Admin Dashboard - Shaivika IT Technologies</title>
+    <link rel="icon" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" type="image/png">
+    <link rel="shortcut icon" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -543,6 +548,7 @@
 
         .data-table-wrapper {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .data-table {
@@ -741,14 +747,136 @@
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast-icon { font-size: 1.25rem; }
 
-        @media (max-width: 900px) {
-            .dashboard-container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; padding: 20px; }
-            .sidebar-nav { display: flex; flex-wrap: wrap; gap: 6px; }
-            .sidebar-link { padding: 8px 12px; font-size: 0.8rem; }
-            .main-content { padding: 20px; }
+        /* Mobile Header and Sidebar Toggle */
+        .mobile-header {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-secondary);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            z-index: 999;
+        }
+
+        .mobile-header-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Responsive Wrappers */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1rem;
+        }
+
+        .chart-responsive-container {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .mobile-header { display: flex; }
+            
+            /* Sidebar as Drawer */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -320px;
+                width: 280px;
+                height: 100vh;
+                z-index: 1001;
+                transition: left 0.3s ease;
+                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+                overflow-y: auto;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content { padding: 16px; overflow-x: hidden; width: 100%; box-sizing: border-box; }
             .form-grid { grid-template-columns: 1fr; }
             #catGridContainer { grid-template-columns: 1fr !important; }
+            
+            /* Stats Grid */
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            /* Invoice Dashboard Cards */
+            .inv-dash-cards {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            
+            /* Billing Header Actions */
+            .inv-flex-between {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+            .inv-flex-between > div {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            /* Modals */
+            .modal-content {
+                width: 95%;
+                max-width: calc(100vw - 20px);
+                max-height: calc(100vh - 20px);
+                margin: 10px auto;
+                padding: 20px;
+                overflow-y: auto;
+            }
+            .inv-modal-content {
+                width: 95%;
+                max-width: calc(100vw - 20px);
+                max-height: calc(100vh - 20px);
+                margin: 10px auto;
+                overflow-y: auto;
+            }
+            
+            /* Typography / Content Fitting */
+            .page-title { font-size: 1.5rem; }
+            .inv-dash-title { font-size: 1.5rem; }
         }
     </style>
     <link rel="stylesheet" href="premium-actions.css">
@@ -780,9 +908,21 @@
     </div>
 
     <!-- ===== MAIN DASHBOARD ===== -->
+    
+    <!-- Mobile Header (Visible only on mobile/tablet) -->
+    <header class="mobile-header">
+        <div class="mobile-header-title">SHAIVIKA ADMIN</div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </header>
+    
+    <!-- Sidebar Overlay (Visible when sidebar is open on mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="dashboard-container" id="dashboardContainer">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="adminSidebar">
             <div class="sidebar-header">
                 <span class="sidebar-logo">SHAIVIKA ADMIN</span>
                 <button class="theme-toggle-btn action-btn" aria-label="Toggle Theme" id="themeToggleBtn">🌙</button>
@@ -1169,41 +1309,133 @@
 
                     <!-- DASHBOARD VIEW -->
                     <div class="inv-view" id="inv-view-dashboard" style="display:block;">
-                        <div class="inv-dash-cards">
+                        
+                        <!-- Dashboard Header & Status -->
+                        <div class="inv-flex-between" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; flex-wrap:wrap; gap:16px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div id="inv-dash-status-indicator" style="display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:14px; padding:4px 10px; border-radius:20px; background:rgba(16, 185, 129, 0.1); color:var(--success);">
+                                    <span style="height:8px; width:8px; background:currentColor; border-radius:50%; display:inline-block; box-shadow:0 0 8px currentColor;"></span>
+                                    LIVE
+                                </div>
+                                <span id="inv-dash-last-updated" style="color:var(--text-muted); font-size:13px;">Last updated: --</span>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="inv-dash-refresh-btn" onclick="window.refreshDashboardData()" style="display:inline-flex; align-items:center; gap:6px; margin-right:8px;">
+                                    <i class="fa fa-sync"></i> Refresh
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="window.switchInvoiceView('create')">
+                                    <i class="fa-solid fa-plus-circle"></i> Create Invoice
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KPI Cards -->
+                        <div class="inv-dash-cards" style="margin-bottom: 24px; display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                             <div class="inv-card premium-card" style="cursor:pointer;" onclick="window.switchInvoiceView('list')" title="Click to view all invoices">
                                 <div class="card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);"><i class="fa fa-file-invoice"></i></div>
                                 <div>
-                                    <h4>Total Invoices</h4>
-                                    <h2 id="inv-dash-total-inv">0</h2>
+                                    <h4 style="font-size:13px; text-transform:uppercase; letter-spacing:0.5px; opacity:0.8; margin-bottom:4px;">Total Invoices</h4>
+                                    <h2 id="inv-dash-total-inv" style="font-size:26px; margin:0;">0</h2>
                                 </div>
                             </div>
                             <div class="inv-card premium-card">
                                 <div class="card-icon" style="background: linear-gradient(135deg, #00C9FF, #92FE9D);"><i class="fa fa-wallet"></i></div>
                                 <div>
-                                    <h4>Total Revenue</h4>
-                                    <h2 id="inv-dash-revenue">₹0</h2>
+                                    <h4 style="font-size:13px; text-transform:uppercase; letter-spacing:0.5px; opacity:0.8; margin-bottom:4px;">Total Revenue</h4>
+                                    <h2 id="inv-dash-revenue" style="font-size:26px; margin:0;">₹0</h2>
                                 </div>
                             </div>
-                            <div class="inv-card premium-card">
-                                <div class="card-icon" style="background: linear-gradient(135deg, #f6d365, #fda085);"><i class="fa fa-hourglass-half"></i></div>
-                                <div>
-                                    <h4>Pending / Due</h4>
-                                    <h2 id="inv-dash-pending">₹0</h2>
+
+                        </div>
+
+                        <!-- Financial Overview Metrics Row -->
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:12px; padding:20px;">
+                            <div style="border-right: 1px solid var(--border-glass); padding-right:15px;">
+                                <div style="color:var(--text-muted); font-size:12px; margin-bottom:5px;">Collection Rate</div>
+                                <div id="inv-metric-collection-rate" style="font-size:20px; font-weight:700; color:var(--success);">0%</div>
+                            </div>
+                            <div style="border-right: 1px solid var(--border-glass); padding-right:15px;">
+                                <div style="color:var(--text-muted); font-size:12px; margin-bottom:5px;">Outstanding Rate</div>
+                                <div id="inv-metric-outstanding-rate" style="font-size:20px; font-weight:700; color:var(--warning);">0%</div>
+                            </div>
+                            <div>
+                                <div style="color:var(--text-muted); font-size:12px; margin-bottom:5px;">Overdue Rate</div>
+                                <div id="inv-metric-overdue-rate" style="font-size:20px; font-weight:700; color:var(--danger);">0%</div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Section -->
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 30px;">
+                            
+                            <div class="premium-panel" style="padding: 20px;">
+                                <h3 style="margin-top:0; margin-bottom:20px; font-size:16px;"><i class="fa fa-chart-area"></i> Revenue Trend (Last 6 Months)</h3>
+                                <div style="position: relative; height:250px; width:100%;">
+                                    <canvas id="chart-revenue-trend"></canvas>
                                 </div>
                             </div>
-                            <div class="inv-card premium-card">
-                                <div class="card-icon" style="background: linear-gradient(135deg, #f857a6, #ff5858);"><i class="fa fa-exclamation-circle"></i></div>
-                                <div>
-                                    <h4>Overdue</h4>
-                                    <h2 id="inv-dash-overdue">₹0</h2>
+                            
+                            <div class="premium-panel" style="padding: 20px;">
+                                <h3 style="margin-top:0; margin-bottom:20px; font-size:16px;"><i class="fa fa-chart-pie"></i> Invoice Status Distribution</h3>
+                                <div style="position: relative; height:250px; width:100%;">
+                                    <canvas id="chart-status-dist"></canvas>
                                 </div>
+                            </div>
+
+                            <div class="premium-panel" style="padding: 20px;">
+                                <h3 style="margin-top:0; margin-bottom:20px; font-size:16px;"><i class="fa fa-chart-bar"></i> Revenue vs Collection</h3>
+                                <div style="position: relative; height:250px; width:100%;">
+                                    <canvas id="chart-rev-vs-col"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="premium-panel" style="padding: 20px;">
+                                <h3 style="margin-top:0; margin-bottom:20px; font-size:16px;"><i class="fa fa-users"></i> Top Clients by Outstanding Balance</h3>
+                                <div style="position: relative; height:250px; width:100%;">
+                                    <canvas id="chart-outstanding"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="premium-panel" style="padding: 20px;">
+                                <h3 style="margin-top:0; margin-bottom:20px; font-size:16px;"><i class="fa fa-calendar-alt"></i> Monthly Invoice Volume</h3>
+                                <div style="position: relative; height:250px; width:100%;">
+                                    <canvas id="chart-monthly-volume"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="premium-panel" style="padding: 20px;">
+                                <h3 style="margin-top:0; margin-bottom:20px; font-size:16px;"><i class="fa fa-hand-holding-usd"></i> Payment Collection Trend</h3>
+                                <div style="position: relative; height:250px; width:100%;">
+                                    <canvas id="chart-payment-trend"></canvas>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Top Clients Table -->
+                        <div class="premium-panel" style="margin-bottom: 30px;">
+                            <h3 style="margin-top:0; margin-bottom:20px; font-size:16px;"><i class="fa fa-star"></i> Top Clients by Billing</h3>
+                            <div class="table-responsive">
+                                <table class="inv-premium-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Client</th>
+                                            <th style="text-align:center;">Invoices</th>
+                                            <th style="text-align:right;">Total Billing</th>
+                                            <th style="text-align:right;">Paid</th>
+                                            <th style="text-align:right;">Outstanding</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inv-top-clients-body">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
                         <div class="inv-recent-section premium-panel">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
                                 <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                                    <h3 style="margin:0;"><i class="fa fa-file-invoice"></i> Total Invoices (<span id="inv-dash-count-badge">0</span>)</h3>
+                                    <h3 style="margin:0;"><i class="fa fa-file-invoice"></i> Recent Invoices (<span id="inv-dash-count-badge">0</span>)</h3>
                                     <div class="inv-filter-pills" id="inv-dash-filter-pills" style="display:flex; gap:6px;">
                                         <button type="button" class="btn btn-sm btn-primary active" data-dash-filter="ALL" onclick="window.setInvoiceDashFilter('ALL')">All</button>
                                         <button type="button" class="btn btn-sm btn-ghost" data-dash-filter="PAID" onclick="window.setInvoiceDashFilter('PAID')">Paid</button>
@@ -1214,7 +1446,7 @@
                                 </div>
                                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                                     <input type="text" id="inv-dash-search" class="inv-input" placeholder="Search total invoices..." style="width: 220px;">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="window.switchInvoiceView('create')"><i class="fa-solid fa-plus-circle"></i> + Create Invoice</button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="window.switchInvoiceView('list')">View All Invoices</button>
                                 </div>
                             </div>
 
@@ -1783,37 +2015,39 @@
                 .text-gradient { background: linear-gradient(135deg, #00C9FF, #92FE9D); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
                 /* Split Screen Layout */
-                .inv-split-screen { display: flex; gap: 30px; align-items: flex-start; }
-                .inv-builder-pane { flex: 1; min-width: 45%; }
-                .inv-preview-pane { flex: 1; position: sticky; top: 30px; display: flex; flex-direction: column; align-items: center; }
+                .inv-split-screen { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: flex-start; }
+                .inv-builder-pane { width: 100%; min-width: 0; }
+                .inv-preview-pane { width: 100%; position: sticky; top: 30px; display: flex; flex-direction: column; align-items: center; min-width: 0; }
                 
                 /* A4 Preview Container */
                 .a4-container {
                     width: 100%;
-                    max-width: 800px;
                     display: flex;
                     justify-content: center;
-                    background: #111;
-                    padding: 20px;
-                    border-radius: 12px;
-                    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-                    overflow-x: auto;
+                    background: #0f172a;
+                    padding: 16px;
+                    border-radius: 16px;
+                    box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+                    overflow: hidden;
+                    box-sizing: border-box;
+                    transition: height 0.2s ease;
                 }
                 
                 .a4-sheet {
-                    background: white;
-                    color: black;
+                    background: #ffffff !important;
+                    color: #0f172a !important;
                     width: 210mm;
                     min-height: 297mm;
-                    padding: 20mm;
-                    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                    padding: 15mm;
+                    box-shadow: 0 15px 50px rgba(0,0,0,0.4);
                     transform-origin: top center;
-                    /* Scaling will be handled by JS based on container width */
+                    box-sizing: border-box;
                     font-family: 'Inter', sans-serif;
+                    flex-shrink: 0;
                 }
 
                 @media (max-width: 1200px) {
-                    .inv-split-screen { flex-direction: column; }
+                    .inv-split-screen { grid-template-columns: 1fr; }
                     .inv-preview-pane { position: static; width: 100%; }
                 }
 
@@ -2220,8 +2454,9 @@
                 toastBox.style.borderColor = 'rgba(239, 68, 68, 0.4)';
             }
 
-
-            toastMsg.textContent = msg;
+            // Strip leading emoji from message to avoid duplicate icons
+            const cleanMsg = msg.replace(/^(✅|ℹ️|⚠️|❌|📥|📤|🔄|✔️)\s*/u, '');
+            toastMsg.textContent = cleanMsg;
             toastBox.classList.add('show');
             if (window._toastTimeout) clearTimeout(window._toastTimeout);
             window._toastTimeout = setTimeout(() => toastBox.classList.remove('show'), 3500);
@@ -3792,7 +4027,7 @@
                         saveData();
                         renderProjectsTable();
                         updateDashboardStats();
-                        showToast(`✅ Loaded ${projects.length} projects from Google Sheet!`, 'success');
+                        showToast(`Loaded ${projects.length} projects from Google Sheet!`, 'success');
                     } else {
                         showToast('Google Sheet is connected but currently has 0 rows.', 'info');
                     }
@@ -4022,6 +4257,42 @@
                 pullProjectsFromGoogleSheet();
             }
         }, 300);
+
+        // 📱 Mobile Sidebar Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const adminSidebar = document.getElementById('adminSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            adminSidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+            if (adminSidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        if (mobileMenuBtn && adminSidebar && sidebarOverlay) {
+            mobileMenuBtn.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+            
+            // Close sidebar on link click (mobile only)
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 1024 && adminSidebar.classList.contains('active')) {
+                        toggleSidebar();
+                    }
+                });
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && adminSidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            });
+        }
     </script>
 
     <!-- INVOICE SYSTEM LOCAL SCRIPTS FIRST -->
