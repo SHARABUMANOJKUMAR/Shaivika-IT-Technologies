@@ -1,4 +1,4 @@
-(function() {
+﻿(function() {
     window.toggleOtherServiceField = function(value) {
         const group = document.getElementById('inv-other-service-group');
         const input = document.getElementById('inv-flat-other-service');
@@ -21,7 +21,7 @@
         if (totalField) totalField.value = total.toFixed(2);
         const paymentMethod = document.getElementById('inv-form-payment-method')?.value || 'Online / Bank Transfer';
         const invoiceNumber = document.getElementById('inv-form-id')?.value || 'INV-PREVIEW';
-        const verificationOrigin = window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ? window.location.origin : 'https://shaivika-it-technologies.netlify.app';
+        const verificationOrigin = window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ? window.location.origin : 'https://shaivikaittechnologies.in';
         const serviceName = selected?.value === 'others'
             ? (document.getElementById('inv-flat-other-service')?.value.trim() || 'Other Service')
             : (selected?.textContent.trim() || 'Service');

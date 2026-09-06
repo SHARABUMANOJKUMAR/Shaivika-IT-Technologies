@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SHAIVIKA IT TECHNOLOGIES - Invoice PDF & Preview Generator
  * Uses html2pdf.js and qrcode.js to generate professional A4 PDFs and live previews.
  */
@@ -73,7 +73,7 @@ const InvoicePDF = {
         const esc = this.escapeHTML;
         const isInterState = inv.state_code && inv.state_code !== 'AP';
         const invoiceNumber = inv.invoice_number || inv.invoiceNumber || inv.invoice_id || inv.invoiceId || '';
-        const verificationUrl = inv.verification_url || inv.verificationUrl || ((window.location.protocol === 'https:' || !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)) ? `${window.location.origin}/verify.html?id=${encodeURIComponent(invoiceNumber)}` : `https://shaivika-it-technologies.netlify.app/verify.html?id=${encodeURIComponent(invoiceNumber)}`);
+        const verificationUrl = inv.verification_url || inv.verificationUrl || ((window.location.protocol === 'https:' || !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)) ? `${window.location.origin}/verify.html?id=${encodeURIComponent(invoiceNumber)}` : `https://shaivikaittechnologies.in/verify.html?id=${encodeURIComponent(invoiceNumber)}`);
         const verifyUrl = verificationUrl;
         const verifyQrData = await this.generateQR(verifyUrl);
 

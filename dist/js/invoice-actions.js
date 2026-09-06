@@ -1,4 +1,4 @@
-/* Invoice Builder actions: one state for local storage, Apps Script, preview, and sharing. */
+﻿/* Invoice Builder actions: one state for local storage, Apps Script, preview, and sharing. */
 (function() {
     const PENDING_KEY = 'shaivika_invoice_drafts';
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
@@ -6,7 +6,7 @@
     const money = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
     const toast = (message, type) => window.showToast ? window.showToast(message, type || 'success') : console[type === 'error' ? 'error' : 'log'](message);
     const field = id => document.getElementById(id);
-    const verificationOrigin = () => window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ? window.location.origin : 'https://shaivika-it-technologies.netlify.app';
+    const verificationOrigin = () => window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ? window.location.origin : 'https://shaivikaittechnologies.in';
     const setBusy = (id, busy, label) => { const button = field(id); if (!button) return; if (busy) { button.dataset.originalLabel = button.innerHTML; button.disabled = true; button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${label}`; } else { button.disabled = false; if (button.dataset.originalLabel) button.innerHTML = button.dataset.originalLabel; } };
     function calculateInvoice() { const serviceSelect = field('inv-flat-service'); const selected = serviceSelect?.selectedOptions[0]; const price = money(field('inv-flat-price')?.value || 0); const gstPercent = Number(field('inv-flat-gst')?.value || 0); const subtotal = money(price); const gstAmount = money(subtotal * gstPercent / 100); const intraState = (field('inv-form-state')?.value || 'AP') === 'AP'; const cgst = intraState ? money(gstAmount / 2) : 0; const sgst = intraState ? money(gstAmount - cgst) : 0; return { subtotal, gstPercent, gstAmount, cgst, sgst, totalAmount: money(subtotal + gstAmount), serviceSelect, selected }; }
     function invoiceNumber() { const current = field('inv-form-id')?.value.trim(); if (current) return current; const date = field('inv-form-date')?.value || new Date().toISOString().slice(0, 10); const compact = date.replace(/-/g, ''); const key = `shaivika_invoice_sequence_${compact}`; let sequence = Number(localStorage.getItem(key) || 0); let number; do { sequence += 1; number = `INV-${compact}-${String(sequence).padStart(4, '0')}`; } while ((window.InvoiceDB?.getInvoices() || []).some(inv => inv.invoice_number === number)); localStorage.setItem(key, String(sequence)); if (field('inv-form-id')) field('inv-form-id').value = number; return number; }
