@@ -70,7 +70,10 @@ const InvoicePDF = {
 
     // Generates the core HTML template used by both Preview and PDF export
     getInvoiceHTML: async function(inv, settings, customer) {
-        const esc = this.escapeHTML;
+        inv = inv || {};
+        settings = settings || (window.InvoiceDB ? window.InvoiceDB.getSettings() : {}) || {};
+        customer = customer || {};
+        const esc = this.escapeHTML || (s => (s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : ''));
         const isInterState = inv.state_code && inv.state_code !== 'AP';
         const invoiceNumber = inv.invoice_number || inv.invoiceNumber || inv.invoice_id || inv.invoiceId || '';
         const verificationUrl = inv.verification_url || inv.verificationUrl || ((window.location.protocol === 'https:' || !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)) ? `${window.location.origin}/verify.html?id=${encodeURIComponent(invoiceNumber)}` : `https://shaivikaittechnologies.in/verify.html?id=${encodeURIComponent(invoiceNumber)}`);
