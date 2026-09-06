@@ -263,11 +263,20 @@ window.setInvoiceListFilter = function(filter) {
         const services = InvoiceDB.getServices();
         const srvSelect = document.getElementById('inv-flat-service');
         const standardServices = [
-            'Web & App Development (2-in-1)', 'Web Development', 'App Development',
-            'AI Automations Suite', 'SEO Optimisation', 'Analytical Dashboards',
-            'AI Chatbot Builders', 'Logo Designing', 'AI Video & Photo Business Promotions',
-            'Virtual Wedding & Invitation Cards', 'Final Year Projects', 'Custom CRM Systems',
-            'SaaS Products', 'Product Mentence'
+            'Web & App Development (2-in-1)',
+            'Web Development',
+            'App Development',
+            'AI Automations Suite',
+            'SEO Optimisation',
+            'Analytical Dashboards',
+            'AI Chatbot Builders',
+            'Logo Designing',
+            'AI Video & Photo Business Promotions',
+            'Virtual Wedding & Invitation Cards',
+            'Final Year Projects',
+            'Custom CRM Systems',
+            'SaaS Products',
+            'Product Mentence'
         ];
         if (srvSelect) {
             srvSelect.innerHTML = '<option value="">-- Select Service --</option>';
@@ -275,7 +284,9 @@ window.setInvoiceListFilter = function(filter) {
                 srvSelect.innerHTML += `<option value="preset-${index + 1}">${name}</option>`;
             });
             services.forEach(s => {
-                if (!standardServices.includes(s.name)) srvSelect.innerHTML += `<option value="${s.service_id}" data-price="${s.price}" data-tax="${s.tax_rate}">${s.name}</option>`;
+                if (!standardServices.includes(s.name)) {
+                    srvSelect.innerHTML += `<option value="${s.service_id}" data-price="${s.price}" data-tax="${s.tax_rate}">${s.name}</option>`;
+                }
             });
             srvSelect.innerHTML += '<option value="others">Others</option>';
         }
@@ -302,11 +313,18 @@ window.setInvoiceListFilter = function(filter) {
                 if (inv.items && inv.items.length > 0) {
                     const item = inv.items[0];
                     if (srvSelect && item.service_id) {
-                        srvSelect.value = srvSelect.querySelector(`option[value="${item.service_id}"]`) ? item.service_id : 'others';
+                        if (srvSelect.querySelector(`option[value="${item.service_id}"]`)) {
+                            srvSelect.value = item.service_id;
+                        } else {
+                            srvSelect.value = 'others';
+                        }
                     }
                     if (document.getElementById('inv-flat-price')) document.getElementById('inv-flat-price').value = item.rate || 0;
                     if (document.getElementById('inv-flat-gst')) document.getElementById('inv-flat-gst').value = item.taxRate || 0;
-                    if (document.getElementById('inv-flat-other-service')) document.getElementById('inv-flat-other-service').value = srvSelect?.value === 'others' ? item.description : '';
+                    if (document.getElementById('inv-flat-other-service')) {
+                        const otherService = srvSelect?.value === 'others' ? item.description : '';
+                        document.getElementById('inv-flat-other-service').value = otherService;
+                    }
                 }
                 
                 // Disable certain fields if SENT or PAID
@@ -375,7 +393,9 @@ window.setInvoiceListFilter = function(filter) {
         
         const srvSelect = document.getElementById('inv-flat-service');
         const selectedService = srvSelect && srvSelect.selectedIndex > 0 ? srvSelect.options[srvSelect.selectedIndex] : null;
-        const serviceName = selectedService?.value === 'others' ? (document.getElementById('inv-flat-other-service')?.value || 'Other Service') : (selectedService?.text || 'Service');
+        const serviceName = selectedService?.value === 'others'
+            ? (document.getElementById('inv-flat-other-service')?.value || 'Other Service')
+            : (selectedService?.text || 'Service');
         const serviceId = srvSelect ? srvSelect.value : null;
 
         const date = document.getElementById('inv-form-date')?.value;
@@ -446,6 +466,11 @@ window.setInvoiceListFilter = function(filter) {
             document.getElementById('inv-flat-gst').value = option.dataset.tax || 18;
             calculateFormTotals();
         }
+    });
+
+    document.getElementById('inv-form-payment-method')?.addEventListener('change', () => {
+        updateLivePreview();
+        window.renderInvoicePreview?.();
     });
 
     window.saveInvoiceForm = function(targetStatus = 'DRAFT') {
@@ -998,11 +1023,6 @@ window.setInvoiceListFilter = function(filter) {
             }
         });
 
-        document.getElementById('inv-form-payment-method')?.addEventListener('change', () => {
-            updateLivePreview();
-            window.renderInvoicePreview?.();
-        });
-
         if (window._pendingInvoiceView) {
             const p = window._pendingInvoiceView;
             window._pendingInvoiceView = null;
@@ -1010,6 +1030,13 @@ window.setInvoiceListFilter = function(filter) {
         } else {
             window.switchInvoiceView('dashboard');
         }
+        
+        // Fetch real-time data silently in the background
+        setTimeout(() => {
+            if (InvoiceDB && InvoiceDB.fetchRemoteInvoices) {
+                InvoiceDB.fetchRemoteInvoices();
+            }
+        }, 100);
     }
 
     if (document.readyState === 'loading') {

@@ -237,6 +237,39 @@ window.InvoiceDB = {
         }
     },
     
+    fetchRemoteInvoices: async function() {
+        const settings = this.getSettings();
+        const gasUrl = settings.gasInvoiceUrl;
+        if (!gasUrl) return [];
+        try {
+            const res = await fetch(`${gasUrl}?action=getInvoices`);
+            const json = await res.json();
+            if (json && json.status === 'success' && Array.isArray(json.invoices)) {
+                // Keep local-only invoices (like DRAFTs that haven't been synced) and merge with remote
+                const localInvoices = this.getInvoices().filter(i => i.status === 'DRAFT');
+                const remoteInvoices = json.invoices;
+                
+                // For remote invoices, ensure we map the keys to match local structure if needed
+                // The backend getInvoiceRecords maps them back perfectly.
+                
+                // Overwrite local storage entirely (keeping only drafts + remote)
+                const combinedInvoices = [...localInvoices, ...remoteInvoices];
+                
+                // Sort by descending date
+                combinedInvoices.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                
+                localStorage.setItem(this.K_INVOICES, JSON.stringify(combinedInvoices));
+                
+                // Dispatch event so UI updates
+                window.dispatchEvent(new Event('shaivika_invoice_updated'));
+                return combinedInvoices;
+            }
+        } catch (err) {
+            console.warn('Failed to fetch remote invoices:', err);
+        }
+        return this.getInvoices();
+    },
+    
     deleteInvoice: function(uuid, force = true) {
         let invoices = this.getInvoices();
         const invoice = invoices.find(i => i.invoice_uuid === uuid || i.invoice_number === uuid);

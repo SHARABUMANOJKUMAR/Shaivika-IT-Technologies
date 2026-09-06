@@ -1030,6 +1030,13 @@ window.setInvoiceListFilter = function(filter) {
         } else {
             window.switchInvoiceView('dashboard');
         }
+        
+        // Fetch real-time data silently in the background
+        setTimeout(() => {
+            if (InvoiceDB && InvoiceDB.fetchRemoteInvoices) {
+                InvoiceDB.fetchRemoteInvoices();
+            }
+        }, 100);
     }
 
     if (document.readyState === 'loading') {
