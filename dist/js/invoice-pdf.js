@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SHAIVIKA IT TECHNOLOGIES - Invoice PDF & Preview Generator
  * Uses html2pdf.js and qrcode.js to generate professional A4 PDFs and live previews.
  */
@@ -131,10 +131,16 @@ const InvoicePDF = {
         const totalAmt = Number(inv.total_amount || 0);
         const words = this.numberToWords(Math.round(totalAmt));
 
-        const safeCompanyName = esc(settings.companyName || 'Shaivika IT Technologies');
-        const safeCompanyAddress = esc(settings.companyAddress || '').replace(/\n/g, '<br>');
-        const safeCompanyEmail = esc(settings.companyEmail || '');
-        const safeCompanyPhone = esc(settings.companyPhone || '');
+        let compEmail = settings.companyEmail;
+        if (!compEmail || compEmail === 'contact@shaivikait.com') {
+            compEmail = 'shaivikagroups@gmail.com';
+        }
+        let compPhone = settings.companyPhone;
+        if (!compPhone || compPhone === '+91 90000 00000' || compPhone === '+91 7013550760') {
+            compPhone = '+91 7981431094';
+        }
+        const safeCompanyEmail = esc(compEmail);
+        const safeCompanyPhone = esc(compPhone);
         const safeCompanyGstin = esc(settings.gstin || '');
 
         const safeInvNumber = esc(invoiceNumber || 'INV-001');
