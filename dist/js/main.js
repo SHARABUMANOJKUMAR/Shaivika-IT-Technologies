@@ -333,19 +333,36 @@ function initPagination() {
 
 // ===== PARALLAX ORBS =====
 function initParallax() {
-  document.addEventListener('mousemove', (e) => {
-    const orbs = document.querySelectorAll('.orb');
-    const x = (e.clientX / window.innerWidth - 0.5) * 20;
-    const y = (e.clientY / window.innerHeight - 0.5) * 20;
-    orbs.forEach((orb, i) => {
-      const factor = (i + 1) * 0.4;
-      orb.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
-    });
-  });
+  if (window.innerWidth < 1024 || ('ontouchstart' in window) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    return;
+  }
+  const orbs = document.querySelectorAll('.orb');
+  if (!orbs.length) return;
+
+  let mouseX = 0, mouseY = 0;
+  let ticking = false;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        orbs.forEach((orb, i) => {
+          const factor = (i + 1) * 0.3;
+          orb.style.transform = `translate3d(${mouseX * factor}px, ${mouseY * factor}px, 0)`;
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 // ===== LOGO MOUSE-TILT =====
 function initLogoTilt() {
+  if (window.innerWidth < 1024 || ('ontouchstart' in window) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    return;
+  }
   const logos = document.querySelectorAll('[data-logo-tilt]');
   if (!logos.length) return;
 
@@ -381,7 +398,7 @@ function initLogoTilt() {
       // Max ±12deg tilt — professional, not exaggerated
       targetX = ((e.clientX - cx) / (rect.width / 2)) * 12;
       targetY = ((e.clientY - cy) / (rect.height / 2)) * -12;
-    });
+    }, { passive: true });
 
     logo.addEventListener('mouseenter', () => {
       isHovering = true;
@@ -394,7 +411,6 @@ function initLogoTilt() {
       isHovering = false;
       targetX = 0;
       targetY = 0;
-      // Resume levitation once tilt resets fully (handled in animate())
     });
   });
 }
