@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SHAIVIKA IT TECHNOLOGIES - Invoice Database Manager
  * Handles local storage for Invoices, Customers, Services, and Payments.
  */
@@ -19,7 +19,7 @@ window.InvoiceDB = {
         companyAddress: 'Kadapa, Andhra Pradesh, India',
         companyEmail: 'shaivikagroups@gmail.com',
         companyPhone: '+91 7981431094',
-        companyWebsite: 'https://shaivikait.com',
+        companyWebsite: 'https://shaivikaittechnologies.in/',
         gstin: '',
         pan: '',
         bankName: 'HDFC Bank',
