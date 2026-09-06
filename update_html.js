@@ -13,7 +13,7 @@ files.forEach(file => {
     });
 
     // Also we need to make sure the open graph tag doesn't get loading=lazy. That's a meta tag.
-    content = content.replace(/content="https:\/\/shaivikagroups\.in\/img\/favicon\.png"/g, 'content="https://shaivika-it-technologies.netlify.app/img/favicon.webp"');
+    content = content.replace(/content="https:\/\/shaivikagroups\.in\/img\/favicon\.png"/g, 'content="https://shaivikaittechnologies.in/img/favicon.webp"');
     content = content.replace(/href="img\/favicon\.png"/g, 'href="img/favicon.webp"');
 
     fs.writeFileSync(file, content);

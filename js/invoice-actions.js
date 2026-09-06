@@ -9,7 +9,7 @@
     const field = id => document.getElementById(id);
     const verificationOrigin = () => window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
         ? window.location.origin
-        : 'https://shaivika-it-technologies.netlify.app';
+        : 'https://shaivikaittechnologies.in';
     const setBusy = (id, busy, label) => {
         const button = field(id);
         if (!button) return;

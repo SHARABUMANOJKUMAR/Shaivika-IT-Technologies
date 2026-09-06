@@ -22,7 +22,7 @@
         const paymentMethod = document.getElementById('inv-form-payment-method')?.value || 'Online / Bank Transfer';
         const invoiceNumber = document.getElementById('inv-form-id')?.value || 'INV-PREVIEW';
         const verificationOrigin = window.location.protocol === 'https:' && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
-            ? window.location.origin : 'https://shaivika-it-technologies.netlify.app';
+            ? window.location.origin : 'https://shaivikaittechnologies.in';
         const serviceName = selected?.value === 'others'
             ? (document.getElementById('inv-flat-other-service')?.value.trim() || 'Other Service')
             : (selected?.textContent.trim() || 'Service');

@@ -3,7 +3,7 @@
  * Handles UI rendering, reactive data binding, and interactions.
  */
 
-function escapeHTML(str) {
+function invEscapeHTML(str) {
     if (str == null) return '';
     return String(str)
         .replace(/&/g, '&amp;')
@@ -218,7 +218,7 @@ window.setInvoiceListFilter = function(filter) {
             const sortedClients = Object.keys(clientStats).map(k => ({ name: k, ...clientStats[k] })).sort((a,b) => b.billed - a.billed).slice(0, 5);
             topClientsBody.innerHTML = sortedClients.length === 0 ? `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No client data available</td></tr>` : sortedClients.map(c => `
                 <tr>
-                    <td><strong>${escapeHTML(c.name)}</strong></td>
+                    <td><strong>${invEscapeHTML(c.name)}</strong></td>
                     <td style="text-align:center;">${c.count}</td>
                     <td style="text-align:right;">${fm(c.billed)}</td>
                     <td style="text-align:right; color:var(--success);">${fm(c.paid)}</td>
@@ -350,16 +350,16 @@ window.setInvoiceListFilter = function(filter) {
 
             recentBody.innerHTML += `
                 <tr>
-                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
-                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
+                    <td><strong>${invEscapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
+                    <td>${invEscapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${sC}">${escapeHTML(inv.status)}</span></td>
+                    <td><span class="tag ${sC}">${invEscapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="switchInvoiceView('create', '${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
                         </div>
                     </td>
                 </tr>
@@ -398,19 +398,19 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(inv => {
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${escapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
-                    <td>${escapeHTML(inv.customer_name || 'N/A')}</td>
+                    <td><strong>${invEscapeHTML(inv.invoice_number)}</strong><br><small style="color:var(--text-muted)">${new Date(inv.invoice_date).toLocaleDateString('en-IN')}</small></td>
+                    <td>${invEscapeHTML(inv.customer_name || 'N/A')}</td>
                     <td>₹${(inv.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
-                    <td><span class="tag ${getStatusColor(inv.status)}">${escapeHTML(inv.status)}</span></td>
+                    <td><span class="tag ${getStatusColor(inv.status)}">${invEscapeHTML(inv.status)}</span></td>
                     <td style="color:${inv.balance_due > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">₹${(inv.balance_due || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="window.switchInvoiceView('create', '${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
-                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${escapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
-                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${escapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View / Download PDF" onclick="window.viewInvoicePDF('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Invoice" onclick="window.switchInvoiceView('create', '${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-pen"></i></button>
+                            ${(inv.status !== 'PAID' && inv.status !== 'CANCELLED' && inv.status !== 'DRAFT') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Record Payment" onclick="window.openPaymentModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-credit-card"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-neutral action-btn-icon" title="Audit Log" onclick="window.openAuditModal('${invEscapeHTML(inv.invoice_number)}')"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                            ${(inv.status === 'SENT' || inv.status === 'OVERDUE') ? `<button type="button" class="action-btn action-btn-toggle action-btn-icon" title="Cancel Invoice" onclick="window.cancelInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
+                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Invoice" onclick="window.deleteInvoice('${invEscapeHTML(inv.invoice_uuid)}')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -817,16 +817,16 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(c => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${escapeHTML(c.customer_id)}</span></td>
-                    <td><strong>${escapeHTML(c.name)}</strong></td>
-                    <td>${escapeHTML(c.company || '-')}</td>
-                    <td>${escapeHTML(c.email || '-')}</td>
+                    <td><span class="tag tag-cyan">${invEscapeHTML(c.customer_id)}</span></td>
+                    <td><strong>${invEscapeHTML(c.name)}</strong></td>
+                    <td>${invEscapeHTML(c.company || '-')}</td>
+                    <td>${invEscapeHTML(c.email || '-')}</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${escapeHTML(c.customer_id)}')" title="Edit Customer">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editCustomer('${invEscapeHTML(c.customer_id)}')" title="Edit Customer">
                                 <i class="fa-solid fa-pen"></i> <span>Edit</span>
                             </button>
-                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteCustomer('${escapeHTML(c.customer_id)}')" title="Delete Customer">
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteCustomer('${invEscapeHTML(c.customer_id)}')" title="Delete Customer">
                                 <i class="fa-solid fa-trash"></i> <span>Delete</span>
                             </button>
                         </div>
@@ -922,16 +922,16 @@ window.setInvoiceListFilter = function(filter) {
         filtered.forEach(s => {
             tbody.innerHTML += `
                 <tr>
-                    <td><span class="tag tag-cyan">${escapeHTML(s.service_id)}</span></td>
-                    <td><strong>${escapeHTML(s.name)}</strong></td>
-                    <td>${escapeHTML(s.hsn || '-')}</td>
+                    <td><span class="tag tag-cyan">${invEscapeHTML(s.service_id)}</span></td>
+                    <td><strong>${invEscapeHTML(s.name)}</strong></td>
+                    <td>${invEscapeHTML(s.hsn || '-')}</td>
                     <td>₹${Number(s.price).toLocaleString('en-IN')} (${s.tax_rate}%)</td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${escapeHTML(s.service_id)}')" title="Edit Service">
+                            <button type="button" class="action-btn action-btn-edit" onclick="window.editService('${invEscapeHTML(s.service_id)}')" title="Edit Service">
                                 <i class="fa-solid fa-pen"></i> <span>Edit</span>
                             </button>
-                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteService('${escapeHTML(s.service_id)}')" title="Delete Service">
+                            <button type="button" class="action-btn action-btn-delete" onclick="window.deleteService('${invEscapeHTML(s.service_id)}')" title="Delete Service">
                                 <i class="fa-solid fa-trash"></i> <span>Delete</span>
                             </button>
                         </div>
@@ -1007,9 +1007,9 @@ window.setInvoiceListFilter = function(filter) {
             services.forEach(s => {
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${escapeHTML(s.name)}</strong><br><small>${escapeHTML(s.hsn||'')}</small></td>
+                        <td><strong>${invEscapeHTML(s.name)}</strong><br><small>${invEscapeHTML(s.hsn||'')}</small></td>
                         <td>₹${Number(s.price).toLocaleString('en-IN')}</td>
-                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${escapeHTML(s.service_id)}')">Add</button></td>
+                        <td style="text-align:right;"><button class="btn btn-sm btn-primary" onclick="window.selectServiceForInvoice('${invEscapeHTML(s.service_id)}')">Add</button></td>
                     </tr>
                 `;
             });
@@ -1153,10 +1153,10 @@ window.setInvoiceListFilter = function(filter) {
                 list.innerHTML += `
                     <li>
                         <div>
-                            <strong>${escapeHTML(log.action)}</strong>
-                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${escapeHTML(log.user)}</div>
+                            <strong>${invEscapeHTML(log.action)}</strong>
+                            <div class="audit-meta">${new Date(log.timestamp).toLocaleString('en-IN')} by ${invEscapeHTML(log.user)}</div>
                         </div>
-                        <span class="tag ${getStatusColor(log.status)}">${escapeHTML(log.status)}</span>
+                        <span class="tag ${getStatusColor(log.status)}">${invEscapeHTML(log.status)}</span>
                     </li>
                 `;
             });
