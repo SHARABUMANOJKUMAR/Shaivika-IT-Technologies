@@ -149,16 +149,31 @@ function sendInvoiceEmail(invoice) {
   return { status: 'success', success: true, message: 'Invoice email sent successfully', email: email };
 }
 
+function serializeDate(dateObj) {
+  if (!dateObj) return '';
+  if (dateObj instanceof Date) {
+    if (isNaN(dateObj.getTime())) return '';
+    return dateObj.toISOString();
+  }
+  return String(dateObj);
+}
+
 function getInvoiceRecords() {
     const invoiceSheet = getOrCreateInvoiceSheet();
     const lastInvoiceRow = invoiceSheet.getLastRow();
-    if (lastInvoiceRow <= 1) return { status: 'success', success: true, invoices: [] };
+    if (lastInvoiceRow <= 1) return { status: 'success', success: true, invoices: [], timestamp: new Date().toISOString(), source: 'google-sheets' };
     const values = invoiceSheet.getRange(2, 1, lastInvoiceRow - 1, INVOICE_HEADERS.length).getValues();
     const invoices = values.map(function(row) {
       const invoiceNumber = String(row[2] || '').trim();
       if (!invoiceNumber || /^proj_/i.test(invoiceNumber)) return null;
       const invoice = {};
-      INVOICE_HEADERS.forEach(function(header, index) { invoice[header] = row[index]; });
+      INVOICE_HEADERS.forEach(function(header, index) { 
+        if (header.includes('Date') || header === 'Timestamp' || header.includes('At')) {
+          invoice[header] = serializeDate(row[index]);
+        } else {
+          invoice[header] = row[index]; 
+        }
+      });
       invoice.invoice_id = row[1];
       invoice.invoice_number = row[2];
       invoice.status = row[3];
@@ -169,13 +184,15 @@ function getInvoiceRecords() {
       invoice.subtotal = row[10];
       invoice.tax_amount = row[11];
       invoice.total_amount = row[14];
-      invoice.invoice_date = row[15];
-      invoice.due_date = row[16];
+      invoice.invoice_date = serializeDate(row[15]);
+      invoice.due_date = serializeDate(row[16]);
       invoice.payment_method = row[18];
+      invoice.created_at = serializeDate(row[22]);
+      invoice.updated_at = serializeDate(row[23]);
       invoice.items = [{ description: row[7], qty: 1, rate: row[8], taxRate: row[9], taxAmount: row[11], total: row[14] }];
       return invoice;
     }).filter(Boolean);
-    return { status: 'success', success: true, invoices: invoices };
+    return { status: 'success', success: true, invoices: invoices, timestamp: new Date().toISOString(), source: 'google-sheets' };
 }
 
 /**

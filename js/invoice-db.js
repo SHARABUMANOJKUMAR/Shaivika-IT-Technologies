@@ -240,32 +240,70 @@ window.InvoiceDB = {
     fetchRemoteInvoices: async function() {
         const settings = this.getSettings();
         const gasUrl = settings.gasInvoiceUrl;
-        if (!gasUrl) return [];
+        if (!gasUrl) {
+            window.InvoiceDBState = { lastFetch: null, error: 'No Google Sheet URL configured.', isFetching: false };
+            window.dispatchEvent(new Event('shaivika_invoice_updated'));
+            return [];
+        }
+        
+        window.InvoiceDBState = { ...window.InvoiceDBState, isFetching: true, error: null };
+        window.dispatchEvent(new Event('shaivika_invoice_updated'));
+        
         try {
             const res = await fetch(`${gasUrl}?action=getInvoices`);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const json = await res.json();
+            
             if (json && json.status === 'success' && Array.isArray(json.invoices)) {
-                // Keep local-only invoices (like DRAFTs that haven't been synced) and merge with remote
                 const localInvoices = this.getInvoices().filter(i => i.status === 'DRAFT');
-                const remoteInvoices = json.invoices;
                 
-                // For remote invoices, ensure we map the keys to match local structure if needed
-                // The backend getInvoiceRecords maps them back perfectly.
+                const remoteInvoices = json.invoices.map(inv => {
+                    const statusMap = {
+                        'paid': 'PAID', 'pending': 'PENDING', 'due': 'PENDING', 
+                        'overdue': 'OVERDUE', 'draft': 'DRAFT'
+                    };
+                    let normStatus = (inv.status || '').toLowerCase();
+                    inv.status = statusMap[normStatus] || inv.status || 'PENDING';
+                    
+                    const p = (v) => {
+                        if (v === null || v === undefined) return 0;
+                        const num = Number(String(v).replace(/,/g, ''));
+                        return isNaN(num) ? 0 : num;
+                    };
+                    
+                    inv.total_amount = p(inv.total_amount);
+                    inv.amount_paid = p(inv.amount_paid);
+                    inv.balance_due = p(inv.balance_due);
+                    if (inv.balance_due === 0 && inv.amount_paid === 0 && inv.status !== 'PAID') {
+                        inv.balance_due = inv.total_amount;
+                    }
+                    
+                    return inv;
+                });
                 
-                // Overwrite local storage entirely (keeping only drafts + remote)
                 const combinedInvoices = [...localInvoices, ...remoteInvoices];
-                
-                // Sort by descending date
                 combinedInvoices.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
                 
                 localStorage.setItem(this.K_INVOICES, JSON.stringify(combinedInvoices));
                 
-                // Dispatch event so UI updates
+                window.InvoiceDBState = { 
+                    lastFetch: new Date().toISOString(), 
+                    error: null, 
+                    isFetching: false 
+                };
                 window.dispatchEvent(new Event('shaivika_invoice_updated'));
                 return combinedInvoices;
+            } else {
+                throw new Error('Invalid response from Google Sheets API');
             }
         } catch (err) {
             console.warn('Failed to fetch remote invoices:', err);
+            window.InvoiceDBState = { 
+                lastFetch: window.InvoiceDBState?.lastFetch || null, 
+                error: err.message || 'Unable to connect to invoice database.', 
+                isFetching: false 
+            };
+            window.dispatchEvent(new Event('shaivika_invoice_updated'));
         }
         return this.getInvoices();
     },
