@@ -46,36 +46,17 @@ window.InvoiceDB = {
         if (!localStorage.getItem(this.K_PAYMENTS)) localStorage.setItem(this.K_PAYMENTS, JSON.stringify([]));
         if (!localStorage.getItem(this.K_AUDIT)) localStorage.setItem(this.K_AUDIT, JSON.stringify([]));
         
-        let existingSettings = JSON.parse(localStorage.getItem(this.K_SETTINGS));
+        const existingSettings = JSON.parse(localStorage.getItem(this.K_SETTINGS));
         if (!existingSettings) {
             localStorage.setItem(this.K_SETTINGS, JSON.stringify(this.defaultSettings));
         } else {
-            if (existingSettings.companyEmail === 'contact@shaivikait.com' || !existingSettings.companyEmail) {
-                existingSettings.companyEmail = this.defaultSettings.companyEmail;
-            }
-            if (existingSettings.companyPhone === '+91 90000 00000' || existingSettings.companyPhone === '+91 7013550760' || !existingSettings.companyPhone) {
-                existingSettings.companyPhone = this.defaultSettings.companyPhone;
-            }
-            if (existingSettings.companyWebsite === 'https://shaivikait.com' || !existingSettings.companyWebsite) {
-                existingSettings.companyWebsite = this.defaultSettings.companyWebsite;
-            }
             // Merge defaults in case new keys were added
             localStorage.setItem(this.K_SETTINGS, JSON.stringify({ ...this.defaultSettings, ...existingSettings }));
         }
     },
 
     getSettings: function() {
-        let settings = JSON.parse(localStorage.getItem(this.K_SETTINGS)) || this.defaultSettings;
-        if (settings.companyEmail === 'contact@shaivikait.com' || !settings.companyEmail) {
-            settings.companyEmail = this.defaultSettings.companyEmail;
-        }
-        if (settings.companyPhone === '+91 90000 00000' || settings.companyPhone === '+91 7013550760' || !settings.companyPhone) {
-            settings.companyPhone = this.defaultSettings.companyPhone;
-        }
-        if (settings.companyWebsite === 'https://shaivikait.com' || !settings.companyWebsite) {
-            settings.companyWebsite = this.defaultSettings.companyWebsite;
-        }
-        return settings;
+        return JSON.parse(localStorage.getItem(this.K_SETTINGS)) || this.defaultSettings;
     },
 
     saveSettings: function(settings) {
