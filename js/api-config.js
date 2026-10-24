@@ -4,23 +4,61 @@
  * 
  * Features:
  * - Centralized routing to server-side endpoints
+ * - Seamless support for both production and local static dev servers (e.g. Live Server on port 5501)
  * - Strict Bearer token handling in sessionStorage (never persisted across sessions in localStorage)
+ * - Safe response parsing with detailed error reporting
  * - Automatic offline queuing for public lead forms
- * - Safe error parsing without exposing internal stack traces
  */
 
 (function(window) {
   'use strict';
 
-  // Base API configuration (Directs to Netlify Functions / redirects)
-  const API_BASE = '/api';
-  const AUTH_ENDPOINT = '/.netlify/functions/admin-auth';
-  const GATEWAY_ENDPOINT = '/.netlify/functions/api';
+  // Detect if running on a local static dev server (e.g. VS Code Live Server on port 5500/5501)
+  const isLocalStatic = typeof window !== 'undefined' && Boolean(
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === 'localhost' ||
+    window.location.protocol === 'file:'
+  ) && window.location.port !== '8888'; // 8888 is native netlify dev
+
+  // On local static dev server, route API calls to the live production functions
+  const BACKEND_ORIGIN = isLocalStatic ? 'https://shaivikaittechnologies.in' : '';
+
+  const API_BASE = `${BACKEND_ORIGIN}/api`;
+  const AUTH_ENDPOINT = `${BACKEND_ORIGIN}/.netlify/functions/admin-auth`;
+  const GATEWAY_ENDPOINT = `${BACKEND_ORIGIN}/.netlify/functions/api`;
 
   const TOKEN_KEY = 'shaivika_admin_token';
   const USER_KEY = 'shaivika_admin_user';
 
+  // Safe JSON response parser
+  async function safeParseJson(response) {
+    const text = await response.text();
+    if (!text || !text.trim()) {
+      return {
+        ok: response.ok,
+        status: response.status,
+        data: { status: 'error', message: `Server returned empty response (HTTP ${response.status})` }
+      };
+    }
+    try {
+      return {
+        ok: response.ok,
+        status: response.status,
+        data: JSON.parse(text)
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        status: response.status,
+        data: { status: 'error', message: `Unexpected response format from server (HTTP ${response.status})` }
+      };
+    }
+  }
+
   const ShaivikaAPI = {
+    isLocalDev: isLocalStatic,
+    backendOrigin: BACKEND_ORIGIN,
+
     // Session Management
     getToken: function() {
       return sessionStorage.getItem(TOKEN_KEY) || '';
@@ -34,7 +72,6 @@
     clearSession: function() {
       sessionStorage.removeItem(TOKEN_KEY);
       sessionStorage.removeItem(USER_KEY);
-      // Clean up any legacy localStorage flags
       localStorage.removeItem('shaivika_admin_logged_in');
       localStorage.removeItem('shaivika_admin_password');
     },
@@ -56,10 +93,6 @@
     // PUBLIC API CALLS
     // -------------------------------------------------------------------------
 
-    /**
-     * Privacy-preserving single invoice verification
-     * Returns ONLY masked customer metadata. Never dumps invoices.
-     */
     verifyInvoice: async function(invoiceId) {
       if (!invoiceId || typeof invoiceId !== 'string') {
         throw new Error('Valid verification ID is required');
@@ -72,16 +105,15 @@
         cache: 'no-store'
       });
 
-      const data = await response.json();
-      if (!response.ok || !data.valid) {
+      const parsed = await safeParseJson(response);
+      const data = parsed.data;
+
+      if (!parsed.ok || !data.valid) {
         throw new Error(data.message || 'Invoice not found or invalid.');
       }
       return data.invoice;
     },
 
-    /**
-     * Public Contact & Lead Form Ingestion
-     */
     submitLead: async function(leadData) {
       const response = await fetch(GATEWAY_ENDPOINT, {
         method: 'POST',
@@ -95,16 +127,15 @@
         })
       });
 
-      const data = await response.json();
-      if (!response.ok && response.status !== 200) {
+      const parsed = await safeParseJson(response);
+      const data = parsed.data;
+
+      if (!parsed.ok && response.status !== 200) {
         throw new Error(data.message || 'Failed to submit inquiry.');
       }
       return data;
     },
 
-    /**
-     * Public Job Application Ingestion
-     */
     submitApplication: async function(appData) {
       const response = await fetch(GATEWAY_ENDPOINT, {
         method: 'POST',
@@ -118,28 +149,28 @@
         })
       });
 
-      const data = await response.json();
-      if (!response.ok && response.status !== 200) {
+      const parsed = await safeParseJson(response);
+      const data = parsed.data;
+
+      if (!parsed.ok && response.status !== 200) {
         throw new Error(data.message || 'Failed to submit application.');
       }
       return data;
     },
 
-    /**
-     * Fetch Public Active Projects
-     */
     getPublicProjects: async function() {
       try {
         const response = await fetch(`${GATEWAY_ENDPOINT}?action=getPublicProjects`, { cache: 'no-store' });
         if (response.ok) {
-          const data = await response.json();
-          if (data && data.projects && data.projects.length) return data.projects;
+          const parsed = await safeParseJson(response);
+          if (parsed.ok && parsed.data && Array.isArray(parsed.data.projects) && parsed.data.projects.length) {
+            return parsed.data.projects;
+          }
         }
       } catch (e) {
         // Fallback to local data
       }
 
-      // Local fallback
       try {
         const local = await fetch('/data/portfolio.json');
         if (local.ok) {
@@ -169,8 +200,10 @@
         })
       });
 
-      const data = await response.json();
-      if (!response.ok || data.status !== 'success') {
+      const parsed = await safeParseJson(response);
+      const data = parsed.data;
+
+      if (!parsed.ok || data.status !== 'success') {
         const error = new Error(data.message || 'Login failed.');
         error.code = data.code || 'AUTH_FAILED';
         error.attemptsRemaining = data.attemptsRemaining;
@@ -196,8 +229,10 @@
           body: JSON.stringify({ action: 'verify' })
         });
 
-        const data = await response.json();
-        if (response.ok && data.status === 'success' && data.valid) {
+        const parsed = await safeParseJson(response);
+        const data = parsed.data;
+
+        if (parsed.ok && data.status === 'success' && data.valid) {
           return { valid: true, user: data.user };
         }
       } catch (e) {
@@ -244,8 +279,10 @@
         })
       });
 
-      const data = await response.json();
-      if (!response.ok || data.status !== 'success') {
+      const parsed = await safeParseJson(response);
+      const data = parsed.data;
+
+      if (!parsed.ok || data.status !== 'success') {
         throw new Error(data.message || 'Failed to update password');
       }
       return data;
@@ -274,14 +311,16 @@
         })
       });
 
-      const data = await response.json();
+      const parsed = await safeParseJson(response);
+      const data = parsed.data;
+
       if (response.status === 401 || data.code === 'UNAUTHORIZED') {
         this.clearSession();
         window.dispatchEvent(new CustomEvent('shaivika_session_expired'));
         throw new Error('Session expired. Please log in again.');
       }
 
-      if (!response.ok || data.status === 'error') {
+      if (!parsed.ok || data.status === 'error') {
         throw new Error(data.message || `Operation '${action}' failed.`);
       }
 

@@ -80,11 +80,12 @@
         } catch (err) {
           const msg = err.message || 'Authentication failed.';
           showToast(msg, 'error');
-          if (err.locked) {
-            if (submitBtn) submitBtn.disabled = true;
+          if (err.locked && submitBtn) {
+            submitBtn.disabled = true;
           }
         } finally {
-          if (submitBtn && !submitBtn.disabled) {
+          if (submitBtn && submitBtn.innerHTML === 'Authenticating...') {
+            submitBtn.disabled = false;
             submitBtn.innerHTML = origText;
           }
         }
