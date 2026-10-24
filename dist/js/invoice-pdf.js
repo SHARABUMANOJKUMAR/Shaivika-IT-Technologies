@@ -139,8 +139,8 @@ const InvoicePDF = {
 
         const safeCompanyName = esc(settings.companyName || 'Shaivika IT Technologies');
         const safeCompanyAddress = esc(settings.companyAddress || '').replace(/\n/g, '<br>');
-        const safeCompanyEmail = esc(settings.companyEmail || '');
-        const safeCompanyPhone = esc(settings.companyPhone || '');
+        const safeCompanyEmail = esc(settings.companyEmail && !settings.companyEmail.includes('shaivikait.com') ? settings.companyEmail : 'shaivikagroups@gmail.com');
+        const safeCompanyPhone = esc(settings.companyPhone && !settings.companyPhone.includes('90000') ? settings.companyPhone : '+91 7981431094');
         const safeCompanyGstin = esc(settings.gstin || '');
 
         const safeInvNumber = esc(invoiceNumber || 'INV-001');
@@ -193,8 +193,8 @@ const InvoicePDF = {
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
                                 <td style="vertical-align: middle; width: 50%;">
-                                    <div style="background: white; display: inline-block; padding: 12px 18px; border-radius: 8px; margin-bottom: 12px;">
-                                        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1786872082/Shaivika_IT_Technologies_Logo_p3p7iw.png" style="height: 65px; max-width: 280px; object-fit: contain;">
+                                    <div style="background: #ffffff; display: inline-block; padding: 14px 20px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
+                                        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/v1786872082/Shaivika_IT_Technologies_Logo_p3p7iw.png" alt="Shaivika IT Technologies Logo" style="height: 95px; max-width: 340px; object-fit: contain; display: block;">
                                     </div>
                                     <div style="font-size: 13px; color: rgba(255,255,255,0.95); line-height: 1.6;">
                                         <strong style="font-size: 16px; color: white;">${safeCompanyName}</strong><br>

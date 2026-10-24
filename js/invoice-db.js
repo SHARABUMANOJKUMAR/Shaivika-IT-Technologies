@@ -29,14 +29,14 @@ window.InvoiceDB = {
         upiId: 'shaivika@hdfcbank',
         defaultTaxRate: 18,
         defaultCurrency: '₹',
-        invoicePrefix: 'SIT-INV-',
+        invoicePrefix: 'INV-',
         customerPrefix: 'SIT-CLI-',
         servicePrefix: 'SIT-SRV-',
-        nextInvoiceSeq: 127,
+        nextInvoiceSeq: 1,
         nextCustomerSeq: 1,
         nextServiceSeq: 1,
         defaultTerms: '1. Payment is due within 15 days.\n2. Late payment is subject to 1.5% monthly interest.\n3. All disputes are subject to Kadapa jurisdiction.',
-        gasInvoiceUrl: '/api/gateway'
+        gasInvoiceUrl: 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec'
     },
 
     init: function() {
@@ -46,17 +46,26 @@ window.InvoiceDB = {
         if (!localStorage.getItem(this.K_PAYMENTS)) localStorage.setItem(this.K_PAYMENTS, JSON.stringify([]));
         if (!localStorage.getItem(this.K_AUDIT)) localStorage.setItem(this.K_AUDIT, JSON.stringify([]));
         
-        const existingSettings = JSON.parse(localStorage.getItem(this.K_SETTINGS));
-        if (!existingSettings) {
-            localStorage.setItem(this.K_SETTINGS, JSON.stringify(this.defaultSettings));
-        } else {
-            // Merge defaults in case new keys were added
-            localStorage.setItem(this.K_SETTINGS, JSON.stringify({ ...this.defaultSettings, ...existingSettings }));
+        let existingSettings = JSON.parse(localStorage.getItem(this.K_SETTINGS)) || {};
+        // Clean legacy placeholders
+        if (!existingSettings.companyEmail || existingSettings.companyEmail.includes('shaivikait.com')) {
+            existingSettings.companyEmail = 'shaivikagroups@gmail.com';
         }
+        if (!existingSettings.companyPhone || existingSettings.companyPhone.includes('90000')) {
+            existingSettings.companyPhone = '+91 7981431094';
+        }
+        if (!existingSettings.gasInvoiceUrl || existingSettings.gasInvoiceUrl === '/api/gateway') {
+            existingSettings.gasInvoiceUrl = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
+        }
+        localStorage.setItem(this.K_SETTINGS, JSON.stringify({ ...this.defaultSettings, ...existingSettings }));
     },
 
     getSettings: function() {
-        return JSON.parse(localStorage.getItem(this.K_SETTINGS)) || this.defaultSettings;
+        const s = JSON.parse(localStorage.getItem(this.K_SETTINGS)) || this.defaultSettings;
+        if (!s.companyEmail || s.companyEmail.includes('shaivikait.com')) s.companyEmail = 'shaivikagroups@gmail.com';
+        if (!s.companyPhone || s.companyPhone.includes('90000')) s.companyPhone = '+91 7981431094';
+        if (!s.gasInvoiceUrl || s.gasInvoiceUrl === '/api/gateway') s.gasInvoiceUrl = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
+        return s;
     },
 
     saveSettings: function(settings) {
@@ -238,60 +247,36 @@ window.InvoiceDB = {
     },
     
     fetchRemoteInvoices: async function() {
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/1cDSJw5WeiaQeZ2jLERTTu4YycYVpwoceo65BCYz3N1Y/export?format=csv';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
         
         window.InvoiceDBState = { ...window.InvoiceDBState, isFetching: true, error: null };
         window.dispatchEvent(new Event('shaivika_invoice_updated'));
         
         try {
-            console.log('[Billing] Fetching invoice CSV...');
-            const res = await fetch(CSV_URL);
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            const csvText = await res.text();
-            
-            // Robust CSV Parser
-            const parseCSV = (text) => {
-                const result = [];
-                let row = [];
-                let current = '';
-                let inQuotes = false;
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-                    const nextChar = text[i + 1];
-                    if (char === '"' && inQuotes && nextChar === '"') {
-                        current += '"'; i++; 
-                    } else if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        row.push(current);
-                        current = '';
-                    } else if ((char === '\n' || char === '\r') && !inQuotes) {
-                        if (char === '\r' && nextChar === '\n') i++;
-                        row.push(current);
-                        result.push(row);
-                        row = [];
-                        current = '';
-                    } else {
-                        current += char;
+            console.log('[Billing] Fetching live invoices from SIT Invoices WebApp...');
+            let invoicesData = null;
+
+            // 1. Try fetching via ShaivikaAPI authenticated session if available
+            try {
+                if (window.ShaivikaAPI && typeof window.ShaivikaAPI.adminRequest === 'function') {
+                    const res = await window.ShaivikaAPI.adminRequest('getInvoices', {});
+                    if (res && Array.isArray(res.invoices)) {
+                        invoicesData = res.invoices;
                     }
                 }
-                if (current || row.length > 0) {
-                    row.push(current);
-                    result.push(row);
-                }
-                return result;
-            };
-
-            const parsedCSV = parseCSV(csvText).filter(r => r.some(cell => cell.trim() !== ''));
-            console.log(`[Billing] CSV response: ${res.status}`);
-            console.log(`[Billing] Rows detected (incl header): ${parsedCSV.length}`);
-
-            if (parsedCSV.length <= 1) {
-                throw new Error('No invoice records found in CSV.');
+            } catch (apiErr) {
+                console.warn('[Billing] Gateway getInvoices notice:', apiErr.message);
             }
 
-            const headers = parsedCSV[0].map(h => h.trim());
-            const rows = parsedCSV.slice(1);
+            // 2. Direct fetch from Google Apps Script WebApp if gateway wasn't used or returned empty
+            if (!invoicesData) {
+                const res = await fetch(GAS_URL, { redirect: 'follow' });
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                const data = await res.json();
+                invoicesData = Array.isArray(data.invoices) ? data.invoices : [];
+            }
+
+            console.log(`[Billing] Received ${invoicesData.length} invoices from Google Sheet.`);
 
             const p = (v) => {
                 if (v === null || v === undefined || v === '') return 0;
@@ -299,73 +284,67 @@ window.InvoiceDB = {
                 return isNaN(num) ? 0 : num;
             };
 
-            const remoteInvoices = [];
-            rows.forEach(row => {
-                const getVal = (colName) => {
-                    const idx = headers.findIndex(h => h.toLowerCase() === colName.toLowerCase());
-                    return idx !== -1 ? (row[idx] || '').trim() : '';
-                };
+            const remoteInvoices = invoicesData.map(item => {
+                const invoiceNum = String(item['Invoice Number'] || item.invoice_number || item.invoiceNumber || '').trim();
+                if (!invoiceNum) return null;
 
-                const invoiceNum = getVal('Invoice Number');
-                if (!invoiceNum) return; // Skip invalid rows
-
-                let statusRaw = getVal('Status').toUpperCase();
+                const statusRaw = String(item['Status'] || item.status || 'PENDING').toUpperCase();
                 const statusMap = {
                     'PAID': 'PAID', 'PENDING': 'PENDING', 'DUE': 'PENDING', 
                     'OVERDUE': 'OVERDUE', 'DRAFT': 'DRAFT', 'ISSUED': 'SENT', 'SENT': 'SENT', 'CANCELLED': 'CANCELLED'
                 };
-                let status = statusMap[statusRaw] || 'PENDING';
-
-                const totalAmount = p(getVal('Total Amount'));
-                const amountPaid = status === 'PAID' ? totalAmount : 0;
+                const status = statusMap[statusRaw] || statusRaw;
+                const totalAmount = p(item['Total Amount'] ?? item.total_amount ?? item.totalAmount);
+                const amountPaid = status === 'PAID' ? totalAmount : p(item.amount_paid);
                 const balanceDue = Math.max(totalAmount - amountPaid, 0);
 
-                let parsedDate = getVal('Invoice Date') || getVal('Timestamp') || new Date().toISOString();
-                let parsedDueDate = getVal('Due Date') || parsedDate;
+                const invoiceDate = item['Invoice Date'] || item.invoice_date || item.invoiceDate || item['Timestamp'] || new Date().toISOString();
+                const dueDate = item['Due Date'] || item.due_date || item.dueDate || invoiceDate;
+                const serviceDesc = item['Service'] || item.service_name || item.service || 'Service Item';
 
-                const inv = {
-                    invoice_uuid: 'CSV-' + invoiceNum,
+                return {
+                    invoice_uuid: item['Invoice ID'] || item.invoice_id || item.invoiceId || ('GAS-' + invoiceNum),
                     invoice_number: invoiceNum,
                     status: status,
-                    customer_name: getVal('Customer Name'),
-                    customer_phone: getVal('Phone'),
-                    customer_email: getVal('Email'),
-                    service: getVal('Service'),
-                    price: p(getVal('Price')),
-                    gst_percent: p(getVal('GST %')),
-                    subtotal: p(getVal('Subtotal')),
-                    gst_amount: p(getVal('GST Amount')),
-                    cgst: p(getVal('CGST')),
-                    sgst: p(getVal('SGST')),
+                    customer_name: item['Customer Name'] || item.customer_name || item.customerName || '',
+                    customer_phone: String(item['Phone'] || item.customer_phone || item.phone || ''),
+                    customer_email: item['Email'] || item.customer_email || item.email || '',
+                    service: serviceDesc,
+                    price: p(item['Price'] ?? item.price),
+                    gst_percent: p(item['GST %'] ?? item.gst_percent ?? item.gstPercent),
+                    subtotal: p(item['Subtotal'] ?? item.subtotal),
+                    gst_amount: p(item['GST Amount'] ?? item.gst_amount ?? item.gstAmount),
+                    cgst: p(item['CGST'] ?? item.cgst),
+                    sgst: p(item['SGST'] ?? item.sgst),
                     total_amount: totalAmount,
                     amount_paid: amountPaid,
                     balance_due: balanceDue,
-                    invoice_date: parsedDate,
-                    due_date: parsedDueDate,
-                    state_code: getVal('State Code'),
-                    payment_method: getVal('Payment Method'),
-                    notes: getVal('Notes'),
-                    pdf_file_name: getVal('PDF File Name'),
-                    pdf_url: getVal('PDF URL'),
-                    created_at: getVal('Created At') || getVal('Timestamp') || new Date().toISOString(),
-                    updated_at: getVal('Updated At') || getVal('Timestamp') || new Date().toISOString()
+                    invoice_date: invoiceDate,
+                    due_date: dueDate,
+                    state_code: item['State Code'] || item.state_code || item.stateCode || 'AP',
+                    payment_method: item['Payment Method'] || item.payment_method || item.paymentMethod || 'Cash',
+                    notes: item['Notes'] || item.notes || '',
+                    pdf_file_name: item['PDF File Name'] || item.pdf_file_name || item.pdfFileName || '',
+                    pdf_url: item['PDF URL'] || item.pdf_url || item.pdfUrl || '',
+                    created_at: item['Created At'] || item.created_at || item.createdAt || item['Timestamp'] || new Date().toISOString(),
+                    updated_at: item['Updated At'] || item.updated_at || item.updatedAt || new Date().toISOString(),
+                    items: item.items || [{
+                        description: serviceDesc,
+                        qty: 1,
+                        rate: p(item['Price'] ?? item.price ?? item.subtotal),
+                        taxRate: p(item['GST %'] ?? item.gst_percent),
+                        taxAmount: p(item['GST Amount'] ?? item.gst_amount),
+                        total: totalAmount
+                    }]
                 };
+            }).filter(Boolean);
 
-                remoteInvoices.push(inv);
-            });
+            const localInvoices = this.getInvoices().filter(i => i.status === 'DRAFT' && !remoteInvoices.some(r => r.invoice_number === i.invoice_number));
+            const combinedInvoices = [...remoteInvoices, ...localInvoices];
+            combinedInvoices.sort((a, b) => new Date(b.created_at || b.invoice_date || 0) - new Date(a.created_at || a.invoice_date || 0));
 
-            console.log(`[Billing] Invoices parsed: ${remoteInvoices.length}`);
-            if(remoteInvoices.length > 0) {
-                 console.log(`[Billing] First normalized invoice object:`, remoteInvoices[0]);
-            }
-
-            const localInvoices = this.getInvoices().filter(i => i.status === 'DRAFT' && !i.invoice_uuid.startsWith('CSV-'));
-            
-            const combinedInvoices = [...localInvoices, ...remoteInvoices];
-            combinedInvoices.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-            
             localStorage.setItem(this.K_INVOICES, JSON.stringify(combinedInvoices));
-            
+
             window.InvoiceDBState = { 
                 lastFetch: new Date().toISOString(), 
                 error: null, 

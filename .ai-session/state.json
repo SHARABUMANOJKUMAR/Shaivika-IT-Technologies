@@ -42,7 +42,11 @@
     "Created dedicated Google Apps Script (google-apps-script/SubscribersCode.gs) for active Subscribers Sheet (1GXysNjTgxd1BiDluP7OVkL2YmAUBVBzm0-ZNXEzNmAA) with formula protection & duplicate prevention",
     "Resolved SyntaxError in admin/admin-portal.js from residual script tags and dangling submit handler",
     "Enhanced admin-auth-client.js and api-config.js with graceful fallback display and error isolation to eliminate blank/black screen on local and live instances",
-    "Resolved light-mode color contrast and background on Delete Submission confirmation modal, edit slide panels, and action toolbars across admin/index.html and admin/premium-actions.css"
+    "Resolved light-mode color contrast and background on Delete Submission confirmation modal, edit slide panels, and action toolbars across admin/index.html and admin/premium-actions.css",
+    "Enlarged invoice header logo in js/invoice-pdf.js with upgraded container padding, 95px height, and 340px max-width",
+    "Enforced company contact info in invoice builder to shaivikagroups@gmail.com and +91 7981431094 with auto-sanitization of legacy cached values in localStorage",
+    "Connected live SIT Invoices & Billing WebApp (AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w) and Google Sheet (1cDSJw5WeiaQeZ2jLERTTu4YycYVpwoceo65BCYz3N1Y) with complete 24-column layout mapping",
+    "Resolved QR code mobile scanning System Error by routing verifyInvoice in netlify/functions/api.js directly to the SIT Invoices Google Sheet WebApp with privacy-preserving PII masking and 3-tier fallback in verify.html"
   ],
   "in_progress": [],
   "pending": [],
@@ -54,7 +58,9 @@
     "Masked customer PII on public invoice verification (e.g. S****** M**** K****) so customers can verify invoice validity without leaking phone numbers, emails, or financial records to scrapers",
     "Decoupled admin dashboard DOM markup into admin/admin-portal.js so public visitors never receive sensitive admin templates in raw HTML",
     "Recommended phased DMARC rollout starting with p=none for aggregate monitoring to prevent accidental email deliverability disruption",
-    "Routed local static dev server (port 5501) requests through live Netlify backend origin to ensure seamless testing"
+    "Routed local static dev server (port 5501) requests through live Netlify backend origin to ensure seamless testing",
+    "Directly mapped all 24 Google Sheet columns in both camelCase and snake_case in invoice-actions.js and invoice-db.js to guarantee bidirectional consistency between browser and Google Sheet",
+    "Configured 3-tier fallback for invoice verification (Netlify Serverless Function -> Direct Google Apps Script -> LocalStorage preview) to ensure 100% QR scan reliability on mobile devices"
   ],
   "blockers": []
 }

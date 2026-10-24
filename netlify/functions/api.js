@@ -13,6 +13,7 @@
 const { verifyToken, auditLog } = require('./admin-auth');
 
 // Configuration from Environment Variables & User Live Endpoints
+const INVOICES_GAS_URL = process.env.INVOICES_GAS_URL || 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
 const CONTACT_GAS_URL = process.env.CONTACT_GAS_URL || 'https://script.google.com/macros/s/AKfycbz2ryEdo__YgiFBkps9pj4kLw5vFW3Uhvv0lSGJ1SNP3uW3n6YXv5sJe077GPvWM4gVAA/exec';
 const PORTFOLIO_GAS_URL = process.env.PORTFOLIO_GAS_URL || 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
 const SUBSCRIBERS_GAS_URL = process.env.SUBSCRIBERS_GAS_URL || 'https://script.google.com/macros/s/AKfycbygI-tj94XyLqm8Lp5q-JU5_TVhbFVnRCtF-DAN1QOQHGrinCqj7ba_hyo4urKoXIw-qg/exec';
@@ -60,8 +61,23 @@ function sanitizeFormula(str) {
   return str;
 }
 
+// Route action to appropriate backend URL
+function getTargetUrlForAction(action) {
+  if (['getInvoices', 'saveInvoice', 'updateInvoice', 'deleteInvoice', 'verifyInvoice', 'sendInvoiceEmail'].includes(action)) {
+    return INVOICES_GAS_URL;
+  }
+  if (['submitLead', 'getLeads', 'updateLeadStatus', 'deleteLead'].includes(action)) {
+    return CONTACT_GAS_URL;
+  }
+  if (['getProjects', 'addProject', 'updateProject', 'deleteProject', 'bulkSyncProjects', 'getPublicProjects'].includes(action)) {
+    return PORTFOLIO_GAS_URL;
+  }
+  return APPS_SCRIPT_URL;
+}
+
 // Forward to Google Apps Script Backend (Server-to-Server with API Key)
 async function forwardToAppsScript(action, payload, user = 'admin') {
+  const targetUrl = getTargetUrlForAction(action);
   const requestBody = {
     action: action,
     apiKey: APPS_SCRIPT_SECRET,
@@ -71,7 +87,7 @@ async function forwardToAppsScript(action, payload, user = 'admin') {
   };
 
   try {
-    const response = await fetch(APPS_SCRIPT_URL, {
+    const response = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
@@ -154,29 +170,52 @@ exports.handler = async (event, context) => {
       auditLog('anonymous', 'verify_invoice_query', invoiceId, 'received');
 
       try {
-        // Query backend for this SPECIFIC invoice only
-        const backendRes = await forwardToAppsScript('verifyInvoice', { invoiceId }, 'public_verifier');
+        // Query the live SIT Invoices WebApp
+        const response = await fetch(INVOICES_GAS_URL, { redirect: 'follow' });
+        if (!response.ok) {
+          throw new Error(`Invoices service returned status ${response.status}`);
+        }
+        const data = await response.json();
+        const invoices = Array.isArray(data.invoices) ? data.invoices : [];
+        const search = invoiceId.toLowerCase();
 
-        if (backendRes && backendRes.valid && backendRes.invoice) {
-          const inv = backendRes.invoice;
-          // Ensure PII is strictly stripped or masked before returning to browser
+        const found = invoices.find(inv => {
+          const num = String(inv['Invoice Number'] || inv.invoice_number || inv.invoiceNumber || '').trim().toLowerCase();
+          const id = String(inv['Invoice ID'] || inv.invoice_id || inv.invoiceId || '').trim().toLowerCase();
+          return num === search || id === search;
+        });
+
+        if (found) {
+          const invStatus = String(found['Status'] || found.status || 'ACTIVE');
+          const rawCustomerName = String(found['Customer Name'] || found.customer_name || found.customerName || 'Valued Customer');
+          const safeName = maskCustomerName(rawCustomerName);
+          const serviceName = String(found['Service'] || found.service_name || found.service || 'Professional Services');
+          const totalAmt = Number(found['Total Amount'] || found.total_amount || found.totalAmount || 0);
+          const invDate = found['Invoice Date'] || found.invoice_date || found.invoiceDate || '';
+          const payMethod = String(found['Payment Method'] || found.payment_method || found.paymentMethod || 'Online');
+
           const safeVerification = {
             status: 'success',
             valid: true,
             invoice: {
-              invoiceNumber: inv.invoiceNumber || inv.invoice_number,
-              invoiceDate: inv.invoiceDate || inv.invoice_date,
-              customerName: maskCustomerName(inv.customerName || inv.customer_name),
-              service: inv.service || inv.service_name || 'Professional Services',
-              totalAmount: Number(inv.totalAmount || inv.total_amount || 0),
-              status: inv.status || 'ACTIVE',
-              paymentMethod: inv.paymentMethod || inv.payment_method || 'Online',
-              items: (inv.items || []).map(item => ({
-                description: item.description,
+              invoiceNumber: found['Invoice Number'] || found.invoice_number || found.invoiceNumber || invoiceId,
+              invoiceDate: invDate,
+              customerName: safeName,
+              service: serviceName,
+              totalAmount: totalAmt,
+              status: invStatus,
+              paymentMethod: payMethod,
+              items: found.items && found.items.length ? found.items.map(item => ({
+                description: item.description || serviceName,
                 qty: Number(item.qty || 1),
-                rate: Number(item.rate || 0),
-                total: Number(item.total || 0)
-              })),
+                rate: Number(item.rate || totalAmt),
+                total: Number(item.total || totalAmt)
+              })) : [{
+                description: serviceName,
+                qty: 1,
+                rate: Number(found['Price'] || found.subtotal || totalAmt),
+                total: totalAmt
+              }],
               verifiedAt: new Date().toISOString()
             }
           };
@@ -199,6 +238,7 @@ exports.handler = async (event, context) => {
         };
 
       } catch (err) {
+        console.error('Invoice verification error:', err.message);
         return {
           statusCode: 502,
           headers: corsHeaders,

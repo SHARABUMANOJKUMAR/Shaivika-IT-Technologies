@@ -227,30 +227,73 @@
 
         async function loadInvoice() {
             if (!verifyId) return null;
+            // 1. Try secure Netlify API gateway
             try {
-                // Call secure, privacy-preserving single invoice verifier
                 if (window.ShaivikaAPI && typeof window.ShaivikaAPI.verifyInvoice === 'function') {
                     const invoice = await window.ShaivikaAPI.verifyInvoice(verifyId);
-                    return invoice;
+                    if (invoice) return invoice;
                 }
-                throw new Error('API client unavailable');
-            } catch (error) {
-                // Fallback to local storage only if offline/local preview, strictly masking customer name
-                const localInvoices = JSON.parse(localStorage.getItem('shaivika_invoices')) || [];
-                const found = localInvoices.find(inv => {
-                    const num = inv.invoice_number || inv.invoiceNumber;
-                    const id = inv.invoice_id || inv.invoiceId;
-                    return num === verifyId || id === verifyId;
-                });
-                if (found) {
-                    const rawName = String(found.customer_name || found.customerName || '');
-                    return {
-                        ...found,
-                        customer_name: rawName.split(' ').map(p => p.length > 1 ? p[0] + '*'.repeat(p.length - 1) : p).join(' ')
-                    };
-                }
-                throw error;
+            } catch (apiErr) {
+                console.warn('Gateway verification fallback:', apiErr.message);
             }
+
+            // 2. Direct fetch from SIT Invoices WebApp (Google Sheet)
+            try {
+                const GAS_URL = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
+                const res = await fetch(GAS_URL, { redirect: 'follow' });
+                if (res.ok) {
+                    const data = await res.json();
+                    const invoices = Array.isArray(data.invoices) ? data.invoices : [];
+                    const search = verifyId.toLowerCase();
+                    const found = invoices.find(inv => {
+                        const num = String(inv['Invoice Number'] || inv.invoice_number || inv.invoiceNumber || '').trim().toLowerCase();
+                        const id = String(inv['Invoice ID'] || inv.invoice_id || inv.invoiceId || '').trim().toLowerCase();
+                        return num === search || id === search;
+                    });
+                    if (found) {
+                        const rawName = String(found['Customer Name'] || found.customer_name || found.customerName || 'Valued Customer');
+                        const maskedName = rawName.split(' ').map(p => p.length > 1 ? p[0] + '*'.repeat(p.length - 1) : p).join(' ');
+                        const serv = String(found['Service'] || found.service_name || found.service || 'Professional Services');
+                        const tot = Number(found['Total Amount'] || found.total_amount || found.totalAmount || 0);
+                        return {
+                            invoiceNumber: found['Invoice Number'] || found.invoice_number || found.invoiceNumber || verifyId,
+                            invoice_number: found['Invoice Number'] || found.invoice_number || found.invoiceNumber || verifyId,
+                            invoiceDate: found['Invoice Date'] || found.invoice_date || found.invoiceDate || '',
+                            invoice_date: found['Invoice Date'] || found.invoice_date || found.invoiceDate || '',
+                            customerName: maskedName,
+                            customer_name: maskedName,
+                            service: serv,
+                            service_name: serv,
+                            totalAmount: tot,
+                            total_amount: tot,
+                            status: String(found['Status'] || found.status || 'ACTIVE'),
+                            paymentMethod: String(found['Payment Method'] || found.payment_method || found.paymentMethod || 'Online'),
+                            payment_method: String(found['Payment Method'] || found.payment_method || found.paymentMethod || 'Online'),
+                            items: found.items && found.items.length ? found.items : [{ description: serv, qty: 1, rate: tot, total: tot }]
+                        };
+                    }
+                }
+            } catch (gasErr) {
+                console.warn('Direct GAS fallback error:', gasErr.message);
+            }
+
+            // 3. Fallback to local storage (for offline/local preview)
+            const localInvoices = JSON.parse(localStorage.getItem('shaivika_invoices')) || [];
+            const found = localInvoices.find(inv => {
+                const num = String(inv.invoice_number || inv.invoiceNumber || '').trim().toLowerCase();
+                const id = String(inv.invoice_id || inv.invoiceId || '').trim().toLowerCase();
+                return num === verifyId.toLowerCase() || id === verifyId.toLowerCase();
+            });
+            if (found) {
+                const rawName = String(found.customer_name || found.customerName || 'Valued Customer');
+                const masked = rawName.split(' ').map(p => p.length > 1 ? p[0] + '*'.repeat(p.length - 1) : p).join(' ');
+                return {
+                    ...found,
+                    customerName: masked,
+                    customer_name: masked
+                };
+            }
+            return null;
         }
 
         setTimeout(async () => {

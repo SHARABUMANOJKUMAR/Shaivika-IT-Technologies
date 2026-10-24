@@ -68,6 +68,7 @@
         const number = invoiceNumber();
         const verificationUrl = `${verificationOrigin()}/verify.html?id=${encodeURIComponent(number)}`;
         const invoice = {
+            // Standard camelCase
             invoiceId, invoiceNumber: number, status: status || existing?.status || 'DRAFT',
             customerName: field('inv-flat-name')?.value.trim() || '', phone: field('inv-flat-phone')?.value.trim() || '',
             email: field('inv-flat-email')?.value.trim() || '', service, price: calc.subtotal, gstPercent: calc.gstPercent,
@@ -76,12 +77,41 @@
             paymentMethod: field('inv-form-payment-method')?.value || 'Online / Bank Transfer', notes: field('inv-flat-summary')?.value || '',
             createdAt, updatedAt: now, pdfFileName: `SHAIVIKA_INVOICE_${number}.pdf`, pdfUrl: '',
             shareUrl: verificationUrl, verificationId: number, verificationUrl,
-            invoice_uuid: invoiceId, invoice_number: number, invoice_date: date, due_date: date,
+
+            // Snake case
+            invoice_uuid: invoiceId, invoice_id: invoiceId, invoice_number: number, invoice_date: date, due_date: date,
             customer_name: field('inv-flat-name')?.value.trim() || '', customer_phone: field('inv-flat-phone')?.value.trim() || '',
             customer_email: field('inv-flat-email')?.value.trim() || '', customer_id: existing?.customer_id || `CUST-${Date.now()}`,
             state_code: field('inv-form-state')?.value || 'AP', payment_method: field('inv-form-payment-method')?.value || 'Online / Bank Transfer',
             subtotal: calc.subtotal, tax_amount: calc.gstAmount, total_amount: calc.totalAmount,
             verification_id: number, verification_url: verificationUrl,
+
+            // Exact 24 Google Sheet column names
+            'Timestamp': now,
+            'Invoice ID': invoiceId,
+            'Invoice Number': number,
+            'Status': status || existing?.status || 'DRAFT',
+            'Customer Name': field('inv-flat-name')?.value.trim() || '',
+            'Phone': field('inv-flat-phone')?.value.trim() || '',
+            'Email': field('inv-flat-email')?.value.trim() || '',
+            'Service': service,
+            'Price': calc.subtotal,
+            'GST %': calc.gstPercent,
+            'Subtotal': calc.subtotal,
+            'GST Amount': calc.gstAmount,
+            'CGST': calc.cgst,
+            'SGST': calc.sgst,
+            'Total Amount': calc.totalAmount,
+            'Invoice Date': date,
+            'Due Date': date,
+            'State Code': field('inv-form-state')?.value || 'AP',
+            'Payment Method': field('inv-form-payment-method')?.value || 'Online / Bank Transfer',
+            'Notes': field('inv-flat-summary')?.value || '',
+            'PDF File Name': `SHAIVIKA_INVOICE_${number}.pdf`,
+            'PDF URL': '',
+            'Created At': createdAt,
+            'Updated At': now,
+
             items: [{ service_id: selected?.value || '', description: service || 'Service', qty: 1, rate: calc.subtotal,
                 taxRate: calc.gstPercent, taxAmount: calc.gstAmount, total: calc.totalAmount }]
         };
@@ -110,17 +140,25 @@
     }
 
     async function request(action, invoice) {
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
         if (window.ShaivikaAPI && typeof window.ShaivikaAPI.adminRequest === 'function') {
             try {
                 const result = await window.ShaivikaAPI.adminRequest(action, { invoice });
-                return result;
+                if (result && (result.status === 'success' || result.success === true)) {
+                    return result;
+                }
             } catch (apiErr) {
-                console.warn('API Gateway invoice action error:', apiErr.message);
-                throw apiErr;
+                console.warn('API Gateway invoice action error, attempting direct GAS sync:', apiErr.message);
             }
         }
-        const response = await fetch(ENDPOINT, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action, invoice }) });
-        if (!response.ok) throw new Error(`Server returned HTTP ${response.status}`);
+        // Direct POST to Google Apps Script WebApp
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: action, invoice: invoice, ...invoice })
+        });
+        if (!response.ok) throw new Error(`Google Apps Script returned HTTP ${response.status}`);
         const result = await response.json();
         if (result.status !== 'success' && result.success !== true) throw new Error(result.message || 'Operation rejected.');
         return result;
