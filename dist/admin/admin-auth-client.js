@@ -32,20 +32,37 @@
 
     // 1. Initial Authentication Check via Server-side Verification
     async function verifyAndMount() {
-      if (!window.ShaivikaAPI) return;
-
-      const authResult = await window.ShaivikaAPI.adminVerify();
-      if (authResult.valid) {
-        if (loginWrapper) loginWrapper.style.display = 'none';
-        if (mountPoint && typeof window.mountAdminPortal === 'function') {
-          window.mountAdminPortal(mountPoint, authResult.user);
-        }
-      } else {
+      if (!window.ShaivikaAPI) {
         if (loginWrapper) loginWrapper.style.display = 'flex';
-        if (mountPoint) {
-          if (typeof window.unmountAdminPortal === 'function') window.unmountAdminPortal();
-          mountPoint.innerHTML = '';
+        return;
+      }
+
+      try {
+        const authResult = await window.ShaivikaAPI.adminVerify();
+        if (authResult.valid) {
+          if (typeof window.mountAdminPortal === 'function') {
+            if (loginWrapper) loginWrapper.style.display = 'none';
+            try {
+              window.mountAdminPortal(mountPoint, authResult.user);
+            } catch (mountErr) {
+              console.error('Error mounting admin portal:', mountErr);
+              if (loginWrapper) loginWrapper.style.display = 'flex';
+              showToast('Admin portal error: ' + (mountErr.message || mountErr), 'error');
+            }
+          } else {
+            console.warn('mountAdminPortal is not defined yet');
+            if (loginWrapper) loginWrapper.style.display = 'flex';
+          }
+        } else {
+          if (loginWrapper) loginWrapper.style.display = 'flex';
+          if (mountPoint) {
+            if (typeof window.unmountAdminPortal === 'function') window.unmountAdminPortal();
+            mountPoint.innerHTML = '';
+          }
         }
+      } catch (err) {
+        console.error('Session verify failed:', err);
+        if (loginWrapper) loginWrapper.style.display = 'flex';
       }
     }
 
@@ -73,9 +90,19 @@
           const res = await window.ShaivikaAPI.adminLogin(username, password);
           showToast('Login successful! Welcome to Shaivika Admin.', 'success');
           loginForm.reset();
-          if (loginWrapper) loginWrapper.style.display = 'none';
-          if (mountPoint && typeof window.mountAdminPortal === 'function') {
-            window.mountAdminPortal(mountPoint, res.user);
+          if (typeof window.mountAdminPortal === 'function') {
+            if (loginWrapper) loginWrapper.style.display = 'none';
+            try {
+              window.mountAdminPortal(mountPoint, res.user);
+            } catch (mountErr) {
+              console.error('Mount error after login:', mountErr);
+              if (loginWrapper) loginWrapper.style.display = 'flex';
+              showToast('Error displaying portal: ' + (mountErr.message || mountErr), 'error');
+            }
+          } else {
+            console.error('mountAdminPortal function not found');
+            showToast('Admin portal could not be initialized.', 'error');
+            if (loginWrapper) loginWrapper.style.display = 'flex';
           }
         } catch (err) {
           const msg = err.message || 'Authentication failed.';

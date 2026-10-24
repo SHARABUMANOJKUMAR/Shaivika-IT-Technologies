@@ -67,6 +67,7 @@
     setSession: function(token, user) {
       if (token) sessionStorage.setItem(TOKEN_KEY, token);
       if (user) sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+      try { localStorage.setItem('shaivika_admin_logged_in', 'true'); } catch (e) {}
     },
 
     clearSession: function() {
@@ -233,6 +234,7 @@
         const data = parsed.data;
 
         if (parsed.ok && data.status === 'success' && data.valid) {
+          try { localStorage.setItem('shaivika_admin_logged_in', 'true'); } catch (e) {}
           return { valid: true, user: data.user };
         }
       } catch (e) {

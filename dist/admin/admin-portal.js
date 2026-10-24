@@ -83,24 +83,7 @@
             themeToggleBtn.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
         });
 
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            // Brute-force rate limiting and lockout protection
-            const lockoutUntil = parseInt(sessionStorage.getItem('shaivika_admin_lockout') || '0', 10);
-            const now = Date.now();
-            if (lockoutUntil > now) {
-                const remaining = Math.ceil((lockoutUntil - now) / 1000);
-                showToast(`Too many failed attempts. Locked for ${remaining}s.`, 'error');
-                return;
-            }
-
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-            const storedPass = localStorage.getItem('shaivika_admin_password');
-
-            // Client-side authentication handler moved to admin-auth-client.js
-
+        // Authentication flow managed by admin-auth-client.js
         logoutBtn?.addEventListener("click", () => { if (typeof window.handleAdminLogout === "function") window.handleAdminLogout(); });
 
         // Ensure switchInvoiceView exists early for zero-latency clicks
@@ -1946,6 +1929,7 @@
 
         // checkAuth managed by admin-auth-client.js
         initTheme();
+        loadData();
 
         // 🔄 Automatic Google Sheet Sync on Admin Init
         setTimeout(() => {
@@ -1989,7 +1973,6 @@
                 }
             });
         }
-    </script>
-  }
+}
 
 })();
