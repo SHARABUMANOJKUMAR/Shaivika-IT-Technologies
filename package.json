@@ -1,0 +1,26 @@
+{
+  "name": "shaivika-it-technologies",
+  "version": "1.0.0",
+  "description": "Shaivika IT Technologies - Enterprise Website, Admin Portal, and AI Assistant",
+  "main": "index.html",
+  "scripts": {
+    "build": "node sync_dist.cjs",
+    "sync": "node sync_dist.cjs",
+    "test": "node tests/security-tests.cjs && node tests/chatbot-integration-test.cjs",
+    "test:security": "node tests/security-tests.cjs",
+    "test:chatbot": "node tests/chatbot-integration-test.cjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "shaivika",
+    "ai-automation",
+    "web-development",
+    "chatbot",
+    "n8n"
+  ],
+  "author": "Shaivika Groups",
+  "license": "UNLICENSED",
+  "private": true
+}

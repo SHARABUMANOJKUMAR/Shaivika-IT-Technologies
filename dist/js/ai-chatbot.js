@@ -401,7 +401,7 @@
             const contentType = n8nRes.headers.get('content-type') || '';
             if (contentType.includes('application/json')) {
               const n8nData = await n8nRes.json();
-              replyText = n8nData.output || n8nData.response || n8nData.text || n8nData.message || (typeof n8nData === 'string' ? n8nData : '');
+              replyText = n8nData.reply || n8nData.output || n8nData.response || n8nData.text || n8nData.message || (typeof n8nData === 'string' ? n8nData : '');
             } else {
               replyText = await n8nRes.text();
             }

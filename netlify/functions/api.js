@@ -616,10 +616,10 @@ exports.handler = async (event, context) => {
             if (typeof data === 'string') {
               aiText = data;
             } else if (data && typeof data === 'object') {
-              aiText = data.output || data.response || data.text || data.message || (data.data && data.data.text) || '';
+              aiText = data.reply || data.output || data.response || data.text || data.message || (data.data && data.data.text) || '';
               if (!aiText && Array.isArray(data) && data[0]) {
                 const first = data[0];
-                aiText = first.output || first.response || first.text || first.message || (typeof first === 'string' ? first : '');
+                aiText = first.reply || first.output || first.response || first.text || first.message || (typeof first === 'string' ? first : '');
               }
             }
           } else {
