@@ -355,7 +355,7 @@
         </div>
       </div>
       <div class="hero-lottie-col">
-        <dotlottie-wc class="hero-lottie" src="https://lottie.host/a7da0733-c444-4b62-b279-53f9a3f63151/hAOUciUDtx.lottie" autoplay loop></dotlottie-wc>
+        <dotlottie-wc class="hero-lottie" src="img/hero-students.lottie" autoplay loop aria-label="Shaivika IT Technologies - Collaborative Technology Team and Students Illustration" role="img"></dotlottie-wc>
       </div>
     </div>
   </section>
@@ -734,16 +734,49 @@
   <script src="js/main.min.js?v=9" defer></script>
   <script src="js/lead-interceptor.js" defer></script>
   
-  <!-- HIGH-PERFORMANCE IDLE RESOURCE LOADER (VANTA & DOTLOTTIE) -->
+  <!-- HIGH-PERFORMANCE RESOURCE LOADER (DOTLOTTIE & VANTA) -->
   <script>
     (function() {
-      // 1. Idle load dotlottie for hero
+      // 1. Resilient DotLottie loader for hero illustration
       function loadDotLottie() {
-        if (!document.querySelector('dotlottie-wc')) return;
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js';
-        script.type = 'module';
-        document.body.appendChild(script);
+        const lottieEl = document.querySelector('dotlottie-wc');
+        if (!lottieEl) return;
+
+        // Auto-recovery error handler: fallback between local asset and remote URL if either fails
+        lottieEl.addEventListener('error', function() {
+          const currentSrc = lottieEl.getAttribute('src') || '';
+          if (!currentSrc.includes('lottie.host')) {
+            console.warn('[DotLottie] Local asset error, recovering with remote Lottie host URL...');
+            lottieEl.setAttribute('src', 'https://lottie.host/a7da0733-c444-4b62-b279-53f9a3f63151/hAOUciUDtx.lottie');
+          } else {
+            console.warn('[DotLottie] Remote URL error, recovering with local asset path...');
+            lottieEl.setAttribute('src', 'img/hero-students.lottie');
+          }
+        }, { once: true });
+
+        // Load DotLottie Web Component module if not already registered
+        if (!customElements.get('dotlottie-wc') && !document.querySelector('script[data-dotlottie-wc]')) {
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js';
+          script.type = 'module';
+          script.setAttribute('data-dotlottie-wc', 'true');
+          script.onerror = function() {
+            // Backup CDN in case unpkg is blocked or experiencing network latency
+            const backupScript = document.createElement('script');
+            backupScript.src = 'https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js';
+            backupScript.type = 'module';
+            backupScript.setAttribute('data-dotlottie-wc', 'true');
+            document.body.appendChild(backupScript);
+          };
+          document.body.appendChild(script);
+        }
+      }
+
+      // Initialize DotLottie as soon as DOM is ready so above-the-fold hero renders immediately
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadDotLottie);
+      } else {
+        loadDotLottie();
       }
 
       // 2. Intelligent Vanta loader (Desktop only, idle, paused when offscreen)
@@ -819,18 +852,16 @@
         });
       }
 
-      // Schedule post-interactive execution
+      // Schedule background Vanta execution strictly on idle
       if ('requestIdleCallback' in window) {
         window.addEventListener('load', () => {
           requestIdleCallback(() => {
-            loadDotLottie();
             initVantaDesktop();
           }, { timeout: 2500 });
         });
       } else {
         window.addEventListener('load', () => {
           setTimeout(() => {
-            loadDotLottie();
             initVantaDesktop();
           }, 1500);
         });
