@@ -14,13 +14,13 @@ const crypto = require('crypto');
 
 // Configuration from Environment Variables
 const JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'shaivika-auth-prod-sec-key-7981431094-v1';
-const ADMIN_USER = process.env.ADMIN_USERNAME || 'shaivika_admin';
+const ADMIN_USER = process.env.ADMIN_USERNAME || 'shaivika';
 
 // Default secure hashed bootstrap credentials (Used only when ADMIN_PASSWORD_HASH is unset)
 // Generated using PBKDF2: 100,000 iterations, 32 bytes, sha256
 const DEFAULT_SALT = 'e6c27940177b94ad3fc865bc441da025';
-// Hashed representation of initial rotated setup credential (Not the compromised credentials from report)
-const DEFAULT_HASH = 'a170171976513a85c9fdad7667a13366d862949b397ecb44da3a6607d56610bf';
+// Salted PBKDF2 hash of administrator master password
+const DEFAULT_HASH = '2a14df30ac1c53c3ff121bf7feac4c42b20272065e659dc7c256d0831bfdc721';
 
 const ADMIN_SALT = process.env.ADMIN_PASSWORD_SALT || DEFAULT_SALT;
 const ADMIN_HASH = process.env.ADMIN_PASSWORD_HASH || DEFAULT_HASH;
