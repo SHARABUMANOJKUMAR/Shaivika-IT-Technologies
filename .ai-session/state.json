@@ -41,7 +41,8 @@
     "Integrated user's 3 live Google Sheets (Contact, Portfolio, Subscribers) into Netlify API Gateway (netlify/functions/api.js)",
     "Created dedicated Google Apps Script (google-apps-script/SubscribersCode.gs) for active Subscribers Sheet (1GXysNjTgxd1BiDluP7OVkL2YmAUBVBzm0-ZNXEzNmAA) with formula protection & duplicate prevention",
     "Resolved SyntaxError in admin/admin-portal.js from residual script tags and dangling submit handler",
-    "Enhanced admin-auth-client.js and api-config.js with graceful fallback display and error isolation to eliminate blank/black screen on local and live instances"
+    "Enhanced admin-auth-client.js and api-config.js with graceful fallback display and error isolation to eliminate blank/black screen on local and live instances",
+    "Resolved light-mode color contrast and background on Delete Submission confirmation modal, edit slide panels, and action toolbars across admin/index.html and admin/premium-actions.css"
   ],
   "in_progress": [],
   "pending": [],
