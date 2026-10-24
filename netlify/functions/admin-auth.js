@@ -20,7 +20,7 @@ const ADMIN_USER = process.env.ADMIN_USERNAME || 'shaivika_admin';
 // Generated using PBKDF2: 100,000 iterations, 32 bytes, sha256
 const DEFAULT_SALT = 'e6c27940177b94ad3fc865bc441da025';
 // Hashed representation of initial rotated setup credential (Not the compromised credentials from report)
-const DEFAULT_HASH = '1f6c4495ea52b414f5263a233634032d887a07fc2580a22a36b5bc9353272e0d';
+const DEFAULT_HASH = 'a170171976513a85c9fdad7667a13366d862949b397ecb44da3a6607d56610bf';
 
 const ADMIN_SALT = process.env.ADMIN_PASSWORD_SALT || DEFAULT_SALT;
 const ADMIN_HASH = process.env.ADMIN_PASSWORD_HASH || DEFAULT_HASH;
