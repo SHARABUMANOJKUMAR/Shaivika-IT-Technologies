@@ -27,6 +27,7 @@
             --bg-secondary: #0f172a;
             --bg-glass: rgba(15, 23, 42, 0.85);
             --bg-card-hover: rgba(15, 23, 42, 0.95);
+            --bg-card: rgba(15, 23, 42, 0.85);
             --surface: rgba(15, 23, 42, 0.85);
             --background: #090d16;
             --border: rgba(255, 255, 255, 0.12);
@@ -43,6 +44,7 @@
         [data-theme="light"] {
             --bg-primary: #f8fafc;
             --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
             --bg-glass: rgba(255, 255, 255, 0.95);
             --bg-card-hover: #ffffff;
             --surface: #ffffff;
@@ -135,11 +137,78 @@
             color: #1e293b;
         }
 
-        [data-theme="light"] .modal-content {
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #0f172a;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        [data-theme="light"] .modal-content,
+        [data-theme="light"] .premium-modal-content {
+            background: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        [data-theme="light"] .premium-modal {
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        [data-theme="light"] .premium-modal-title {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .premium-modal-text {
+            color: #475569 !important;
+        }
+
+        [data-theme="light"] .warning-icon {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border: 2px solid rgba(239, 68, 68, 0.3) !important;
+            color: #ef4444 !important;
+        }
+
+        [data-theme="light"] .premium-btn-cancel,
+        [data-theme="light"] #cancelDeleteBtn {
+            background: #f1f5f9 !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        [data-theme="light"] .premium-btn-cancel:hover,
+        [data-theme="light"] #cancelDeleteBtn:hover {
+            background: #e2e8f0 !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
+        }
+
+        [data-theme="light"] .premium-btn-confirm,
+        [data-theme="light"] #confirmDeleteActionBtn {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
+        }
+
+        [data-theme="light"] .premium-btn-confirm:hover,
+        [data-theme="light"] #confirmDeleteActionBtn:hover {
+            background: #dc2626 !important;
+            border-color: #dc2626 !important;
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.45) !important;
+        }
+
+        [data-theme="light"] .edit-slide-panel {
+            background: #ffffff !important;
+            border-left: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+            box-shadow: -10px 0 35px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        [data-theme="light"] .edit-panel-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .edit-panel-close {
+            color: #64748b !important;
+        }
+
+        [data-theme="light"] .edit-panel-close:hover {
+            color: #0f172a !important;
         }
 
         [data-theme="light"] .action-btn-edit {
