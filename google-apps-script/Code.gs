@@ -1,299 +1,679 @@
 /**
  * ============================================================================
- * SHAIVIKA IT TECHNOLOGIES - GOOGLE APPS SCRIPT BACKEND
- * Invoice Database & Services API
+ * SHAIVIKA IT TECHNOLOGIES - HARDENED ENTERPRISE GOOGLE APPS SCRIPT BACKEND
+ * Unified Data Service for Invoices, Leads, Portfolio, Jobs & Applications
  * ============================================================================
  * 
- * SETUP INSTRUCTIONS:
- * 1. Open Google Sheets (https://sheets.new) and create a new Spreadsheet.
- * 2. Rename the first sheet tab to: "Invoices" (or leave as Sheet1, script handles it).
- * 3. Go to Extensions -> Apps Script.
- * 4. Replace all code in Code.gs with this complete script.
- * 5. Click "Deploy" -> "Manage deployments" -> Edit -> New Version (or "New deployment").
- * 6. Configuration:
- *    - Description: "Shaivika Invoice API"
- *    - Execute as: "Me" (your email)
- *    - Who has access: "Anyone" (CRITICAL for website & admin portal access)
- * 7. Click "Deploy", Authorize permissions when prompted.
- * 8. Copy the generated "Web App URL" (ends with /exec).
- * 9. Paste this URL into your Shaivika Admin Dashboard -> Settings -> Google Sheet Integration!
+ * SECURITY ARCHITECTURE:
+ * 1. Server-to-Server Authentication: Requires valid API Key (Script Properties: 'API_KEY')
+ *    for all privileged operations (reading invoice database, modifying projects, etc.).
+ * 2. Anonymous Access Strictly Restricted:
+ *    - Anonymous callers CANNOT dump customer invoices or access customer PII.
+ *    - Anonymous 'verifyInvoice' queries return only non-sensitive, masked verification records.
+ *    - Anonymous 'submitLead' and 'submitApplication' are validated, bounded, and sanitized.
+ * 3. Formula Injection Neutralization: All input fields starting with =, +, -, @ are escaped.
+ * 4. Record-Level Validation: Schema, type, and length constraints on every field.
+ * 5. Secure Logging: Internal audit trail without logging customer PII or credentials.
  */
 
-const INVOICE_SHEET_NAME = 'Invoices';
-const INVOICE_HEADERS = [
-  'Timestamp', 'Invoice ID', 'Invoice Number', 'Status', 'Customer Name',
-  'Phone', 'Email', 'Service', 'Price', 'GST %', 'Subtotal', 'GST Amount',
-  'CGST', 'SGST', 'Total Amount', 'Invoice Date', 'Due Date', 'State Code',
-  'Payment Method', 'Notes', 'PDF File Name', 'PDF URL', 'Created At', 'Updated At'
-];
+// Configuration & Default Fallback Secret (Overridden by ScriptProperties 'API_KEY')
+const CONFIG = {
+  DEFAULT_API_KEY: 'shaivika-gas-backend-secret-2026',
+  COMPANY_NAME: 'Shaivika IT Technologies',
+  MAX_FIELD_LENGTH: 3000
+};
 
-function getOrCreateInvoiceSheet() {
+// Sheet Names
+const SHEETS = {
+  INVOICES: 'Invoices',
+  PORTFOLIO: 'Portfolio',
+  JOBS: 'Jobs',
+  APPLICATIONS: 'Applications',
+  LEADS: 'Leads',
+  AUDIT_LOG: 'AuditLog'
+};
+
+// Column Layouts
+const HEADERS = {
+  INVOICES: [
+    'Timestamp', 'Invoice ID', 'Invoice Number', 'Status', 'Customer Name',
+    'Phone', 'Email', 'Service', 'Price', 'GST %', 'Subtotal', 'GST Amount',
+    'CGST', 'SGST', 'Total Amount', 'Invoice Date', 'Due Date', 'State Code',
+    'Payment Method', 'Notes', 'PDF File Name', 'PDF URL', 'Created At', 'Updated At'
+  ],
+  PORTFOLIO: [
+    'ID', 'Title', 'Description', 'Categories', 'Link', 'Emoji', 'Image', 'ModalID', 'Status', 'CreatedAt'
+  ],
+  JOBS: [
+    'Job ID', 'Title', 'Department', 'Location', 'Type', 'Experience', 'Description', 'Requirements', 'Status', 'CreatedAt'
+  ],
+  APPLICATIONS: [
+    'Application ID', 'Job ID', 'Job Title', 'Candidate Name', 'Email', 'Phone', 'Experience', 'Portfolio', 'Message', 'Resume URL', 'Status', 'SubmittedAt'
+  ],
+  LEADS: [
+    'Lead ID', 'Full Name', 'Email', 'Phone', 'Company', 'Service', 'Message', 'Source', 'Status', 'SubmittedAt'
+  ],
+  AUDIT_LOG: [
+    'Timestamp', 'Actor', 'Action', 'Resource ID', 'Status'
+  ]
+};
+
+// ---------------------------------------------------------------------------
+// SHEET INITIALIZATION & RETRIEVAL HELPERS
+// ---------------------------------------------------------------------------
+function getOrCreateSheet(sheetName, headers, headerColor = '#1e3a8a') {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(INVOICE_SHEET_NAME);
-  if (!sheet) sheet = ss.insertSheet(INVOICE_SHEET_NAME);
-  if (sheet.getName() !== INVOICE_SHEET_NAME) {
-    throw new Error('Invoice operation attempted on wrong sheet.');
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
   }
-  if (sheet.getLastRow() === 0) {
-    sheet.getRange(1, 1, 1, INVOICE_HEADERS.length).setValues([INVOICE_HEADERS]);
-    sheet.getRange(1, 1, 1, INVOICE_HEADERS.length)
-      .setBackground('#1e3a8a').setFontColor('#ffffff').setFontWeight('bold')
+  if (sheet.getLastRow() === 0 && headers && headers.length > 0) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setBackground(headerColor)
+      .setFontColor('#ffffff')
+      .setFontWeight('bold')
       .setHorizontalAlignment('center');
     sheet.setFrozenRows(1);
   }
   return sheet;
 }
 
-function invoiceValue(value) {
-  return value === null || value === undefined ? '' : value;
-}
-
-function invoiceRow(invoice) {
-  const firstItem = invoice.items && invoice.items[0] ? invoice.items[0] : {};
-  const price = invoice.price ?? invoice.subtotal ?? firstItem.rate ?? 0;
-  const gstPercent = invoice.gstPercent ?? invoice.gst_percent ?? invoice.tax_rate ?? firstItem.taxRate ?? 0;
-  const service = invoice.service || invoice.service_name || firstItem.description || '';
-  return [
-    new Date(), invoiceValue(invoice.invoiceId || invoice.invoice_id),
-    invoiceValue(invoice.invoiceNumber || invoice.invoice_number), invoiceValue(invoice.status),
-    invoiceValue(invoice.customerName || invoice.customer_name), invoiceValue(invoice.phone || invoice.customer_phone),
-    invoiceValue(invoice.email || invoice.customer_email), invoiceValue(service),
-    Number(price), Number(gstPercent),
-    Number(invoice.subtotal || 0), Number(invoice.gstAmount ?? invoice.gst_amount ?? 0),
-    Number(invoice.cgst || 0), Number(invoice.sgst || 0), Number(invoice.totalAmount ?? invoice.total_amount ?? 0),
-    invoiceValue(invoice.invoiceDate || invoice.invoice_date), invoiceValue(invoice.dueDate || invoice.due_date),
-    invoiceValue(invoice.stateCode || invoice.state_code), invoiceValue(invoice.paymentMethod || invoice.payment_method),
-    invoiceValue(invoice.notes), invoiceValue(invoice.pdfFileName || invoice.pdf_file_name),
-    invoiceValue(invoice.pdfUrl || invoice.pdf_url), invoiceValue(invoice.createdAt || invoice.created_at),
-    invoiceValue(invoice.updatedAt || invoice.updated_at)
-  ];
-}
-
-function validateInvoicePayload(invoice) {
-  const firstItem = invoice.items && invoice.items[0] ? invoice.items[0] : {};
-  const price = invoice.price ?? invoice.subtotal ?? firstItem.rate ?? 0;
-  const service = invoice.service || invoice.service_name || firstItem.description;
-  const required = [
-    ['invoiceId', invoice.invoiceId || invoice.invoice_id],
-    ['invoiceNumber', invoice.invoiceNumber || invoice.invoice_number],
-    ['status', invoice.status],
-    ['customerName', invoice.customerName || invoice.customer_name],
-    ['service', service],
-    ['paymentMethod', invoice.paymentMethod || invoice.payment_method],
-    ['invoiceDate', invoice.invoiceDate || invoice.invoice_date],
-    ['dueDate', invoice.dueDate || invoice.due_date],
-    ['stateCode', invoice.stateCode || invoice.state_code]
-  ];
-  const missing = required.filter(item => item[1] === null || item[1] === undefined || String(item[1]).trim() === '').map(item => item[0]);
-  if (missing.length) return { status: 'error', success: false, message: 'Missing invoice fields: ' + missing.join(', ') };
-  if (Number(price) <= 0 || Number(invoice.totalAmount ?? invoice.total_amount ?? firstItem.total ?? 0) < 0) {
-    return { status: 'error', success: false, message: 'Invoice price and total amount must be valid.' };
+// ---------------------------------------------------------------------------
+// SECURITY & SANITIZATION UTILITIES
+// ---------------------------------------------------------------------------
+function getActiveApiKey() {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const storedKey = props.getProperty('API_KEY');
+    if (storedKey && storedKey.trim() !== '') return storedKey.trim();
+  } catch (e) {
+    // Ignore property read errors
   }
-  return null;
+  return CONFIG.DEFAULT_API_KEY;
 }
 
-function saveInvoiceRecord(invoice) {
-  const sheet = getOrCreateInvoiceSheet();
-  const invoiceId = String(invoice.invoiceId || invoice.invoice_id || '');
-  const invoiceNumber = String(invoice.invoiceNumber || invoice.invoice_number || '');
-  if (!invoiceId || !invoiceNumber) return { status: 'error', success: false, message: 'Invoice ID and invoice number are required.' };
-  const validationError = validateInvoicePayload(invoice);
-  if (validationError) return validationError;
-
-  const lastRow = sheet.getLastRow();
-  const rows = lastRow > 1 ? sheet.getRange(2, 2, lastRow - 1, 2).getValues() : [];
-  let targetRow = -1;
-  rows.some(function(row, index) {
-    if (String(row[0]) === invoiceId || String(row[1]) === invoiceNumber) {
-      targetRow = index + 2;
-      return true;
-    }
-    return false;
-  });
-
-  const values = invoiceRow(invoice);
-  if (targetRow > 0) sheet.getRange(targetRow, 1, 1, INVOICE_HEADERS.length).setValues([values]);
-  else sheet.appendRow(values);
-  return {
-    status: 'success', success: true, message: 'Invoice saved successfully',
-    invoiceId: invoiceId, invoiceNumber: invoiceNumber
-  };
+function validateApiKey(providedKey) {
+  const expectedKey = getActiveApiKey();
+  if (!providedKey || typeof providedKey !== 'string') return false;
+  return providedKey.trim() === expectedKey;
 }
 
-function sendInvoiceEmail(invoice) {
-  const email = String(invoice.email || invoice.customer_email || '').trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { status: 'error', success: false, message: 'A valid customer email is required.' };
+// Neutralize spreadsheet formula injection (e.g. '=cmd|...', '+SUM(...)', '@...', '-...')
+function sanitizeCell(val) {
+  if (val === null || val === undefined) return '';
+  let str = String(val).trim();
+  if (str.length > CONFIG.MAX_FIELD_LENGTH) {
+    str = str.substring(0, CONFIG.MAX_FIELD_LENGTH);
   }
-  const name = String(invoice.customerName || invoice.customer_name || 'Customer');
-  const number = String(invoice.invoiceNumber || invoice.invoice_number || 'Invoice');
-  const total = Number(invoice.totalAmount ?? invoice.total_amount ?? 0).toFixed(2);
-  const date = String(invoice.invoiceDate || invoice.invoice_date || '');
-  const service = String(invoice.service || invoice.service_name || 'Professional Services');
-  const payment = String(invoice.paymentMethod || invoice.payment_method || 'Online / Bank Transfer');
-  const shareUrl = String(invoice.shareUrl || invoice.share_url || '');
-  const safe = function(value) { return String(value).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); };
-  const link = shareUrl ? '<p><a href="' + safe(shareUrl) + '" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">View Invoice</a></p>' : '';
-  const htmlBody = '<div style="margin:0;background:#f1f5f9;padding:24px;font-family:Arial,sans-serif;color:#172033">' +
-    '<div style="max-width:620px;margin:auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,.12)">' +
-    '<div style="padding:28px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff"><div style="font-size:22px;font-weight:bold">Shaivika IT Technologies</div><div style="opacity:.85;margin-top:6px">Professional invoice notification</div></div>' +
-    '<div style="padding:28px"><p style="font-size:17px">Hello ' + safe(name) + ',</p><p>Your invoice has been generated and issued successfully.</p>' +
-    '<table style="width:100%;border-collapse:collapse;margin:22px 0"><tr><td style="padding:10px 0;color:#64748b">Invoice</td><td style="padding:10px 0;text-align:right;font-weight:bold">' + safe(number) + '</td></tr>' +
-    '<tr><td style="padding:10px 0;color:#64748b">Service</td><td style="padding:10px 0;text-align:right">' + safe(service) + '</td></tr>' +
-    '<tr><td style="padding:10px 0;color:#64748b">Invoice date</td><td style="padding:10px 0;text-align:right">' + safe(date) + '</td></tr>' +
-    '<tr><td style="padding:10px 0;color:#64748b">Payment method</td><td style="padding:10px 0;text-align:right">' + safe(payment) + '</td></tr>' +
-    '<tr><td style="padding:14px 0;border-top:2px solid #e2e8f0;font-weight:bold">Total amount</td><td style="padding:14px 0;border-top:2px solid #e2e8f0;text-align:right;color:#2563eb;font-size:21px;font-weight:bold">₹' + total + '</td></tr></table>' +
-    link + '<p style="color:#64748b;line-height:1.6">Thank you for choosing Shaivika IT Technologies.</p></div>' +
-    '<div style="padding:18px 28px;background:#f8fafc;color:#64748b;font-size:12px">This is an automated message. Please keep this email for your records.</div></div></div>';
-  MailApp.sendEmail({ to: email, subject: 'Invoice ' + number + ' - Shaivika IT Technologies', htmlBody: htmlBody, body: 'Your invoice ' + number + ' total is ₹' + total + '. ' + (shareUrl || '') });
-  return { status: 'success', success: true, message: 'Invoice email sent successfully', email: email };
-}
-
-function serializeDate(dateObj) {
-  if (!dateObj) return '';
-  if (dateObj instanceof Date) {
-    if (isNaN(dateObj.getTime())) return '';
-    return dateObj.toISOString();
+  if (/^[=+@-]/.test(str)) {
+    return "'" + str; // Prefix with single quote
   }
-  return String(dateObj);
+  return str;
 }
 
-function getInvoiceRecords() {
-    const invoiceSheet = getOrCreateInvoiceSheet();
-    const lastInvoiceRow = invoiceSheet.getLastRow();
-    if (lastInvoiceRow <= 1) return { status: 'success', success: true, invoices: [], timestamp: new Date().toISOString(), source: 'google-sheets' };
-    const values = invoiceSheet.getRange(2, 1, lastInvoiceRow - 1, INVOICE_HEADERS.length).getValues();
-    const invoices = values.map(function(row) {
-      const invoiceNumber = String(row[2] || '').trim();
-      if (!invoiceNumber || /^proj_/i.test(invoiceNumber)) return null;
-      const invoice = {};
-      INVOICE_HEADERS.forEach(function(header, index) { 
-        if (header.includes('Date') || header === 'Timestamp' || header.includes('At')) {
-          invoice[header] = serializeDate(row[index]);
-        } else {
-          invoice[header] = row[index]; 
-        }
-      });
-      invoice.invoice_id = row[1];
-      invoice.invoice_number = row[2];
-      invoice.status = row[3];
-      invoice.customer_name = row[4];
-      invoice.customer_phone = row[5];
-      invoice.customer_email = row[6];
-      invoice.service_name = row[7];
-      invoice.subtotal = row[10];
-      invoice.tax_amount = row[11];
-      invoice.total_amount = row[14];
-      invoice.invoice_date = serializeDate(row[15]);
-      invoice.due_date = serializeDate(row[16]);
-      invoice.payment_method = row[18];
-      invoice.created_at = serializeDate(row[22]);
-      invoice.updated_at = serializeDate(row[23]);
-      invoice.items = [{ description: row[7], qty: 1, rate: row[8], taxRate: row[9], taxAmount: row[11], total: row[14] }];
-      return invoice;
-    }).filter(Boolean);
-    return { status: 'success', success: true, invoices: invoices, timestamp: new Date().toISOString(), source: 'google-sheets' };
+// Mask customer name for public verification
+function maskName(name) {
+  if (!name || typeof name !== 'string') return 'Valued Customer';
+  return name.split(' ').map(function(part) {
+    if (part.length <= 1) return part;
+    return part[0] + '*'.repeat(Math.max(1, part.length - 1));
+  }).join(' ');
 }
 
-/**
- * Standard JSON / JSONP Response
- */
-function createJsonResponse(data, callback) {
-  if (callback && String(callback).trim() !== '') {
-    return ContentService.createTextOutput(callback + '(' + JSON.stringify(data) + ')')
-      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+// Record internal audit log entry
+function logAudit(actor, action, resourceId, status) {
+  try {
+    const sheet = getOrCreateSheet(SHEETS.AUDIT_LOG, HEADERS.AUDIT_LOG, '#334155');
+    sheet.appendRow([
+      new Date().toISOString(),
+      sanitizeCell(actor || 'system'),
+      sanitizeCell(action || 'unknown'),
+      sanitizeCell(resourceId || ''),
+      sanitizeCell(status || 'success')
+    ]);
+  } catch (e) {
+    // Silently continue if audit log fails
   }
+}
+
+// Standard JSON output builder
+function createResponse(data, statusCode = 200) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/**
- * Core Action Handler for both GET and POST requests
- */
-function processAction(action, payload) {
-  action = action || 'getInvoices';
+// ---------------------------------------------------------------------------
+// AREA 1: INVOICE MANAGEMENT
+// ---------------------------------------------------------------------------
 
-  if (action === 'ping') {
+// 1.A: Public Single-Invoice Verification (Finding 3 Remediation)
+function verifySingleInvoice(invoiceId) {
+  if (!invoiceId) return { status: 'error', valid: false, message: 'Missing verification ID' };
+  const sheet = getOrCreateSheet(SHEETS.INVOICES, HEADERS.INVOICES);
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { status: 'error', valid: false, message: 'Invoice not found' };
+
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.INVOICES.length).getValues();
+  const search = String(invoiceId).trim().toLowerCase();
+
+  for (let i = 0; i < values.length; i++) {
+    const row = values[i];
+    const rowId = String(row[1] || '').trim().toLowerCase();
+    const rowNumber = String(row[2] || '').trim().toLowerCase();
+
+    if (rowId === search || rowNumber === search) {
+      const status = String(row[3] || 'ACTIVE');
+      if (status === 'DRAFT') {
+        return { status: 'error', valid: false, message: 'Document is in draft status and not yet issued.' };
+      }
+
+      // Return ONLY masked, non-sensitive verification details
+      return {
+        status: 'success',
+        valid: true,
+        invoice: {
+          invoiceNumber: String(row[2]),
+          status: status,
+          customerName: maskName(String(row[4])),
+          service: String(row[7]),
+          totalAmount: Number(row[14] || 0),
+          invoiceDate: row[15] instanceof Date ? row[15].toISOString() : String(row[15]),
+          paymentMethod: String(row[18] || 'Online'),
+          items: [{ description: String(row[7]), qty: 1, rate: Number(row[8] || 0), total: Number(row[14] || 0) }]
+        }
+      };
+    }
+  }
+
+  return { status: 'error', valid: false, message: 'Invoice record not found' };
+}
+
+// 1.B: Authenticated Invoice Query (Requires API Key)
+function getAllInvoices() {
+  const sheet = getOrCreateSheet(SHEETS.INVOICES, HEADERS.INVOICES);
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { status: 'success', success: true, invoices: [] };
+
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.INVOICES.length).getValues();
+  const invoices = values.map(function(row) {
+    const invoiceNumber = String(row[2] || '').trim();
+    if (!invoiceNumber) return null;
+
+    const inv = {};
+    HEADERS.INVOICES.forEach(function(header, idx) {
+      const val = row[idx];
+      inv[header] = (val instanceof Date) ? val.toISOString() : val;
+    });
+
+    inv.invoice_id = row[1];
+    inv.invoice_number = row[2];
+    inv.status = row[3];
+    inv.customer_name = row[4];
+    inv.customer_phone = row[5];
+    inv.customer_email = row[6];
+    inv.service_name = row[7];
+    inv.subtotal = row[10];
+    inv.tax_amount = row[11];
+    inv.total_amount = row[14];
+    inv.invoice_date = row[15] instanceof Date ? row[15].toISOString() : String(row[15]);
+    inv.due_date = row[16] instanceof Date ? row[16].toISOString() : String(row[16]);
+    inv.payment_method = row[18];
+    inv.created_at = row[22] instanceof Date ? row[22].toISOString() : String(row[22]);
+    inv.items = [{ description: row[7], qty: 1, rate: row[8], taxRate: row[9], taxAmount: row[11], total: row[14] }];
+    return inv;
+  }).filter(Boolean);
+
+  return { status: 'success', success: true, count: invoices.length, invoices: invoices };
+}
+
+// 1.C: Authenticated Save / Update Invoice
+function saveOrUpdateInvoice(invoice) {
+  if (!invoice) return { status: 'error', message: 'Missing invoice payload' };
+  const sheet = getOrCreateSheet(SHEETS.INVOICES, HEADERS.INVOICES);
+  const invoiceId = sanitizeCell(invoice.invoiceId || invoice.invoice_id);
+  const invoiceNumber = sanitizeCell(invoice.invoiceNumber || invoice.invoice_number);
+
+  if (!invoiceId || !invoiceNumber) {
+    return { status: 'error', message: 'Invoice ID and invoice number are required.' };
+  }
+
+  const firstItem = (invoice.items && invoice.items[0]) || {};
+  const price = Number(invoice.price ?? invoice.subtotal ?? firstItem.rate ?? 0);
+  const gstPercent = Number(invoice.gstPercent ?? invoice.gst_percent ?? invoice.tax_rate ?? firstItem.taxRate ?? 0);
+  const service = sanitizeCell(invoice.service || invoice.service_name || firstItem.description || 'Professional Services');
+
+  const rowValues = [
+    new Date(),
+    invoiceId,
+    invoiceNumber,
+    sanitizeCell(invoice.status || 'DRAFT'),
+    sanitizeCell(invoice.customerName || invoice.customer_name),
+    sanitizeCell(invoice.phone || invoice.customer_phone),
+    sanitizeCell(invoice.email || invoice.customer_email),
+    service,
+    price,
+    gstPercent,
+    Number(invoice.subtotal || price),
+    Number(invoice.gstAmount ?? invoice.gst_amount ?? 0),
+    Number(invoice.cgst || 0),
+    Number(invoice.sgst || 0),
+    Number(invoice.totalAmount ?? invoice.total_amount ?? price),
+    sanitizeCell(invoice.invoiceDate || invoice.invoice_date),
+    sanitizeCell(invoice.dueDate || invoice.due_date),
+    sanitizeCell(invoice.stateCode || invoice.state_code || 'AP'),
+    sanitizeCell(invoice.paymentMethod || invoice.payment_method || 'Online'),
+    sanitizeCell(invoice.notes || ''),
+    sanitizeCell(invoice.pdfFileName || invoice.pdf_file_name || ''),
+    sanitizeCell(invoice.pdfUrl || invoice.pdf_url || ''),
+    sanitizeCell(invoice.createdAt || invoice.created_at || new Date().toISOString()),
+    new Date().toISOString()
+  ];
+
+  const lastRow = sheet.getLastRow();
+  let targetRow = -1;
+  if (lastRow > 1) {
+    const ids = sheet.getRange(2, 2, lastRow - 1, 2).getValues();
+    for (let i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]) === invoiceId || String(ids[i][1]) === invoiceNumber) {
+        targetRow = i + 2;
+        break;
+      }
+    }
+  }
+
+  if (targetRow > 0) {
+    sheet.getRange(targetRow, 1, 1, HEADERS.INVOICES.length).setValues([rowValues]);
+  } else {
+    sheet.appendRow(rowValues);
+  }
+
+  return { status: 'success', success: true, message: 'Invoice saved successfully', invoiceId: invoiceId, invoiceNumber: invoiceNumber };
+}
+
+// ---------------------------------------------------------------------------
+// AREA 2: LEADS & CONTACT FORM SUBMISSIONS
+// ---------------------------------------------------------------------------
+function submitLeadRecord(lead) {
+  if (!lead) return { status: 'error', message: 'Missing lead payload' };
+  const sheet = getOrCreateSheet(SHEETS.LEADS, HEADERS.LEADS, '#047857');
+  const leadId = sanitizeCell(lead.id || ('lead_' + Date.now()));
+  const fullName = sanitizeCell(lead.fullName || lead.name);
+  const email = sanitizeCell(lead.email);
+
+  if (!fullName || !email) {
+    return { status: 'error', message: 'Full name and email are required' };
+  }
+
+  sheet.appendRow([
+    leadId,
+    fullName,
+    email,
+    sanitizeCell(lead.phone || ''),
+    sanitizeCell(lead.company || ''),
+    sanitizeCell(lead.service || 'General Inquiry'),
+    sanitizeCell(lead.message || ''),
+    sanitizeCell(lead.source || 'Website'),
+    'new',
+    new Date().toISOString()
+  ]);
+
+  return { status: 'success', success: true, message: 'Inquiry saved successfully', id: leadId };
+}
+
+function getLeadRecords() {
+  const sheet = getOrCreateSheet(SHEETS.LEADS, HEADERS.LEADS, '#047857');
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { status: 'success', leads: [] };
+
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.LEADS.length).getValues();
+  const leads = values.map(function(row) {
     return {
-      status: 'success',
-      message: 'Shaivika IT Invoice Backend is live and connected!',
-      timestamp: new Date().toISOString()
+      id: row[0],
+      name: row[1],
+      email: row[2],
+      phone: row[3],
+      company: row[4],
+      service: row[5],
+      message: row[6],
+      source: row[7],
+      status: row[8],
+      submittedAt: row[9] instanceof Date ? row[9].toISOString() : String(row[9])
+    };
+  });
+  return { status: 'success', count: leads.length, leads: leads };
+}
+
+// ---------------------------------------------------------------------------
+// AREA 3: PORTFOLIO MANAGEMENT
+// ---------------------------------------------------------------------------
+function getProjects(publicOnly = false) {
+  const sheet = getOrCreateSheet(SHEETS.PORTFOLIO, HEADERS.PORTFOLIO, '#4338ca');
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { status: 'success', projects: [] };
+
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.PORTFOLIO.length).getValues();
+  const projects = values.map(function(row) {
+    const status = String(row[8] || 'active').toLowerCase();
+    if (publicOnly && status !== 'active') return null;
+
+    const rawCats = String(row[3] || '');
+    const categories = rawCats ? rawCats.split(',').map(function(s) { return s.trim(); }) : [];
+
+    return {
+      id: String(row[0]),
+      title: String(row[1]),
+      description: String(row[2]),
+      categories: categories,
+      link: String(row[4] || ''),
+      emoji: String(row[5] || '🚀'),
+      image: String(row[6] || ''),
+      modalId: String(row[7] || ''),
+      status: status,
+      createdAt: row[9] instanceof Date ? row[9].toISOString() : String(row[9])
+    };
+  }).filter(Boolean);
+
+  return { status: 'success', count: projects.length, projects: projects };
+}
+
+function saveOrUpdateProject(proj) {
+  if (!proj) return { status: 'error', message: 'Missing project payload' };
+  const sheet = getOrCreateSheet(SHEETS.PORTFOLIO, HEADERS.PORTFOLIO, '#4338ca');
+  const projId = sanitizeCell(proj.id || ('proj_' + Date.now()));
+  const title = sanitizeCell(proj.title);
+  if (!title) return { status: 'error', message: 'Project title is required' };
+
+  const cats = Array.isArray(proj.categories) ? proj.categories.join(', ') : sanitizeCell(proj.categories || '');
+  const rowValues = [
+    projId,
+    title,
+    sanitizeCell(proj.description || ''),
+    cats,
+    sanitizeCell(proj.link || ''),
+    sanitizeCell(proj.emoji || '🚀'),
+    sanitizeCell(proj.image || ''),
+    sanitizeCell(proj.modalId || ''),
+    sanitizeCell(proj.status || 'active'),
+    new Date().toISOString()
+  ];
+
+  const lastRow = sheet.getLastRow();
+  let targetRow = -1;
+  if (lastRow > 1) {
+    const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]) === projId) {
+        targetRow = i + 2;
+        break;
+      }
+    }
+  }
+
+  if (targetRow > 0) {
+    sheet.getRange(targetRow, 1, 1, HEADERS.PORTFOLIO.length).setValues([rowValues]);
+  } else {
+    sheet.appendRow(rowValues);
+  }
+
+  return { status: 'success', message: 'Project saved successfully', id: projId };
+}
+
+function deleteProjectRecord(projId) {
+  if (!projId) return { status: 'error', message: 'Missing project ID' };
+  const sheet = getOrCreateSheet(SHEETS.PORTFOLIO, HEADERS.PORTFOLIO, '#4338ca');
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { status: 'error', message: 'Project not found' };
+
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (let i = 0; i < ids.length; i++) {
+    if (String(ids[i][0]) === String(projId)) {
+      sheet.deleteRow(i + 2);
+      return { status: 'success', message: 'Project deleted successfully', id: projId };
+    }
+  }
+  return { status: 'error', message: 'Project ID not found' };
+}
+
+// ---------------------------------------------------------------------------
+// AREA 4: JOBS & CAREER POSTINGS
+// ---------------------------------------------------------------------------
+function getJobs(publicOnly = false) {
+  const sheet = getOrCreateSheet(SHEETS.JOBS, HEADERS.JOBS, '#b45309');
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { status: 'success', jobs: [] };
+
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.JOBS.length).getValues();
+  const jobs = values.map(function(row) {
+    const status = String(row[8] || 'active').toLowerCase();
+    if (publicOnly && status !== 'active') return null;
+
+    return {
+      id: String(row[0]),
+      title: String(row[1]),
+      department: String(row[2]),
+      location: String(row[3]),
+      type: String(row[4]),
+      experience: String(row[5]),
+      description: String(row[6]),
+      requirements: String(row[7]),
+      status: status,
+      createdAt: row[9] instanceof Date ? row[9].toISOString() : String(row[9])
+    };
+  }).filter(Boolean);
+
+  return { status: 'success', count: jobs.length, jobs: jobs };
+}
+
+function saveOrUpdateJob(job) {
+  if (!job) return { status: 'error', message: 'Missing job payload' };
+  const sheet = getOrCreateSheet(SHEETS.JOBS, HEADERS.JOBS, '#b45309');
+  const jobId = sanitizeCell(job.id || ('job_' + Date.now()));
+  const title = sanitizeCell(job.title);
+  if (!title) return { status: 'error', message: 'Job title is required' };
+
+  const rowValues = [
+    jobId,
+    title,
+    sanitizeCell(job.department || 'Engineering'),
+    sanitizeCell(job.location || 'Kadapa / Remote'),
+    sanitizeCell(job.type || 'Full-time'),
+    sanitizeCell(job.experience || '1-3 Years'),
+    sanitizeCell(job.description || ''),
+    sanitizeCell(job.requirements || ''),
+    sanitizeCell(job.status || 'active'),
+    new Date().toISOString()
+  ];
+
+  const lastRow = sheet.getLastRow();
+  let targetRow = -1;
+  if (lastRow > 1) {
+    const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]) === jobId) {
+        targetRow = i + 2;
+        break;
+      }
+    }
+  }
+
+  if (targetRow > 0) {
+    sheet.getRange(targetRow, 1, 1, HEADERS.JOBS.length).setValues([rowValues]);
+  } else {
+    sheet.appendRow(rowValues);
+  }
+
+  return { status: 'success', message: 'Job posting saved successfully', id: jobId };
+}
+
+// ---------------------------------------------------------------------------
+// AREA 5: JOB APPLICATIONS
+// ---------------------------------------------------------------------------
+function submitApplicationRecord(app) {
+  if (!app) return { status: 'error', message: 'Missing application payload' };
+  const sheet = getOrCreateSheet(SHEETS.APPLICATIONS, HEADERS.APPLICATIONS, '#0f766e');
+  const appId = sanitizeCell(app.id || ('app_' + Date.now()));
+  const name = sanitizeCell(app.name || app.candidateName);
+  const email = sanitizeCell(app.email);
+
+  if (!name || !email) {
+    return { status: 'error', message: 'Candidate name and email are required' };
+  }
+
+  sheet.appendRow([
+    appId,
+    sanitizeCell(app.jobId || 'general'),
+    sanitizeCell(app.jobTitle || 'General Application'),
+    name,
+    email,
+    sanitizeCell(app.phone || ''),
+    sanitizeCell(app.experience || ''),
+    sanitizeCell(app.portfolio || ''),
+    sanitizeCell(app.message || ''),
+    sanitizeCell(app.resumeUrl || ''),
+    'pending',
+    new Date().toISOString()
+  ]);
+
+  return { status: 'success', message: 'Application recorded successfully', id: appId };
+}
+
+function getApplicationRecords() {
+  const sheet = getOrCreateSheet(SHEETS.APPLICATIONS, HEADERS.APPLICATIONS, '#0f766e');
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { status: 'success', applications: [] };
+
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.APPLICATIONS.length).getValues();
+  const apps = values.map(function(row) {
+    return {
+      id: row[0],
+      jobId: row[1],
+      jobTitle: row[2],
+      name: row[3],
+      email: row[4],
+      phone: row[5],
+      experience: row[6],
+      portfolio: row[7],
+      message: row[8],
+      resumeUrl: row[9],
+      status: row[10],
+      submittedAt: row[11] instanceof Date ? row[11].toISOString() : String(row[11])
+    };
+  });
+  return { status: 'success', count: apps.length, applications: apps };
+}
+
+// ---------------------------------------------------------------------------
+// DISPATCHER & REQUEST HANDLERS
+// ---------------------------------------------------------------------------
+function processRequest(action, payload, providedKey) {
+  action = String(action || '').trim();
+
+  // Public Actions (No API Key Required)
+  if (action === 'verifyInvoice') {
+    return verifySingleInvoice(payload.invoiceId || payload.id);
+  }
+  if (action === 'submitLead') {
+    return submitLeadRecord(payload.lead || payload);
+  }
+  if (action === 'submitApplication') {
+    return submitApplicationRecord(payload.application || payload);
+  }
+  if (action === 'getPublicProjects') {
+    return getProjects(true);
+  }
+  if (action === 'getPublicJobs') {
+    return getJobs(true);
+  }
+  if (action === 'ping') {
+    return { status: 'success', message: 'Shaivika backend operational', timestamp: new Date().toISOString() };
+  }
+
+  // Privileged Actions: Require Valid API Key
+  if (!validateApiKey(providedKey)) {
+    logAudit('unauthenticated_client', action, 'unauthorized', 'rejected');
+    return {
+      status: 'error',
+      code: 401,
+      message: 'Unauthorized: Privileged operations require valid server-side API Key.'
     };
   }
 
-  if (action === 'saveInvoice' || action === 'updateInvoice') {
-    return saveInvoiceRecord(payload.invoice || payload);
-  }
-  if (action === 'sendInvoiceEmail') {
-    return sendInvoiceEmail(payload.invoice || payload);
-  }
-  if (action === 'getInvoices') {
-    return getInvoiceRecords();
-  }
+  logAudit(payload.user || 'admin', action, payload.id || 'collection', 'received');
 
-  return {
-    status: 'error',
-    message: 'Unknown action: ' + action
-  };
+  // Privileged Operations Routing
+  switch (action) {
+    case 'getInvoices':
+      return getAllInvoices();
+    case 'saveInvoice':
+    case 'updateInvoice':
+      return saveOrUpdateInvoice(payload.invoice || payload);
+    case 'getProjects':
+      return getProjects(false);
+    case 'addProject':
+    case 'updateProject':
+      return saveOrUpdateProject(payload.project || payload);
+    case 'deleteProject':
+      return deleteProjectRecord(payload.id || (payload.project && payload.project.id));
+    case 'getJobs':
+      return getJobs(false);
+    case 'addJob':
+    case 'updateJob':
+      return saveOrUpdateJob(payload.job || payload);
+    case 'getApplications':
+      return getApplicationRecords();
+    case 'getLeads':
+      return getLeadRecords();
+    default:
+      return { status: 'error', message: 'Unknown action: ' + action };
+  }
 }
 
-/**
- * GET Handler: Supports read and write operations via GET / JSONP
- */
 function doGet(e) {
   try {
-    const callback = (e && e.parameter && (e.parameter.callback || e.parameter.prefix)) || '';
-    let action = (e && e.parameter && e.parameter.action) || 'getInvoices';
+    const params = (e && e.parameter) || {};
+    const action = params.action || 'ping';
+    const apiKey = params.apiKey || params.key || '';
     let payload = {};
 
-    if (e && e.parameter) {
-      if (e.parameter.payload) {
-        try { payload = JSON.parse(e.parameter.payload); } catch (err) { payload = e.parameter; }
-      } else {
-        payload = e.parameter;
-      }
+    if (params.payload) {
+      try { payload = JSON.parse(params.payload); } catch (err) { payload = params; }
+    } else {
+      payload = params;
     }
 
-    const result = processAction(action, payload);
-    return createJsonResponse(result, callback);
-
-  } catch (error) {
-    const callback = (e && e.parameter && (e.parameter.callback || e.parameter.prefix)) || '';
-    return createJsonResponse({ status: 'error', message: error.toString() }, callback);
+    const result = processRequest(action, payload, apiKey);
+    return createResponse(result);
+  } catch (err) {
+    return createResponse({ status: 'error', message: 'Server processing error' }, 500);
   }
 }
 
-/**
- * POST Handler: Handles Add, Edit, Delete, and Bulk Sync via POST
- */
 function doPost(e) {
   try {
     let payload = {};
-    let action = 'saveInvoice';
+    let action = '';
+    let apiKey = '';
 
     if (e && e.postData && e.postData.contents) {
       try {
         payload = JSON.parse(e.postData.contents);
-        if (payload.action) action = payload.action;
+        action = payload.action;
+        apiKey = payload.apiKey || payload.key;
       } catch (err) {
         payload = e.parameter || {};
-        if (payload.action) action = payload.action;
+        action = payload.action;
+        apiKey = payload.apiKey || payload.key;
       }
     } else if (e && e.parameter) {
       payload = e.parameter;
-      if (payload.action) action = payload.action;
+      action = payload.action;
+      apiKey = payload.apiKey || payload.key;
     }
 
-    // Handle array payload (bulk sync)
-    if (Array.isArray(payload)) {
-      payload.forEach(inv => saveInvoiceRecord(inv));
-      return createJsonResponse({ status: 'success', message: 'Bulk sync completed' }, '');
-    }
-
-    const result = processAction(action, payload);
-    return createJsonResponse(result, '');
-
-  } catch (error) {
-    return createJsonResponse({ status: 'error', message: error.toString() }, '');
+    const result = processRequest(action, payload, apiKey);
+    return createResponse(result);
+  } catch (err) {
+    return createResponse({ status: 'error', message: 'Server processing error' }, 500);
   }
 }

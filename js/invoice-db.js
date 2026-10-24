@@ -36,7 +36,7 @@ window.InvoiceDB = {
         nextCustomerSeq: 1,
         nextServiceSeq: 1,
         defaultTerms: '1. Payment is due within 15 days.\n2. Late payment is subject to 1.5% monthly interest.\n3. All disputes are subject to Kadapa jurisdiction.',
-        gasInvoiceUrl: 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec'
+        gasInvoiceUrl: '/api/gateway'
     },
 
     init: function() {

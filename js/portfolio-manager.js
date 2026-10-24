@@ -424,10 +424,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // ==========================================================
       // LIVE GOOGLE SHEET RESILIENT SYNC (Fetch + JSONP Fallback)
       // ==========================================================
-      const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
+      const DEFAULT_GAS_URL = '/api/gateway';
       const gasUrl = localStorage.getItem('shaivika_gas_portfolio_url') || DEFAULT_GAS_URL;
 
       async function fetchGasProjects(url) {
+        if (window.ShaivikaAPI && typeof window.ShaivikaAPI.getPublicProjects === 'function') {
+          try {
+            const list = await window.ShaivikaAPI.getPublicProjects();
+            if (Array.isArray(list) && list.length > 0) return list;
+          } catch (e) {
+            console.info('API Gateway public projects notice:', e.message);
+          }
+        }
         if (!url) return null;
         const getUrl = url.includes('?') ? `${url}&action=getProjects` : `${url}?action=getProjects`;
 

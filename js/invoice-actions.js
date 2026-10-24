@@ -1,7 +1,7 @@
 /* Invoice Builder actions: one state for local storage, Apps Script, preview, and sharing. */
 (function() {
     const PENDING_KEY = 'shaivika_invoice_drafts';
-    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec';
+    const ENDPOINT = '/api/gateway';
     let activeRequest = false;
 
     const money = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
@@ -110,10 +110,19 @@
     }
 
     async function request(action, invoice) {
+        if (window.ShaivikaAPI && typeof window.ShaivikaAPI.adminRequest === 'function') {
+            try {
+                const result = await window.ShaivikaAPI.adminRequest(action, { invoice });
+                return result;
+            } catch (apiErr) {
+                console.warn('API Gateway invoice action error:', apiErr.message);
+                throw apiErr;
+            }
+        }
         const response = await fetch(ENDPOINT, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action, invoice }) });
-        if (!response.ok) throw new Error(`Google Sheets returned HTTP ${response.status}`);
+        if (!response.ok) throw new Error(`Server returned HTTP ${response.status}`);
         const result = await response.json();
-        if (result.status !== 'success' && result.success !== true) throw new Error(result.message || 'Google Sheets rejected the invoice.');
+        if (result.status !== 'success' && result.success !== true) throw new Error(result.message || 'Operation rejected.');
         return result;
     }
 

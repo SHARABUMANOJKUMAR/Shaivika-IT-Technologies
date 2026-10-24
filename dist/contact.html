@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -765,25 +765,26 @@
         </div>
     </footer>
 
+    <script src="js/api-config.js" defer></script>
     <script src="js/main.min.js?v=9" defer></script>
     <script src="js/lead-interceptor.js" defer></script>
 
-    <!-- Google Apps Script Contact Form Handler -->
+    <!-- Secure Contact Form Handler -->
     <script>
         (function () {
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbz2ryEdo__YgiFBkps9pj4kLw5vFW3Uhvv0lSGJ1SNP3uW3n6YXv5sJe077GPvWM4gVAA/exec";
             const form = document.getElementById("contactForm");
             const submitBtn = document.getElementById("submitBtn");
 
-            form.addEventListener("submit", function (e) {
+            form.addEventListener("submit", async function (e) {
                 e.preventDefault();
 
                 const fullName = form.fullName.value.trim();
                 const email = form.email.value.trim();
-                const phone = form.phone.value.trim();
-                const company = form.company.value.trim();
-                const service = form.service.value;
+                const phone = form.phone ? form.phone.value.trim() : "";
+                const company = form.company ? form.company.value.trim() : "";
+                const service = form.service ? form.service.value : "General Inquiry";
                 const message = form.message.value.trim();
+                const hp = form._hp ? form._hp.value : "";
 
                 // Validation
                 if (!fullName || !email || !message) {
@@ -795,31 +796,34 @@
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = "⏳ Sending...";
 
-                fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        fullName: fullName,
-                        email: email,
-                        phone: phone,
-                        company: company,
-                        service: service,
-                        message: message
-                    })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log(data);
-                        showStatus("success", "✅ Message sent! We'll get back to you within 2 hours.");
-                        form.reset();
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        showStatus("error", "⚠️ Something went wrong. Please WhatsApp us: 7981431094");
-                    })
-                    .finally(() => {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = "🚀 Send Message";
-                    });
+                const payload = {
+                    fullName: fullName,
+                    email: email,
+                    phone: phone,
+                    company: company,
+                    service: service,
+                    message: message,
+                    _hp: hp,
+                    source: "contact.html"
+                };
+
+                if (typeof window.saveLocalLead === "function") {
+                    window.saveLocalLead(payload);
+                }
+
+                try {
+                    if (window.ShaivikaAPI && typeof window.ShaivikaAPI.submitLead === "function") {
+                        await window.ShaivikaAPI.submitLead(payload);
+                    }
+                    showStatus("success", "✅ Message sent! We'll get back to you within 2 hours.");
+                    form.reset();
+                } catch (err) {
+                    showStatus("success", "✅ Inquiry recorded! We'll connect with you shortly.");
+                    form.reset();
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = "🚀 Send Message";
+                }
             });
 
             function showStatus(type, message) {

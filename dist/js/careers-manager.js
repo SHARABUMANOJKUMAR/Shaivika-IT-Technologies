@@ -717,38 +717,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('LocalStorage save error:', storageErr);
           }
 
-          // 2. Google Apps Script Sync
-          const gasUrl = 'https://script.google.com/macros/s/AKfycbzmRvImPbmXCG_Y0jKWkq6LZP1JyPWN3tfQlSl6br0-70fr0JTH93ro9JMD46xPSzZ2/exec';
-          if (gasUrl) {
+          // 2. Secure API Gateway Submission
+          if (window.ShaivikaAPI && typeof window.ShaivikaAPI.submitApplication === 'function') {
             try {
-              const { resumeBase64: _b64, ...dataToSync } = applicationData;
-              let gasIframe = document.getElementById('_gasIframe');
-              if (!gasIframe) {
-                gasIframe = document.createElement('iframe');
-                gasIframe.name = '_gasIframe';
-                gasIframe.id = '_gasIframe';
-                gasIframe.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;';
-                document.body.appendChild(gasIframe);
-              }
-
-              const hiddenForm = document.createElement('form');
-              hiddenForm.method = 'POST';
-              hiddenForm.action = gasUrl;
-              hiddenForm.target = '_gasIframe';
-              hiddenForm.style.cssText = 'display:none;';
-              hiddenForm.enctype = 'application/x-www-form-urlencoded';
-
-              const input = document.createElement('input');
-              input.type = 'hidden';
-              input.name = 'data';
-              input.value = JSON.stringify(dataToSync);
-              hiddenForm.appendChild(input);
-
-              document.body.appendChild(hiddenForm);
-              hiddenForm.submit();
-              setTimeout(() => hiddenForm.remove(), 1000);
-            } catch (gasErr) {
-              console.warn('GAS form submit warning:', gasErr);
+              await window.ShaivikaAPI.submitApplication(applicationData);
+            } catch (apiErr) {
+              console.warn('API Gateway notice (cached locally):', apiErr.message);
             }
           }
 

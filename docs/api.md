@@ -1,168 +1,229 @@
-﻿# Shaivika IT Technologies - API & Data Services Documentation
+# Shaivika IT Technologies - Enterprise API & Security Architecture Documentation
 
 ## Overview
-This document outlines the API endpoints, form interceptor services, and data management interfaces powering Shaivika IT Technologies.
+This document specifies the secure API architecture, authentication endpoints, public ingestion services, and Google Apps Script mediation layer for **Shaivika IT Technologies**.
 
 ---
 
-### 1. Lead & Contact Ingestion Endpoint
+## 1. Authentication Service (`/api/admin-auth` -> `netlify/functions/admin-auth.js`)
 
-#### Description
-Captures contact inquiries, consultation requests, and project leads from website contact forms and modal dialogues.
+Provides cryptographically secure administrator authentication, password management, and HMAC-SHA256 session token management.
 
-- **Primary URL**: Google Apps Script Webhook / Internal Interceptor (`js/lead-interceptor.js`)
-- **Fallback URL / Local Cache**: LocalStorage Key: `shaivika_leads`
+- **URL**: `/.netlify/functions/admin-auth` (or `/api/admin-auth`)
+- **Transport**: HTTPS Only
+- **Rate Limiting**: Anti-brute-force IP lockout (max 5 consecutive failed attempts; 15-minute lock window).
+
+### 1.1 Action: Admin Login (`action: "login"`)
 - **Method**: `POST`
-- **Content-Type**: `application/json` or `application/x-www-form-urlencoded`
-
-#### Request Payload
+- **Request Headers**: `Content-Type: application/json`
+- **Request Payload**:
 ```json
 {
-  "id": "lead_1786021111436",
-  "name": "Sharabu Manoj Kumar",
-  "email": "contact@shaivikagroups.com",
-  "phone": "+91 7981431094",
-  "subject": "Web Development & AI Automation",
-  "service": "AI Automations Suite",
-  "message": "Project requirement details...",
-  "source": "contact.html",
-  "timestamp": "2026-08-06T13:00:00.000Z",
-  "status": "new"
+  "action": "login",
+  "username": "shaivika_admin",
+  "password": "SecureAdminPassword123!"
 }
 ```
-
-#### Response (Success: 200 OK)
+- **Success Response (200 OK)**:
 ```json
 {
   "status": "success",
-  "message": "Inquiry recorded successfully. We will connect with you shortly."
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzaGFpdmlrYV9hZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODY4MDAwMCwiZXhwIjoxNzg4NzA4ODAwLCJqdGkiOiJmMWU4NzJjYWY4OWEifQ.signature",
+  "user": {
+    "username": "shaivika_admin",
+    "role": "admin"
+  },
+  "expiresAt": 1788708800000
+}
+```
+- **Error Responses**:
+  - `401 Unauthorized` (`INVALID_CREDENTIALS`):
+    ```json
+    { "status": "error", "code": "INVALID_CREDENTIALS", "message": "Invalid credentials.", "attemptsRemaining": 4 }
+    ```
+  - `429 Too Many Requests` (`ACCOUNT_LOCKED`):
+    ```json
+    { "status": "error", "code": "ACCOUNT_LOCKED", "message": "Account locked due to consecutive failed attempts. Please retry in 890 seconds." }
+    ```
+
+### 1.2 Action: Verify Token (`action: "verify"`)
+- **Method**: `POST`
+- **Request Headers**: `Authorization: Bearer <token>`, `Content-Type: application/json`
+- **Request Payload**: `{ "action": "verify" }`
+- **Success Response (200 OK)**:
+```json
+{
+  "status": "success",
+  "valid": true,
+  "user": { "username": "shaivika_admin", "role": "admin" },
+  "expiresAt": 1788708800000
+}
+```
+- **Error Response (401 Unauthorized)**:
+```json
+{ "status": "error", "code": "UNAUTHORIZED", "message": "Invalid or expired session token" }
+```
+
+### 1.3 Action: Admin Logout (`action: "logout"`)
+- **Method**: `POST`
+- **Request Headers**: `Authorization: Bearer <token>`
+- **Success Response (200 OK)**:
+```json
+{ "status": "success", "message": "Session logged out successfully" }
+```
+
+### 1.4 Action: Change Password (`action: "changePassword"`)
+- **Method**: `POST`
+- **Request Headers**: `Authorization: Bearer <token>`, `Content-Type: application/json`
+- **Request Payload**:
+```json
+{
+  "action": "changePassword",
+  "currentPassword": "CurrentSecurePassword123!",
+  "newPassword": "NewStrongPassword456!"
+}
+```
+- **Success Response (200 OK)**:
+```json
+{
+  "status": "success",
+  "message": "Password hashed successfully.",
+  "newSalt": "e6c27940177b94ad3fc865bc441da025",
+  "newHash": "1f6c4495ea52b414f5263a233634032d887a07fc2580a22a36b5bc9353272e0d"
 }
 ```
 
-#### Error Handling (400 Bad Request / Network Offline)
-- **Response**:
+---
+
+## 2. Secure API Gateway (`/api/gateway` -> `netlify/functions/api.js`)
+
+Centralized gateway mediating public submissions and privileged administrative operations.
+
+### 2.1 Public: Single Invoice Verification (`action: "verifyInvoice"`)
+- **Method**: `GET`
+- **URL**: `/.netlify/functions/api?action=verifyInvoice&id=INV-2026-0001`
+- **Privacy Protection**: Returns only non-sensitive verification metadata and masked customer identity. Prevents bulk database dumping.
+- **Success Response (200 OK)**:
+```json
+{
+  "status": "success",
+  "valid": true,
+  "invoice": {
+    "invoiceNumber": "INV-2026-0001",
+    "invoiceDate": "2026-08-01T00:00:00.000Z",
+    "customerName": "S****** M**** K****",
+    "service": "Web Development & AI Automation",
+    "totalAmount": 25000,
+    "status": "PAID",
+    "paymentMethod": "Online / Bank Transfer",
+    "items": [
+      { "description": "Web Development & AI Automation", "qty": 1, "rate": 25000, "total": 25000 }
+    ],
+    "verifiedAt": "2026-10-24T08:00:00.000Z"
+  }
+}
+```
+- **Not Found / Draft Response (404 Not Found)**:
 ```json
 {
   "status": "error",
-  "message": "Validation failed: required fields missing."
+  "valid": false,
+  "message": "The requested invoice could not be authenticated. It may not exist or is still a draft."
 }
 ```
-- **Offline Behavior**: Automatically persisted to LocalStorage queue with automatic retry upon online event restoration.
 
----
-
-### 2. Career Application Ingestion Endpoint
-
-#### Description
-Handles candidate job applications, resume file attachments (base64 encoded data URI), and candidate profile details.
-
-- **Storage Key**: `shaivika_job_applications`
+### 2.2 Public: Contact & Lead Ingestion (`action: "submitLead"`)
 - **Method**: `POST`
-- **Content-Type**: `application/json`
-
-#### Request Payload
+- **Protection**: Honeypot detection (`_hp`), length constraints, formula escaping (`=+@-`), rate limiting (max 10/10 min).
+- **Request Payload**:
 ```json
 {
-  "id": "app_1786021200000",
-  "jobId": "job_fullstack",
-  "jobTitle": "Full-Stack Web Developer",
+  "action": "submitLead",
+  "fullName": "Sharabu Manoj Kumar",
+  "email": "contact@shaivikagroups.com",
+  "phone": "+91 7981431094",
+  "company": "Shaivika Groups",
+  "service": "AI Automations Suite",
+  "message": "Project requirement details...",
+  "_hp": "",
+  "source": "contact.html"
+}
+```
+- **Success Response (200 OK)**:
+```json
+{ "status": "success", "message": "Thank you! Your inquiry has been recorded." }
+```
+
+### 2.3 Public: Career Job Application (`action: "submitApplication"`)
+- **Method**: `POST`
+- **Payload Limits**: Max 5MB attachment, validated MIME types (`pdf`, `doc`, `docx`).
+- **Request Payload**:
+```json
+{
+  "action": "submitApplication",
+  "jobId": "job_dev_1",
+  "jobTitle": "Full Stack Engineer",
   "name": "Candidate Name",
   "email": "candidate@example.com",
   "phone": "+91 9876543210",
-  "experience": "1-2 Years",
+  "experience": "2 Years",
   "portfolio": "https://github.com/candidate",
+  "message": "Cover note...",
   "resumeFileName": "resume.pdf",
   "resumeBase64": "data:application/pdf;base64,...",
-  "submittedDate": "2026-08-06T13:00:00.000Z",
-  "status": "Under Review"
+  "_hp": ""
+}
+```
+- **Success Response (200 OK)**:
+```json
+{ "status": "success", "message": "Application submitted successfully." }
+```
+
+### 2.4 Privileged Operations (Requires `Authorization: Bearer <token>`)
+
+| Action | HTTP Method | Payload Parameters | Purpose |
+| :--- | :--- | :--- | :--- |
+| `getInvoices` | POST | `{ action: "getInvoices" }` | Fetch complete customer invoices list |
+| `saveInvoice` | POST | `{ action: "saveInvoice", invoice: { ... } }` | Create or update invoice record |
+| `sendInvoiceEmail` | POST | `{ action: "sendInvoiceEmail", invoice: { ... } }` | Dispatch automated invoice notification email |
+| `getProjects` | POST | `{ action: "getProjects" }` | Retrieve all portfolio projects (draft & active) |
+| `addProject` | POST | `{ action: "addProject", project: { ... } }` | Create new showcase project |
+| `updateProject` | POST | `{ action: "updateProject", project: { ... } }` | Modify existing showcase project |
+| `deleteProject` | POST | `{ action: "deleteProject", id: "proj_..." }` | Delete showcase project |
+| `getJobs` | POST | `{ action: "getJobs" }` | Retrieve all job openings |
+| `addJob` | POST | `{ action: "addJob", job: { ... } }` | Create new job posting |
+| `getApplications` | POST | `{ action: "getApplications" }` | Retrieve candidate submissions |
+| `getLeads` | POST | `{ action: "getLeads" }` | Retrieve contact inquiry submissions |
+
+- **Unauthenticated Failure (401 Unauthorized)**:
+```json
+{
+  "status": "error",
+  "code": "UNAUTHORIZED",
+  "message": "Access denied: Valid administrator authentication session required."
 }
 ```
 
 ---
 
-### 3. Google Sheet Portfolio & CMS API (`google-apps-script/Code.gs`)
+## 3. Hardened Google Apps Script Backend (`google-apps-script/Code.gs`)
 
-#### Description
-Provides dynamic bi-directional synchronization between Google Sheets, Admin Dashboard, and the live Website.
+The Google Apps Script acts as an authenticated private storage tier.
 
-- **Deployment**: Google Apps Script Web App (Executes as "Me", Access: "Anyone")
-- **Spreadsheet Sheet Name**: `Portfolio`
+- **Authentication**: Validated via `ScriptProperties.getProperty('API_KEY')` matching `APPS_SCRIPT_SECRET`.
+- **Public Whitelist**: Only `verifyInvoice`, `submitLead`, `submitApplication`, `getPublicProjects`, and `getPublicJobs` are executable anonymously.
+- **Formula Injection Mitigation**: All cells prefixed with `=`, `+`, `-`, or `@` are converted with a leading single quote (`'`).
+- **Audit Log Sheet (`AuditLog`)**: Records timestamp, actor, action, and status.
 
-#### Google Sheet Column Layout
-1. `A: ID` - Unique ID string (e.g. `p1`, `proj_1786021234567`)
-2. `B: Title` - Project title (e.g. `Manspharshcare Platform`)
-3. `C: Description` - Detailed description
-4. `D: Categories` - Comma-separated category slugs (e.g. `webapp, ui`)
-5. `E: Link` - Target URL or `contact.html`
-6. `F: Emoji` - Icon / Emoji fallback (e.g. `🏥`)
-7. `G: Image` - Optional image thumbnail URL
-8. `H: ModalID` - Modal identifier (e.g. `#modal-manspharsh`)
-9. `I: Status` - `active` or `draft`
-10. `J: CreatedAt` - Timestamp string
+---
 
-#### GET / Endpoint
-- **URL**: `https://script.google.com/macros/s/.../exec?action=getProjects`
-- **Response**:
-```json
-{
-  "status": "success",
-  "count": 18,
-  "projects": [
-    {
-      "id": "p1",
-      "title": "Manspharshcare Platform",
-      "description": "Comprehensive healthcare web platform...",
-      "categories": ["webapp", "ui"],
-      "link": "https://mansparshcare.xyz/",
-      "emoji": "🏥",
-      "image": "",
-      "modalId": "#modal-manspharsh",
-      "status": "active",
-      "created_at": "8/6/2026, 6:30:00 PM"
-    }
-  ]
-}
-```
+## 4. Live Google Sheets & Dedicated WebApp Deployments
 
-#### POST / Endpoint Actions
-- **Add Project (`action: "addProject"`)**:
-```json
-{
-  "action": "addProject",
-  "project": {
-    "id": "proj_1786021234567",
-    "title": "New Web Application",
-    "description": "Project overview...",
-    "categories": ["webapp", "saas"],
-    "link": "https://example.com",
-    "emoji": "🚀",
-    "image": "",
-    "status": "active"
-  }
-}
-```
-- **Update Project (`action: "updateProject"`)**:
-```json
-{
-  "action": "updateProject",
-  "project": {
-    "id": "proj_1786021234567",
-    "title": "Updated Title",
-    ...
-  }
-}
-```
-- **Delete Project (`action: "deleteProject"`)**:
-```json
-{
-  "action": "deleteProject",
-  "id": "proj_1786021234567"
-}
-```
-- **Bulk Sync (`action: "bulkSync"`)**:
-```json
-{
-  "action": "bulkSync",
-  "projects": [ ... ]
-}
-```
+The Shaivika IT Technologies ecosystem connects to three dedicated live Google Spreadsheets mediated securely by the Netlify API Gateway:
+
+| Service | Google Spreadsheet ID & Link | Deployed WebApp URL | Purpose & Integration |
+| :--- | :--- | :--- | :--- |
+| **Contact Form** | [`19Sa9Bh6_cEs-oTUEPRRgQURpC5BaOwYfhaoF6nFBCMU`](https://docs.google.com/spreadsheets/d/19Sa9Bh6_cEs-oTUEPRRgQURpC5BaOwYfhaoF6nFBCMU/edit) | `https://script.google.com/macros/s/AKfycbz2ryEdo__YgiFBkps9pj4kLw5vFW3Uhvv0lSGJ1SNP3uW3n6YXv5sJe077GPvWM4gVAA/exec` | Ingests validated inquiries from `contact.html` via `ShaivikaAPI.submitLead()`. Rate limited with honeypot bot trap. |
+| **Portfolio Projects** | [`1Z59x7O4SRh42SWDO-HWuMmcT5lRXZZ-A3rR95C9ZeHc`](https://docs.google.com/spreadsheets/d/1Z59x7O4SRh42SWDO-HWuMmcT5lRXZZ-A3rR95C9ZeHc/edit) | `https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec` | Feeds the dynamic portfolio projects to `portfolio.html` and enables authenticated 2-way sync with the Admin Portal. |
+| **Subscribers (Newsletter)** | [`1GXysNjTgxd1BiDluP7OVkL2YmAUBVBzm0-ZNXEzNmAA`](https://docs.google.com/spreadsheets/d/1GXysNjTgxd1BiDluP7OVkL2YmAUBVBzm0-ZNXEzNmAA/edit) | `https://script.google.com/macros/s/AKfycbygI-tj94XyLqm8Lp5q-JU5_TVhbFVnRCtF-DAN1QOQHGrinCqj7ba_hyo4urKoXIw-qg/exec` | Captures newsletter subscriptions across all website footers. Script in `google-apps-script/SubscribersCode.gs` handles duplicate prevention and formula escaping. |
+
