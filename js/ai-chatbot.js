@@ -1,12 +1,14 @@
 /**
  * SHAIVIKA IT TECHNOLOGIES - AI CHATBOT CONTROLLER
- * High-performance, secure, responsive floating assistant
+ * High-performance, secure, responsive floating animated robot assistant
  * 
  * Features:
  * - Direct integration with n8n AI webhook + Netlify Serverless API Gateway
+ * - Premium animated 3D robot assistant launcher with idle float and pulse
  * - Multi-turn conversation management in session
  * - Instant interactive quick action chips
  * - Formatted Markdown rendering with safe XSS escaping
+ * - Dynamic thinking indicator during AI generation
  * - Resilient error handling with retry capability
  * - Full keyboard and mobile accessibility
  */
@@ -14,10 +16,11 @@
 (function() {
   'use strict';
 
-  // Configuration
+  // Configuration (Centralized Robot Image & Branding URLs)
   const CONFIG = {
     GATEWAY_ENDPOINT: '/.netlify/functions/api',
     DIRECT_N8N_WEBHOOK: 'https://n8n.shaivikamanojkumarcloud.me/webhook/shaivika-ai-chat',
+    ROBOT_IMAGE_URL: 'https://res.cloudinary.com/dwv8kc9vb/image/upload/v1792840309/img2_ai_chat_bot_oimisa.jpg',
     LOGO_URL: 'https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_80/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png',
     MAX_CHARS: 1000,
     WELCOME_MESSAGE: "Hi! 👋 Welcome to Shaivika IT Technologies. I'm your AI assistant, here to help you explore our AI automation, websites, applications, and business growth solutions. How can I help you today?",
@@ -114,23 +117,45 @@
 
   // Build DOM Structure
   function initDOM() {
-    // Check if already injected
+    // Check if already injected to avoid duplicates
     if (document.getElementById('shaivika-chatbot-wrapper')) return;
 
     const wrapper = document.createElement('div');
     wrapper.id = 'shaivika-chatbot-wrapper';
 
     wrapper.innerHTML = `
-      <!-- Launcher Button -->
-      <button class="shaivika-chat-launcher" id="shaivikaChatLauncher" aria-label="Open Shaivika AI Chatbot" title="Chat with Shaivika AI">
+      <!-- Animated Robot Launcher Button -->
+      <button class="shaivika-chat-launcher has-notification" id="shaivikaChatLauncher" aria-label="Open Shaivika AI Chatbot" title="Chat with Shaivika AI">
+        <!-- Tasteful Glow / Notification Ring -->
+        <span class="shaivika-launcher-glow-ring" aria-hidden="true"></span>
+        
+        <!-- Robot Image Wrap -->
+        <div class="shaivika-launcher-avatar-wrap">
+          <img
+            src="${CONFIG.ROBOT_IMAGE_URL}"
+            alt="Shaivika AI Assistant Robot"
+            class="shaivika-robot-img"
+            loading="eager"
+            onerror="this.style.display='none'; document.getElementById('shaivikaLauncherFallback').style.display='block';"
+          />
+          <!-- Fallback icon if image fails to load -->
+          <svg id="shaivikaLauncherFallback" class="launcher-fallback-icon" viewBox="0 0 24 24" style="display:none;" aria-hidden="true">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+            <path d="M7 9h10v2H7zm0-3h10v2H7z"/>
+          </svg>
+        </div>
+
+        <!-- Close Cross Icon for Active State -->
+        <div class="shaivika-launcher-close-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </div>
+
+        <!-- Notification Sparkle Badge -->
         <span class="shaivika-launcher-badge">AI ✨</span>
-        <svg class="launcher-icon-open" viewBox="0 0 24 24">
-          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-          <path d="M7 9h10v2H7zm0-3h10v2H7z"/>
-        </svg>
-        <svg class="launcher-icon-close" viewBox="0 0 24 24">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
+
+        <!-- Tooltip -->
         <span class="shaivika-chat-tooltip">Chat with Shaivika AI</span>
       </button>
 
@@ -139,13 +164,16 @@
         <!-- Header -->
         <div class="shaivika-chat-header">
           <div class="shaivika-chat-header-info">
-            <div class="shaivika-chat-avatar">
-              <img src="${CONFIG.LOGO_URL}" alt="Shaivika Logo" width="32" height="32" loading="lazy">
+            <div class="shaivika-chat-avatar-robot" id="shaivikaHeaderAvatar">
+              <img src="${CONFIG.ROBOT_IMAGE_URL}" alt="Shaivika AI Robot" width="44" height="44" loading="lazy">
+              <span class="shaivika-status-dot-robot" id="shaivikaHeaderStatusDot"></span>
             </div>
             <div class="shaivika-chat-titles">
-              <h3>Shaivika AI Assistant <span style="font-size:12px;">✨</span></h3>
-              <div class="shaivika-chat-status">
-                <span class="shaivika-status-dot"></span>
+              <div class="shaivika-header-title-row">
+                <h3>Shaivika AI Assistant</h3>
+                <span class="shaivika-sparkle-pill">AI 2.0</span>
+              </div>
+              <div class="shaivika-chat-status" id="shaivikaChatStatusText">
                 <span>Your business growth partner</span>
               </div>
             </div>
@@ -241,7 +269,7 @@
         html += `
           <div class="shaivika-message shaivika-message-ai">
             <div class="shaivika-msg-avatar">
-              <img src="${CONFIG.LOGO_URL}" alt="AI" width="20" height="20">
+              <img src="${CONFIG.ROBOT_IMAGE_URL}" alt="Shaivika AI" width="28" height="28">
             </div>
             <div class="shaivika-msg-body">
               <div class="shaivika-msg-content">${formatMarkdown(msg.text)}</div>
@@ -268,18 +296,23 @@
     // Loading typing indicator
     if (state.isLoading) {
       html += `
-        <div class="shaivika-typing-bubble" id="shaivikaTypingIndicator" aria-label="Shaivika AI is typing">
-          <span class="shaivika-typing-dot"></span>
-          <span class="shaivika-typing-dot"></span>
-          <span class="shaivika-typing-dot"></span>
+        <div class="shaivika-message shaivika-message-ai" id="shaivikaTypingWrapper">
+          <div class="shaivika-msg-avatar">
+            <img src="${CONFIG.ROBOT_IMAGE_URL}" alt="Shaivika AI" width="28" height="28">
+          </div>
+          <div class="shaivika-typing-bubble" id="shaivikaTypingIndicator" aria-label="Shaivika AI is typing">
+            <span class="shaivika-typing-dot"></span>
+            <span class="shaivika-typing-dot"></span>
+            <span class="shaivika-typing-dot"></span>
+          </div>
         </div>
       `;
     }
 
-    // Error retry banner if last failed
+    // Error retry banner if last query failed
     if (state.lastFailedQuery) {
       html += `
-        <div class="shaivika-chat-error" id="shaivikaErrorNotice">
+        <div class="shaivika-error-card" id="shaivikaErrorNotice">
           <span>Unable to reach AI assistant right now.</span>
           <button type="button" class="shaivika-retry-btn" id="shaivikaRetryBtn">Retry</button>
         </div>
@@ -288,7 +321,7 @@
 
     container.innerHTML = html;
 
-    // Scroll to bottom
+    // Scroll to bottom smoothly
     setTimeout(() => {
       container.scrollTop = container.scrollHeight;
     }, 20);
@@ -317,6 +350,29 @@
     }
   }
 
+  // Update Thinking State in Header
+  function setThinkingState(isThinking) {
+    const avatar = document.getElementById('shaivikaHeaderAvatar');
+    const statusText = document.getElementById('shaivikaChatStatusText');
+    if (avatar) {
+      if (isThinking) {
+        avatar.classList.add('is-thinking');
+      } else {
+        avatar.classList.remove('is-thinking');
+      }
+    }
+    if (statusText) {
+      if (isThinking) {
+        statusText.innerHTML = `
+          <span class="shaivika-thinking-spinner"></span>
+          <span class="shaivika-thinking-text">Shaivika AI is thinking...</span>
+        `;
+      } else {
+        statusText.innerHTML = `<span>Your business growth partner</span>`;
+      }
+    }
+  }
+
   // Send message to Backend
   async function sendMessage(text) {
     const trimmed = String(text || '').trim();
@@ -340,6 +396,7 @@
 
     state.isLoading = true;
     state.lastFailedQuery = null;
+    setThinkingState(true);
     renderMessages();
 
     // Clear input
@@ -435,12 +492,13 @@
       state.lastFailedQuery = trimmed;
     } finally {
       state.isLoading = false;
+      setThinkingState(false);
       renderMessages();
       if (input && state.isOpen) input.focus();
     }
   }
 
-  // Client-Side Fallback based strictly on Section 5 Verified Company Knowledge
+  // Client-Side Fallback based strictly on Verified Company Knowledge
   function generateClientFallback(query) {
     const q = String(query || '').toLowerCase().trim();
 
@@ -548,6 +606,7 @@
       if (shouldOpen) {
         chatWindow.classList.add('is-open');
         launcher.classList.add('is-active');
+        launcher.classList.remove('has-notification'); // Stop notification animation on first open
         launcher.setAttribute('aria-expanded', 'true');
         setTimeout(() => {
           if (input) input.focus();
