@@ -17,8 +17,92 @@ const INVOICES_GAS_URL = process.env.INVOICES_GAS_URL || 'https://script.google.
 const CONTACT_GAS_URL = process.env.CONTACT_GAS_URL || 'https://script.google.com/macros/s/AKfycbz2ryEdo__YgiFBkps9pj4kLw5vFW3Uhvv0lSGJ1SNP3uW3n6YXv5sJe077GPvWM4gVAA/exec';
 const PORTFOLIO_GAS_URL = process.env.PORTFOLIO_GAS_URL || 'https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec';
 const SUBSCRIBERS_GAS_URL = process.env.SUBSCRIBERS_GAS_URL || 'https://script.google.com/macros/s/AKfycbygI-tj94XyLqm8Lp5q-JU5_TVhbFVnRCtF-DAN1QOQHGrinCqj7ba_hyo4urKoXIw-qg/exec';
+const N8N_CHAT_WEBHOOK = process.env.N8N_CHAT_WEBHOOK || 'https://n8n.shaivikamanojkumarcloud.me/webhook/shaivika-ai-chat';
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || PORTFOLIO_GAS_URL;
 const APPS_SCRIPT_SECRET = process.env.APPS_SCRIPT_SECRET || 'shaivika-gas-backend-secret-2026';
+
+// Verified company knowledge responder for AI chatbot
+function generateFallbackChatResponse(query) {
+  const q = String(query || '').toLowerCase().trim();
+
+  // 1. Pricing inquiries
+  if (q.includes('pric') || q.includes('cost') || q.includes('plan') || q.includes('package') || q.includes('rate') || q.includes('fee')) {
+    return "Here are our advertised growth plans at **Shaivika IT Technologies**:\n\n" +
+      "• **Starter Plan — ₹5,000**: Essential digital presence, responsive web setup, and basic integrations.\n" +
+      "• **Growth Plan — ₹15,000**: Advanced business automation, dynamic web applications, lead capture, and CRM syncing.\n" +
+      "• **Business Plan — ₹25,000**: Comprehensive enterprise automation, custom AI chatbots, custom workflows, and API integrations.\n" +
+      "• **Custom Enterprise Plan**: Tailored scope for complex SaaS platforms and enterprise architectures.\n\n" +
+      "*Note: These are advertised package prices. Exact deliverables, timeline, and final quotation are confirmed by our team based on your specific requirements.*\n\n" +
+      "Would you like to discuss a customized plan for your project? Reach our team at **+91 7981431094** or send WhatsApp keyword **START**!";
+  }
+
+  // 2. AI Chatbot services
+  if (q.includes('chatbot') || q.includes('bot') || q.includes('ai chat') || q.includes('conversational')) {
+    return "At **Shaivika IT Technologies**, we build intelligent, custom **AI Chatbots** for websites, WhatsApp, and Telegram! 🤖✨\n\n" +
+      "Our AI chatbots help businesses:\n" +
+      "• Automate 24/7 customer support with human-like responses\n" +
+      "• Qualify leads and capture contact details automatically\n" +
+      "• Sync inquiries directly into your CRM or Google Sheets\n" +
+      "• Reduce repetitive manual support workload by up to 80%\n\n" +
+      "Would you like an AI Chatbot tailored for your website or WhatsApp? Reply with your business type or message us on WhatsApp with keyword **START** to get a free live demonstration!";
+  }
+
+  // 3. Web & Application Development
+  if (q.includes('website') || q.includes('web') || q.includes('app') || q.includes('application') || q.includes('software') || q.includes('saas') || q.includes('ui') || q.includes('ux') || q.includes('development') || q.includes('design')) {
+    return "**Shaivika IT Technologies** builds high-performance, modern websites and applications engineered for digital growth:\n\n" +
+      "• **Modern Web Applications**: Lightning-fast, mobile-first, and SEO-optimized business websites.\n" +
+      "• **SaaS & Cloud Platforms**: Scalable architectures with secure user authentication and database management.\n" +
+      "• **E-Commerce & Portals**: Custom online stores, client billing dashboards, and payment gateways.\n" +
+      "• **UI/UX Design**: Premium interactive interfaces crafted to wow visitors and maximize conversions.\n\n" +
+      "Tell us what you're planning to build, or reach us directly at **shaivikagroups@gmail.com** or **+91 7981431094**!";
+  }
+
+  // 4. Business & Process Automation
+  if (q.includes('automation') || q.includes('automate') || q.includes('workflow') || q.includes('crm') || q.includes('erp') || q.includes('lead') || q.includes('integration') || q.includes('api')) {
+    return "Our core mission under **Shaivika Groups** is: **'Automate. Scale. Grow.'** 🚀\n\n" +
+      "We build end-to-end business automation systems including:\n" +
+      "• **CRM & ERP Automation**: Eliminate manual data entry and track customer pipelines effortlessly.\n" +
+      "• **Lead Generation Systems**: Automated capture, qualification, and instant notification alerts.\n" +
+      "• **Workflow Automation (n8n/Make)**: Connecting your forms, spreadsheets, databases, and communication channels.\n" +
+      "• **WhatsApp Business Automation**: Automated customer onboarding, status updates, and interactive notifications.\n\n" +
+      "We don't just build solutions; we build your success story. Which business process would you like to automate first?";
+  }
+
+  // 5. Contact information
+  if (q.includes('contact') || q.includes('call') || q.includes('phone') || q.includes('email') || q.includes('reach') || q.includes('address') || q.includes('location') || q.includes('whatsapp') || q.includes('touch')) {
+    return "We'd love to connect with you! Here is how you can reach **Shaivika IT Technologies**:\n\n" +
+      "• 📱 **Phone / WhatsApp**: [+91 7981431094](tel:+917981431094)\n" +
+      "• 💬 **WhatsApp Quick Chat**: Send keyword **START** to [+91 7981431094](https://wa.me/917981431094?text=START)\n" +
+      "• ✉️ **Email**: [shaivikagroups@gmail.com](mailto:shaivikagroups@gmail.com)\n" +
+      "• 📍 **Headquarters**: Kadapa, Andhra Pradesh, India\n" +
+      "• 🌐 **Website**: [shaivikaittechnologies.in](https://shaivikaittechnologies.in/)\n\n" +
+      "Our team is available to assist you with free consultations and project estimates!";
+  }
+
+  // 6. Services overview
+  if (q.includes('service') || q.includes('offer') || q.includes('do') || q.includes('work') || q.includes('solution') || q.includes('help')) {
+    return "At **Shaivika IT Technologies**, we deliver comprehensive digital solutions to help your business automate and scale:\n\n" +
+      "1. **AI Chatbots & Virtual Assistants** (Website & WhatsApp automation)\n" +
+      "2. **Custom Website & Full-Stack Web App Development**\n" +
+      "3. **CRM, ERP & Business Process Automation**\n" +
+      "4. **AI Video Advertisements & Digital Content Creation**\n" +
+      "5. **SaaS Platforms & Custom Cloud Portals**\n" +
+      "6. **API Integrations & Custom Webhooks**\n" +
+      "7. **UI/UX Design & Conversion Optimization**\n\n" +
+      "Which of these solutions are you most interested in exploring?";
+  }
+
+  // Default friendly welcome response
+  return "Thank you for reaching out to **Shaivika IT Technologies**! 🌟\n\n" +
+    "Brand Tagline: *'Automate. Scale. Grow.'*\n\n" +
+    "We specialize in **AI Chatbots**, **Full-Stack Web Development**, **CRM/ERP Automations**, and **Business Growth Systems**.\n\n" +
+    "You can ask me about:\n" +
+    "• Our services & capabilities\n" +
+    "• Pricing plans (starting from ₹5,000)\n" +
+    "• How AI automation can save your team hours every day\n" +
+    "• Direct contact with our technical team\n\n" +
+    "How can I assist your business growth today?";
+}
 
 // In-memory rate limiting for public submissions (per IP)
 const submissionTracker = new Map();
@@ -460,6 +544,143 @@ exports.handler = async (event, context) => {
           statusCode: 200,
           headers: corsHeaders,
           body: JSON.stringify({ status: 'success', jobs: [] })
+        };
+      }
+    }
+
+    // 6. PUBLIC AI CHATBOT INTERACTION (n8n Webhook Proxy with Fallback)
+    if (action === 'chatMessage') {
+      if (!checkPublicRateLimit(clientIp)) {
+        auditLog(clientIp, 'chat_rate_limited', 'public_chatbot', 'blocked');
+        return {
+          statusCode: 429,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            status: 'error',
+            code: 'RATE_LIMITED',
+            message: 'Too many messages sent. Please wait a moment before sending another message.'
+          })
+        };
+      }
+
+      const rawMessage = String(body.message || body.chatInput || query.message || '').trim();
+      if (!rawMessage) {
+        return {
+          statusCode: 400,
+          headers: corsHeaders,
+          body: JSON.stringify({ status: 'error', error: 'Message cannot be empty.', message: 'Message cannot be empty.' })
+        };
+      }
+
+      if (rawMessage.length > 1000) {
+        return {
+          statusCode: 400,
+          headers: corsHeaders,
+          body: JSON.stringify({ status: 'error', error: 'Message exceeds 1,000 characters limit.', message: 'Message exceeds 1,000 characters limit.' })
+        };
+      }
+
+      const sessionId = String(body.sessionId || ('session_' + clientIp.replace(/[^a-zA-Z0-9]/g, ''))).slice(0, 100);
+      const cleanMessage = sanitizeFormula(rawMessage);
+
+      auditLog(clientIp, 'chat_message_received', sessionId, 'in_progress');
+
+      try {
+        const n8nPayload = {
+          message: cleanMessage,
+          chatInput: cleanMessage,
+          sessionId: sessionId,
+          timestamp: new Date().toISOString()
+        };
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 18000);
+
+        const response = await fetch(N8N_CHAT_WEBHOOK, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/plain, */*'
+          },
+          body: JSON.stringify(n8nPayload),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const contentType = response.headers.get('content-type') || '';
+          let aiText = '';
+
+          if (contentType.includes('application/json')) {
+            const data = await response.json();
+            if (typeof data === 'string') {
+              aiText = data;
+            } else if (data && typeof data === 'object') {
+              aiText = data.output || data.response || data.text || data.message || (data.data && data.data.text) || '';
+              if (!aiText && Array.isArray(data) && data[0]) {
+                const first = data[0];
+                aiText = first.output || first.response || first.text || first.message || (typeof first === 'string' ? first : '');
+              }
+            }
+          } else {
+            aiText = await response.text();
+          }
+
+          // If n8n returned default "Workflow was started", the Webhook node hasn't been set to wait for AI output
+          if (aiText && typeof aiText === 'string' && aiText.trim() === 'Workflow was started') {
+            auditLog(clientIp, 'chat_n8n_immediate_notice', sessionId, 'fallback');
+            const fallbackReply = generateFallbackChatResponse(cleanMessage);
+            return {
+              statusCode: 200,
+              headers: corsHeaders,
+              body: JSON.stringify({
+                status: 'success',
+                reply: fallbackReply,
+                source: 'verified_knowledge_base',
+                n8nNotice: 'n8n Webhook responded immediately ("Workflow was started"). To return the AI output directly, set Webhook "Respond" to "Using Respond to Webhook Node" or "When Last Node Finishes".'
+              })
+            };
+          }
+
+          if (aiText && typeof aiText === 'string' && aiText.trim()) {
+            auditLog(clientIp, 'chat_message_responded', sessionId, 'success');
+            return {
+              statusCode: 200,
+              headers: corsHeaders,
+              body: JSON.stringify({
+                status: 'success',
+                reply: aiText.trim(),
+                source: 'n8n_workflow'
+              })
+            };
+          }
+        }
+
+        // If n8n returned a non-200 (e.g. 404 webhook inactive in n8n canvas) or empty response:
+        auditLog(clientIp, 'chat_n8n_offline_fallback', sessionId, 'fallback');
+        const fallbackReply = generateFallbackChatResponse(cleanMessage);
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            status: 'success',
+            reply: fallbackReply,
+            source: 'verified_knowledge_base',
+            notice: 'n8n workflow is currently standby.'
+          })
+        };
+
+      } catch (err) {
+        console.warn('n8n proxy error, utilizing verified knowledge fallback:', err.message);
+        const fallbackReply = generateFallbackChatResponse(cleanMessage);
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            status: 'success',
+            reply: fallbackReply,
+            source: 'verified_knowledge_base'
+          })
         };
       }
     }

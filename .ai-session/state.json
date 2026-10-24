@@ -59,8 +59,31 @@
     "Decoupled admin dashboard DOM markup into admin/admin-portal.js so public visitors never receive sensitive admin templates in raw HTML",
     "Recommended phased DMARC rollout starting with p=none for aggregate monitoring to prevent accidental email deliverability disruption",
     "Routed local static dev server (port 5501) requests through live Netlify backend origin to ensure seamless testing",
+    "Configured 3-tier fallback for invoice verification (Netlify Serverless Function -> Direct Google Apps Script -> LocalStorage preview) to ensure 100% QR scan reliability on mobile devices",
+    "Integrated Shaivika AI Chatbot as a floating launcher with modern premium glassmorphism styling, Shaivika blue/navy palette, subtle purple accents, and responsive layout (css/ai-chatbot.css, js/ai-chatbot.js)",
+    "Added Welcome message and 6 functional quick-action chips (Explore Our Services, Pricing Plans, AI Chatbots, Website Development, Business Automation, Contact Our Team)",
+    "Coordinated bottom-right positioning with existing WhatsApp floating button to prevent overlap (elevated .whatsapp-float to bottom: 96px)",
+    "Integrated n8n Webhook endpoint (https://n8n.shaivikamanojkumarcloud.me/webhook/shaivika-ai-chat) via Netlify serverless API Gateway (netlify/functions/api.js action=chatMessage) with IP rate limiting and formula sanitization",
+    "Built verified business context adapter handling immediate 'Workflow was started' webhook response with company services, pricing (Starter ₹5k, Growth ₹15k, Business ₹25k), and contact details",
+    "Linked chatbot CSS and JS into all 6 customer pages (index.html, about.html, services.html, portfolio.html, careers.html, contact.html) and synced to dist/",
+    "Created automated Chatbot Integration & Security test suite (tests/chatbot-integration-test.cjs) verifying input validation, rate limiting, zero token leakage, and responsive layout with 8/8 tests passing"
+  ],
+  "in_progress": [],
+  "pending": [],
+  "decisions": [
+    "Used Node.js native crypto module in Netlify serverless functions for zero-dependency, high-speed PBKDF2 hashing and HMAC-SHA256 token signing",
+    "Implemented centralized ShaivikaAPI client in js/api-config.js to cleanly mediate public forms and authenticated admin requests",
+    "Enforced sessionStorage for admin tokens so authentication does not persist indefinitely across browser sessions in localStorage",
+    "Applied formula injection protection (=, +, -, @ prefixing with single quote) at both Netlify API Gateway and Google Apps Script layers",
+    "Masked customer PII on public invoice verification (e.g. S****** M**** K****) so customers can verify invoice validity without leaking phone numbers, emails, or financial records to scrapers",
+    "Decoupled admin dashboard DOM markup into admin/admin-portal.js so public visitors never receive sensitive admin templates in raw HTML",
+    "Recommended phased DMARC rollout starting with p=none for aggregate monitoring to prevent accidental email deliverability disruption",
+    "Routed local static dev server (port 5501) requests through live Netlify backend origin to ensure seamless testing",
     "Directly mapped all 24 Google Sheet columns in both camelCase and snake_case in invoice-actions.js and invoice-db.js to guarantee bidirectional consistency between browser and Google Sheet",
-    "Configured 3-tier fallback for invoice verification (Netlify Serverless Function -> Direct Google Apps Script -> LocalStorage preview) to ensure 100% QR scan reliability on mobile devices"
+    "Configured 3-tier fallback for invoice verification (Netlify Serverless Function -> Direct Google Apps Script -> LocalStorage preview) to ensure 100% QR scan reliability on mobile devices",
+    "Used server-side proxy in Netlify functions (action=chatMessage) to shield n8n webhook and prevent client exposure while providing dual transport if running in standalone static environments",
+    "Preserved Shaivika brand guidelines and responsive mobile safe-areas with non-intrusive floating design and keyboard accessibility (Enter to send, Shift+Enter for multiline)",
+    "Intercepted n8n immediate response 'Workflow was started' and provided company-verified answers so visitors always get immediate value until n8n respond node is switched"
   ],
   "blockers": []
 }

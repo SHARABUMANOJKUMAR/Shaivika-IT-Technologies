@@ -179,7 +179,39 @@ Centralized gateway mediating public submissions and privileged administrative o
 { "status": "success", "message": "Application submitted successfully." }
 ```
 
-### 2.4 Privileged Operations (Requires `Authorization: Bearer <token>`)
+### 2.4 Public: AI Chatbot Assistant (`action: "chatMessage"`)
+- **Method**: `POST`
+- **URL**: `/.netlify/functions/api?action=chatMessage`
+- **Protection**: IP-based rate limiting (max 10 requests / 10 minutes), formula injection sanitization, maximum message length enforcement (1,000 characters).
+- **Security Guarantee**: OpenRouter credentials and n8n private configs remain 100% server-side. Dual transport gracefully connects via Netlify serverless proxy or direct n8n webhook.
+- **Request Payload**:
+```json
+{
+  "action": "chatMessage",
+  "message": "What are your services and pricing?",
+  "sessionId": "session_visitor_12345"
+}
+```
+- **Success Response (200 OK)**:
+```json
+{
+  "status": "success",
+  "reply": "Welcome to Shaivika IT Technologies! We offer AI chatbots, web and app development, lead generation, and business automation systems. Our advertised packages start at ₹5,000 for Starter, ₹15,000 for Growth, and ₹25,000 for Business.",
+  "sessionId": "session_visitor_12345",
+  "source": "n8n_workflow"
+}
+```
+- **Error Responses**:
+  - `400 Bad Request` (Empty or oversized input):
+    ```json
+    { "status": "error", "error": "Message cannot be empty.", "message": "Message cannot be empty." }
+    ```
+  - `429 Too Many Requests` (Rate limit exceeded):
+    ```json
+    { "status": "error", "code": "RATE_LIMITED", "message": "Too many messages sent. Please wait a moment before sending another message." }
+    ```
+
+### 2.5 Privileged Operations (Requires `Authorization: Bearer <token>`)
 
 | Action | HTTP Method | Payload Parameters | Purpose |
 | :--- | :--- | :--- | :--- |
