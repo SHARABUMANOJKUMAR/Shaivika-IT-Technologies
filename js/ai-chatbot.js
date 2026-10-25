@@ -165,12 +165,12 @@
         <div class="shaivika-chat-header">
           <div class="shaivika-chat-header-info">
             <div class="shaivika-chat-avatar-robot" id="shaivikaHeaderAvatar">
-              <img src="${CONFIG.ROBOT_IMAGE_URL}" alt="Shaivika AI Robot" width="44" height="44" loading="lazy">
+              <img src="${CONFIG.ROBOT_IMAGE_URL}" alt="Shaivika AI Robot" width="40" height="40" loading="lazy">
               <span class="shaivika-status-dot-robot" id="shaivikaHeaderStatusDot"></span>
             </div>
             <div class="shaivika-chat-titles">
               <div class="shaivika-header-title-row">
-                <h3>Shaivika AI Assistant</h3>
+                <h3 class="shaivika-header-title">Shaivika AI <span class="shaivika-title-extra">Assistant</span></h3>
                 <span class="shaivika-sparkle-pill">AI 2.0</span>
               </div>
               <div class="shaivika-chat-status" id="shaivikaChatStatusText">
@@ -180,17 +180,17 @@
           </div>
           <div class="shaivika-chat-actions">
             <button class="shaivika-header-btn" id="shaivikaResetChatBtn" title="Reset conversation" aria-label="Reset conversation">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                 <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
               </svg>
             </button>
             <button class="shaivika-header-btn" id="shaivikaMinimizeChatBtn" title="Minimize chat" aria-label="Minimize chat">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                 <path d="M19 13H5v-2h14v2z"/>
               </svg>
             </button>
             <button class="shaivika-header-btn" id="shaivikaCloseChatBtn" title="Close chat" aria-label="Close chat">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
               </svg>
             </button>
