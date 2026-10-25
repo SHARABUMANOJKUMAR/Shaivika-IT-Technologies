@@ -251,11 +251,13 @@ The Google Apps Script acts as an authenticated private storage tier.
 
 ## 4. Live Google Sheets & Dedicated WebApp Deployments
 
-The Shaivika IT Technologies ecosystem connects to three dedicated live Google Spreadsheets mediated securely by the Netlify API Gateway:
+The Shaivika IT Technologies ecosystem connects to dedicated live Google Spreadsheets mediated securely by the Netlify API Gateway:
 
 | Service | Google Spreadsheet ID & Link | Deployed WebApp URL | Purpose & Integration |
 | :--- | :--- | :--- | :--- |
 | **Contact Form** | [`19Sa9Bh6_cEs-oTUEPRRgQURpC5BaOwYfhaoF6nFBCMU`](https://docs.google.com/spreadsheets/d/19Sa9Bh6_cEs-oTUEPRRgQURpC5BaOwYfhaoF6nFBCMU/edit) | `https://script.google.com/macros/s/AKfycbz2ryEdo__YgiFBkps9pj4kLw5vFW3Uhvv0lSGJ1SNP3uW3n6YXv5sJe077GPvWM4gVAA/exec` | Ingests validated inquiries from `contact.html` via `ShaivikaAPI.submitLead()`. Rate limited with honeypot bot trap. |
 | **Portfolio Projects** | [`1Z59x7O4SRh42SWDO-HWuMmcT5lRXZZ-A3rR95C9ZeHc`](https://docs.google.com/spreadsheets/d/1Z59x7O4SRh42SWDO-HWuMmcT5lRXZZ-A3rR95C9ZeHc/edit) | `https://script.google.com/macros/s/AKfycbwBnqwzKd77hBm3Ij8AtoXRnChjQrTgVv_wu3VFIXPKG8vtkNQ81A7TlarM67Kzl76t/exec` | Feeds the dynamic portfolio projects to `portfolio.html` and enables authenticated 2-way sync with the Admin Portal. |
 | **Subscribers (Newsletter)** | [`1GXysNjTgxd1BiDluP7OVkL2YmAUBVBzm0-ZNXEzNmAA`](https://docs.google.com/spreadsheets/d/1GXysNjTgxd1BiDluP7OVkL2YmAUBVBzm0-ZNXEzNmAA/edit) | `https://script.google.com/macros/s/AKfycbygI-tj94XyLqm8Lp5q-JU5_TVhbFVnRCtF-DAN1QOQHGrinCqj7ba_hyo4urKoXIw-qg/exec` | Captures newsletter subscriptions across all website footers. Script in `google-apps-script/SubscribersCode.gs` handles duplicate prevention and formula escaping. |
+| **Invoices & Billing** | [`1cDSJw5WeiaQeZ2jLERTTu4YycYVpwoceo65BCYz3N1Y`](https://docs.google.com/spreadsheets/d/1cDSJw5WeiaQeZ2jLERTTu4YycYVpwoceo65BCYz3N1Y/edit?gid=998665391#gid=998665391) | `https://script.google.com/macros/s/AKfycbyoSibvTqZNQbmm5AhtYZVUYiy8zUYoToPeQGzY6je3MUPqFJAZO9mk_xa9vT73Fx186w/exec` | Stores 24-column invoice records from Invoice Builder (`/invoice/`) and powers QR code scanning verification (`/verify.html`) via Netlify serverless proxy. |
+
 
