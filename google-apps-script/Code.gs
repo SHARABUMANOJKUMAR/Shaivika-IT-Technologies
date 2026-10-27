@@ -175,7 +175,7 @@ function verifySingleInvoice(invoiceId) {
         invoice: {
           invoiceNumber: String(row[2]),
           status: status,
-          customerName: maskName(String(row[4])),
+          customerName: String(row[4] || 'Valued Customer'),
           service: String(row[7]),
           totalAmount: Number(row[14] || 0),
           invoiceDate: row[15] instanceof Date ? row[15].toISOString() : String(row[15]),

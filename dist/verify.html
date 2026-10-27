@@ -251,8 +251,7 @@
                         return num === search || id === search;
                     });
                     if (found) {
-                        const rawName = String(found['Customer Name'] || found.customer_name || found.customerName || 'Valued Customer');
-                        const maskedName = rawName.split(' ').map(p => p.length > 1 ? p[0] + '*'.repeat(p.length - 1) : p).join(' ');
+                        const customerName = String(found['Customer Name'] || found.customer_name || found.customerName || 'Valued Customer');
                         const serv = String(found['Service'] || found.service_name || found.service || 'Professional Services');
                         const tot = Number(found['Total Amount'] || found.total_amount || found.totalAmount || 0);
                         return {
@@ -260,8 +259,8 @@
                             invoice_number: found['Invoice Number'] || found.invoice_number || found.invoiceNumber || verifyId,
                             invoiceDate: found['Invoice Date'] || found.invoice_date || found.invoiceDate || '',
                             invoice_date: found['Invoice Date'] || found.invoice_date || found.invoiceDate || '',
-                            customerName: maskedName,
-                            customer_name: maskedName,
+                            customerName: customerName,
+                            customer_name: customerName,
                             service: serv,
                             service_name: serv,
                             totalAmount: tot,
@@ -285,12 +284,11 @@
                 return num === verifyId.toLowerCase() || id === verifyId.toLowerCase();
             });
             if (found) {
-                const rawName = String(found.customer_name || found.customerName || 'Valued Customer');
-                const masked = rawName.split(' ').map(p => p.length > 1 ? p[0] + '*'.repeat(p.length - 1) : p).join(' ');
+                const customerName = String(found.customer_name || found.customerName || 'Valued Customer');
                 return {
                     ...found,
-                    customerName: masked,
-                    customer_name: masked
+                    customerName: customerName,
+                    customer_name: customerName
                 };
             }
             return null;

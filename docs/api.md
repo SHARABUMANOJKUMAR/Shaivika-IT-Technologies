@@ -111,7 +111,7 @@ Centralized gateway mediating public submissions and privileged administrative o
   "invoice": {
     "invoiceNumber": "INV-2026-0001",
     "invoiceDate": "2026-08-01T00:00:00.000Z",
-    "customerName": "S****** M**** K****",
+    "customerName": "SMR Car Travels",
     "service": "Web Development & AI Automation",
     "totalAmount": 25000,
     "status": "PAID",

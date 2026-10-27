@@ -272,7 +272,7 @@ exports.handler = async (event, context) => {
         if (found) {
           const invStatus = String(found['Status'] || found.status || 'ACTIVE');
           const rawCustomerName = String(found['Customer Name'] || found.customer_name || found.customerName || 'Valued Customer');
-          const safeName = maskCustomerName(rawCustomerName);
+          const customerName = rawCustomerName;
           const serviceName = String(found['Service'] || found.service_name || found.service || 'Professional Services');
           const totalAmt = Number(found['Total Amount'] || found.total_amount || found.totalAmount || 0);
           const invDate = found['Invoice Date'] || found.invoice_date || found.invoiceDate || '';
@@ -284,7 +284,7 @@ exports.handler = async (event, context) => {
             invoice: {
               invoiceNumber: found['Invoice Number'] || found.invoice_number || found.invoiceNumber || invoiceId,
               invoiceDate: invDate,
-              customerName: safeName,
+              customerName: customerName,
               service: serviceName,
               totalAmount: totalAmt,
               status: invStatus,
