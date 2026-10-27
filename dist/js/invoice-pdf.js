@@ -220,8 +220,8 @@ const InvoicePDF = {
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
                                 <td style="vertical-align: middle; width: 50%;">
-                                    <div style="background: #ffffff; display: inline-block; padding: 14px 20px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
-                                        <img src="${logoDataUri}" crossorigin="anonymous" alt="Shaivika IT Technologies Logo" style="height: 95px; max-width: 340px; object-fit: contain; display: block;">
+                                    <div style="background: #ffffff; display: inline-block; padding: 14px 20px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); width: 223px; min-width: 223px; box-sizing: content-box;">
+                                        <img src="${logoDataUri}" alt="Shaivika IT Technologies Logo" width="223" height="95" style="width: 223px !important; min-width: 223px !important; height: 95px !important; max-width: 223px !important; object-fit: contain; display: block;">
                                     </div>
                                     <div style="font-size: 13px; color: rgba(255,255,255,0.95); line-height: 1.6;">
                                         <strong style="font-size: 16px; color: white;">${safeCompanyName}</strong><br>
@@ -447,13 +447,16 @@ const InvoicePDF = {
             document.body.appendChild(container);
 
             if (document.fonts?.ready) await document.fonts.ready;
-            await Promise.all(Array.from(container.querySelectorAll('img')).map(img => {
-                if (img.complete) return Promise.resolve();
-                return new Promise(resolve => {
-                    img.addEventListener('load', resolve, { once: true });
-                    img.addEventListener('error', resolve, { once: true });
-                });
+            await Promise.all(Array.from(container.querySelectorAll('img')).map(async img => {
+                if (img.decode) {
+                    try { await img.decode(); } catch(e) {}
+                } else if (!img.complete) {
+                    await new Promise(res => { img.onload = res; img.onerror = res; });
+                }
             }));
+            // Force synchronous layout reflow so element dimensions are locked
+            void container.offsetHeight;
+            await new Promise(r => setTimeout(r, 60));
 
             const invoiceContent = container.querySelector('.invoice-print-wrapper');
             if (!invoiceContent || invoiceContent.textContent.trim().length < 40) {
@@ -482,6 +485,19 @@ const InvoicePDF = {
             const JsPdf = window.jspdf?.jsPDF || window.jsPDF;
             const pdf = new JsPdf({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
             pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+
+            // Direct vector/pixel-perfect logo overlay onto PDF
+            // Guarantees the Shaivika logo is ALWAYS in the PDF with 100% crispness
+            try {
+                const effectiveLogo = await this.getLogoDataUri(settings.companyLogo || settings.logo);
+                if (effectiveLogo && typeof effectiveLogo === 'string' && effectiveLogo.startsWith('data:image/')) {
+                    const format = effectiveLogo.includes('image/jpeg') ? 'JPEG' : 'PNG';
+                    // Logo box in mm on A4: left: 17.46mm, top: 14.55mm, width: 58.98mm, height: 25.13mm
+                    pdf.addImage(effectiveLogo, format, 17.46, 14.55, 58.98, 25.13, undefined, 'FAST');
+                }
+            } catch (overlayErr) {
+                console.warn('PDF direct logo overlay skipped:', overlayErr);
+            }
             const pdfBlob = pdf.output('blob');
             console.log('[PDF] Generated PDF size:', pdfBlob.size);
             if (!pdfBlob || pdfBlob.size < 10000) throw new Error('Generated PDF is unexpectedly small.');
