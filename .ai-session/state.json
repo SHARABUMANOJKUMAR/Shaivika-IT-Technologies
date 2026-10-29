@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-30T03:31:00Z",
+  "last_updated": "2026-10-30T03:43:00Z",
   "completed": [
     "Comprehensive architecture & codebase study across all HTML, CSS, and JS components",
     "Audited broken links, missing assets, and navigation selectors across all pages",
@@ -57,7 +57,8 @@
     "Fixed QR code verification page Billed To field across verify.html, dist/verify.html, netlify/functions/api.js, and google-apps-script/Code.gs to display the authentic customer name (e.g. SMR Car Travels) instead of asterisks/masked characters (S** C** T******)",
     "Hardened invoice PDF logo rendering with explicit 223px box dimensions, asynchronous image pre-decoding (img.decode), and direct vector/pixel-perfect jsPDF image overlay (x: 17.46mm, y: 14.55mm, w: 58.98mm, h: 25.13mm), guaranteeing the Shaivika logo is ALWAYS present in downloaded PDFs across all browser engines",
     "Updated netlify.toml /js/* cache policy to 'public, max-age=0, must-revalidate' and bumped script cachebuster to ?v=3.5.0 in admin/index.html to ensure client browsers immediately execute updated invoice generator logic",
-    "Updated Google Maps location in contact.html (Find Us in Kadapa section) with the new Kadapa location (lat 14.472747, lng 78.8024194, place ID 0x3bb37210d4f26f87:0xaf158859a18a02a0), added direct clickable links to the Google Maps URL on the Address info card and Office Location detail, and synchronized dist/contact.html"
+    "Updated Google Maps location in contact.html (Find Us in Kadapa section) with the new Kadapa location (lat 14.472747, lng 78.8024194, place ID 0x3bb37210d4f26f87:0xaf158859a18a02a0), added direct clickable links to the Google Maps URL on the Address info card and Office Location detail, and synchronized dist/contact.html",
+    "Fixed CSP frame-src in netlify.toml from 'none' to allow Google Maps iframes ('self' https://www.google.com https://maps.google.com) to resolve iframe blocked error, and updated all LinkedIn social links across index, about, services, portfolio, careers, and contact pages to https://www.linkedin.com/company/shaivikagroups/"
   ],
   "in_progress": [],
   "pending": [],
